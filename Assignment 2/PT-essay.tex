@@ -1,0 +1,88 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LATEX-TEMPLATE TECHNISCH RAPPORT
+%-------------------------------------------------------------------------------
+% This template is derived from the AVI PT report template.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%-------------------------------------------------------------------------------
+%	PACKAGES EN DOCUMENT CONFIGURATIE
+%-------------------------------------------------------------------------------
+
+\documentclass{uva-inf-article}
+%\usepackage[dutch]{babel}
+%\usepackage{csquotes}
+
+\usepackage[style=numeric-comp]{biblatex}
+\addbibresource{PT-essay.bib}
+
+%-------------------------------------------------------------------------------
+%	GEGEVENS VOOR IN DE TITEL
+%-------------------------------------------------------------------------------
+
+% Vul de naam van de opdracht in.
+\assignment{Assignment 2}
+% Vul het soort opdracht in.
+\assignmenttype{Essay}
+% Vul de titel van de eindopdracht in.
+\title{Lexicographic Analysis}
+
+% Vul de volledige namen van alle auteurs in.
+\author{René Kok}
+\author{TODO}
+
+% Vul de corresponderende UvAnetID's in.
+\uvanetid{13671146}
+\uvanetid{TODO}
+
+% Vul eventueel ook de naam van de docent of vakcoordinator toe.
+\docent{Dhr. dr. C.U. (Clemens) Grelck}
+\course{Compiler Construction}
+% Te vinden op onder andere Datanose.
+\courseid{5062COMP6Y}
+
+% Dit is de datum die op het document komt te staan. Standaard is dat vandaag.
+\date{\today}
+
+%-------------------------------------------------------------------------------
+%	VOORPAGINA
+%-------------------------------------------------------------------------------
+
+\begin{document}
+\maketitle
+
+%-------------------------------------------------------------------------------
+%	INHOUDSOPGAVE EN ABSTRACT
+%-------------------------------------------------------------------------------
+
+% Niet doen bij korte verslagen en rapporten
+%\tableofcontents
+%\begin{abstract}
+%\lipsum[13]
+%\end{abstract}
+
+%-------------------------------------------------------------------------------
+%	INTRODUCTIE
+%-------------------------------------------------------------------------------
+
+\section{Introduction}
+\lipsum[1]
+
+%-------------------------------------------------------------------------------
+%	METHODE
+%-------------------------------------------------------------------------------
+
+\section{Assignment}
+%\lipsum[3]
+\subsection{Thompson’s Construction}
+\subsection{Subset Construction}
+\subsection{Hopcroft’s Algorithm}
+\subsection{Direct-coded Scanner}
+
+%-------------------------------------------------------------------------------
+%	BIJLAGEN EN EINDE
+%-------------------------------------------------------------------------------
+
+%\section{Bijlage A}
+%\section{Bijlage B}
+%\section{Bijlage C}
+\end{document}
