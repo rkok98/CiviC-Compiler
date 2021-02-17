@@ -8,6 +8,8 @@
 \usepackage{tikz}
 \usetikzlibrary{automata,positioning}
 
+\usepackage{listings}
+
 %-------------------------------------------------------------------------------
 %	GEGEVENS VOOR IN DE TITEL
 %-------------------------------------------------------------------------------
@@ -63,8 +65,12 @@
 %	METHODE
 %-------------------------------------------------------------------------------
 
+\newpage
 \section{Assignment}
+
 \subsection{Thompson’s Construction}
+\lipsum[1]
+\begin{figure}[h]
 \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
     \node[state, initial](0) {0};
     \node[state, below right=of 0](1){1};
@@ -89,8 +95,14 @@
     (7) edge node {$\epsilon$} (8)
     (8) edge node {$\epsilon$} (9)
         edge [bend left] node {$\epsilon$} (1);
- \end{tikzpicture}
+\end{tikzpicture}
+\caption{Final non-deterministic finite automaton for "(ac$\mid$ab)*"}
+\end{figure}
 \subsection{Subset Construction}
+\lipsum[1]
 \subsection{Hopcroft’s Algorithm}
+\lipsum[1]
 \subsection{Direct-coded Scanner}
+\lipsum[1]
+\lstinputlisting[language=C]{code.c}
 \end{document}
