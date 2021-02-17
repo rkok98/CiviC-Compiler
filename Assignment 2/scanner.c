@@ -1,11 +1,7 @@
 /**
- * Authors: René Kok & Aram Mutlu
+ * Authors: Rene Kok & Aram Mutlu
  * Scanner for the (ab|ac)* regex
- * 
- * @param FILE the File to parse
- * @return buffer | NULL
- * 
-*/
+ */
 
 char *scanner(FILE *stream)
 {
