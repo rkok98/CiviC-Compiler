@@ -64,31 +64,32 @@
 %-------------------------------------------------------------------------------
 
 \section{Assignment}
+%\lipsum[3]
 \subsection{Thompson’s Construction}
 \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
     \node[state, initial](0) {0};
     \node[state, below right=of 0](1){1};
-    \node[state, right=of 1](5){5};
-    \node[state, above=of 5](2){2};
+    \node[state, above right=of 1](2){2};
     \node[state, right=of 2](3){3};
     \node[state, right=of 3](4){4};
+    \node[state, right=of 1](5){5};
     \node[state, right=of 5](6){6};
     \node[state, right=of 6](7){7};
     \node[state, right=of 7](8){8};
     \node[state, accepting, above right=of 8](9){9};
     \path[->] 
-    (0) edge node {$\epsilon$} (1)
-        edge [bend left] node {$\epsilon$} (9)
-    (1) edge node {$\epsilon$} (2)
-        edge node {$\epsilon$} (5)
-    (2) edge node {a} (3)
-    (3) edge node {b} (4)
-    (4) edge node {$\epsilon$} (8)
-    (5) edge node {a} (6)
-    (6) edge node {c} (7)
-    (7) edge node {$\epsilon$} (8)
-    (8) edge node {$\epsilon$} (9)
-        edge [bend left] node {$\epsilon$} (1);
+    (0) edge node {0} (1)
+        edge node {0} (9)
+    (1) edge node {0} (2)
+        edge node {0} (5)
+    (2) edge node {0} (3)
+    (3) edge node {0} (4)
+    (4) edge node {0} (8)
+    (5) edge node {0} (6)
+    (6) edge node {0} (7)
+    (7) edge node {0} (8)
+    (8) edge node {0} (9)
+        edge node {0} (1);
  \end{tikzpicture}
 \subsection{Subset Construction}
 \subsection{Hopcroft’s Algorithm}
