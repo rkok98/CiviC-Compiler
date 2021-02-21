@@ -2,7 +2,6 @@
  * Authors: Rene Kok & Aram Mutlu
  * Scanner for the (ab|ac)* regex
  */
-
 char *scanner(FILE *stream)
 {
     static char buffer[max]; //  fixed  size  buffer  for  token

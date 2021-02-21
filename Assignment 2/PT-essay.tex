@@ -61,7 +61,7 @@
 \section{Introduction}
 \begin{flushleft}
 \par This report provides information regarding the second assignment 
-     "Lexicographic Analysis" of the course Compiler Construction given by Dhr. dr. C.U. Grelck. 
+     "Lexicographic Analysis" of the course Compiler Construction lectured by Dhr. dr. C.U. Grelck. 
      The goal of this assignment is to create a Direct-coded Scanner of the regex "(ac$\mid$ab)*". To accomplish this we will pay particular attention to 
      Thompson’s Construction, Subset Construction, Hopcroft’s Algorithm and as last create a Direct-coded Scanner. In each section we will go deeper 
      in the steps taken to accomplish the goal of the assignment.
@@ -82,7 +82,6 @@
     \par It starts with defining an automaton that recognizes "ac" (see Figure ~\ref{fig:ThCoStep1}).
 
     \begin{figure}[h]
-        \label{fig:ThCoStep1}
         \centering
         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
             \node[state, initial](2){2};
@@ -93,12 +92,12 @@
             (3) edge node {c} (4);
         \end{tikzpicture}
         \caption{Step 1 creating NFA for "ac" $\rightarrow$ (ac$\mid$ab)*}
+        \label{fig:ThCoStep1}
     \end{figure}
 
     \par Then the automaton for recognizing "ab" is defined (see Figure ~\ref{fig:ThCoStep2}).
 
     \begin{figure}[h]
-        \label{fig:ThCoStep2}
         \centering
         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
             \node[state, initial](2){2};
@@ -114,13 +113,13 @@
             (6) edge node {b} (7);
         \end{tikzpicture}
         \caption{Step 2 creating NFA for (ab) $\rightarrow$ (ac$\mid$ab)*}
+        \label{fig:ThCoStep2}
     \end{figure}
 
     \par Because the regex expression matches either "ab" or "ab", the two automatons are linked by an alternation 
          (see Figure ~\ref{fig:ThCoStep3}).
 
     \begin{figure}[h]
-        \label{fig:ThCoStep3}
         \centering
         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
             \node[state, initial](1){1};
@@ -142,6 +141,7 @@
             (7) edge node {$\epsilon$} (8);
         \end{tikzpicture}
         \caption{Step 3 creating NFA for (ac$\mid$ab) $\rightarrow$ (ac$\mid$ab)*}
+        \label{fig:ThCoStep3}
     \end{figure}
     
     \newpage
@@ -149,7 +149,6 @@
          creating the final automaton for the regex expression (see Figure ~\ref{fig:NFA}).
 
     \begin{figure}[h]
-        \label{fig:NFA}
         \centering
         \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
             \node[state, initial](0) {0};
@@ -177,6 +176,7 @@
                 edge [bend left] node {$\epsilon$} (1);
         \end{tikzpicture}
         \caption{Final non-deterministic finite automaton for (ac$\mid$ab)*}
+        \label{fig:NFA}
     \end{figure}
 
 \newpage
@@ -184,7 +184,6 @@
     \par Based on the NFA diagram (see Figure ~\ref{fig:NFA}), the following subset construction has been drawn up:
     \begin{table}[h!]
         \begin{center}
-            \label{tab:table1}
             \begin{tabular}{l|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
                 \textbf{State} & \textbf{$\epsilon$-closures} \\
                 \hline
@@ -200,6 +199,7 @@
                 \{9\} & \{9\} \\
             \end{tabular}
             \caption{Subset construction from NFA}
+            \label{tab:table1}
         \end{center}
     \end{table}
 
@@ -220,8 +220,10 @@
     (3) edge [bend left] node {a} (1);
 \end{tikzpicture}
 \caption{Deterministic finite automaton for (ac$\mid$ab)*}
+\label{fig:DFA}
 \end{figure}
 \subsection{Hopcroft’s Algorithm}
+\par The DFA diagram (see Figure ~\ref{fig:DFA}) has been minimized using Hopcroft's algorithm and resulted in the following diagram:
 \begin{figure}[h]
     \centering
 \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
@@ -232,9 +234,11 @@
     (1) edge [bend left] node {b,c} (0);
 \end{tikzpicture}
 \caption{Minimized deterministic finite automaton for (ac$\mid$ab)*}
+\label{fig:Min-DFA}
 \end{figure}
 \newpage
 \subsection{Direct-coded Scanner}
+\par Following direct-coded scanner has been constructed based on on the minimized DFA diagram (see Figure ~\ref{fig:Min-DFA}):
 \lstinputlisting[basicstyle=\small, language=C]{scanner.c}
 \end{flushleft}
 \end{document}
