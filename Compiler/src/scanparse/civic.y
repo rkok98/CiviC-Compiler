@@ -29,9 +29,12 @@ static int yyerror( char *errname);
  node               *node;
 }
 
-%token BRACKET_L BRACKET_R COMMA SEMICOLON
-%token MINUS PLUS STAR SLASH PERCENT LE LT GE GT EQ NE OR AND
-%token TRUEVAL FALSEVAL LET
+%token PARENTHESIS_L PARENTHESIS_R CURLY_L CURLY_R BRACKET_L BRACKET_R COMMA SEMICOLON
+%token MINUS PLUS STAR SLASH PERCENT LE LT GE GT EQ NE OR AND LET NEG
+%token INT FLOAT BOOL VOID TRUEVAL FALSEVAL
+%token EXTERN EXPORT RETURN
+%token IF ELSE DO WHILE FOR
+
 
 %token <cint> NUM
 %token <cflt> FLOAT
@@ -88,7 +91,7 @@ expr: constant
       {
         $$ = TBmakeVar( STRcpy( $1));
       }
-    | BRACKET_L expr binop expr BRACKET_R
+    | PARENTHESIS_L expr binop expr PARENTHESIS_R
       {
         $$ = TBmakeBinop( $3, $2, $4);
       }
