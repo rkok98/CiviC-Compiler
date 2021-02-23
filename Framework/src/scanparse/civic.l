@@ -49,13 +49,28 @@
 ">"                        { FILTER( GT);    }
 "=="                       { FILTER( EQ);    }
 "!="                       { FILTER( NE);    }
-"&&"                       { FILTER( AND);    }
+"&&"                       { FILTER( AND);   }
 "||"                       { FILTER( OR);    }
 
-"="                        { FILTER( LET);    }
+"="                        { FILTER( LET);   }
+
+"!"                        { FILTER( NEG);   }
+
+"void"                     { FILTER( VOID); }
 
 "true"                     { FILTER( TRUEVAL); }
 "false"                    { FILTER( FALSEVAL); }
+
+"int"                      { FILTER( INT); }
+"float"                    { FILTER( FLOAT); }
+"bool"                     { FILTER( BOOL); }
+
+"if"                       { FILTER( IF); }
+"else"                     { FILTER( ELSE); }
+"do"                       { FILTER( DO);}
+"while"                    { FILTER( WHILE); }
+"for"                      { FILTER( FOR); }
+
 
 [A-Za-z][A-Za-z0-9_]*      { yylval.id = STRcpy(yytext);
                              FILTER( ID);
@@ -65,6 +80,10 @@
                              FILTER( NUM);
                            }
 
+[0-9]*[.][0-9]+            { yylval.cflt = atof(yytext);  
+                             FILTER( FLOATNUM);
+                           }                           
+
 \n.*                       { global.line += 1;
                              global.col = 0;
                              yyless(1);
@@ -72,3 +91,8 @@
 
 [ \t]                      { global.col += yyleng;
                            } 
+
+[ \t\n]+                                  // White space
+"//".*                                    // Comments
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */ }
+[/][*]                                    { yy_fatal_error("Unterminated comment"); } 
