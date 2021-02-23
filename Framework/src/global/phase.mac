@@ -1,0 +1,79 @@
+/*
+ * Phase and subphase definitions
+ */
+
+
+#include "phase_initialise_defs.mac"
+
+/******************************************************************************/
+
+
+PHASE( ld,
+       "Loading CiviC program",
+       ALWAYS)
+
+SUBPHASE( cpp,
+          "Running C preprocessor",
+          SPdoRunPreProcessor, 
+          NEVER,
+          ld)
+
+SUBPHASE( scp,
+          "Reading input file",
+          SPdoScanParse, 
+          ALWAYS,
+          ld)
+
+ENDPHASE( ld) 
+
+
+/******************************************************************************/
+
+
+PHASE( pet,
+       "Perform example transformations",
+       ALWAYS)
+
+SUBPHASE( ri, 
+          "Rename identifiers",
+          RIdoRenameIdentifiers, 
+          ALWAYS,
+          pet)      
+
+SUBPHASE( si, 
+          "Sum Integers",
+          SIdoSumInts, 
+          ALWAYS,
+          pet)   
+   
+SUBPHASE( os, 
+          "Optimise subtraction",
+          OSdoOptSub, 
+          ALWAYS,
+          pet)   
+      
+ENDPHASE( pet) 
+
+
+/******************************************************************************/
+
+
+PHASE( cg,
+       "Generating Code",
+       ALWAYS)
+
+SUBPHASE( prt, "Generating byte code", GBCdoGenByteCode, ALWAYS, cg)      
+SUBPHASE( prt_ast, "Print ast", PRTdoPrint, ALWAYS, cg)      
+
+SUBPHASE( frtr, 
+          "De-allocating syntax tree representation",
+          FREEdoFreeTree, 
+          ALWAYS,
+          cg)
+
+ENDPHASE( cg) 
+
+
+/******************************************************************************/
+
+#include "phase_undefine_defs.mac"
