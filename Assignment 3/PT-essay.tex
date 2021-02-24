@@ -38,81 +38,81 @@
 \begin{document}
 \maketitle
 
-\section{Introduction}
 \begin{flushleft}
 
 %-------------------------------------------------------------------------------
 %	METHODE
 %-------------------------------------------------------------------------------
 
-\newpage
-\section{Assignment}
-\subsection{Precedence and Associativity}
+\section{Precedence and Associativity}
 \begin{figure}[h]
-    \begin{lstlisting}
-    Expr4   =>  Expr4 + Expr3 
-            |   Expr
+\begin{lstlisting}
+Expr4   =>  Expr4 + Expr3 
+        |   Expr3
 
-    Expr3   =>  - Expr3 
-            |   Expr
+Expr3   =>  - Expr3 
+        |   Expr2
 
-    Expr2   =>  Expr2 ++ 
-            |   Expr
-            
-    Expr1   =>  ( Expr4 ) 
-            |   Id
-    \end{lstlisting}
-    \caption{Grammar of expressions with proper precedence and associativity}
-    \label{fig:1}
-\end{figure}
-\subsection{Left- and Right-recursive Grammars}
-\begin{figure}[h]
-    \begin{lstlisting}
-        Expr4   =>  Expr3 Expr4'
-        Expr4'  =>  + Expr4 Expr3
-                |   ε
+Expr2   =>  Expr2 ++ 
+        |   Expr1
         
-        Expr3   =>  Expr2 Expr3'
-        Expr3'  =>  - Expr3
-                |   ε
-        
-        Expr2   =>  Expr1 Expr2'
-        Expr2'  =>  ++ Expr2
-                |   ε
-        
-        Expr1   =>  Id Expr1'
-        Expr1'  =>  ( Expr4 )
-                |   ε
-    \end{lstlisting}
-    \caption{Right-recursive grammar of expressions with proper precedence and associativity}
-    \label{fig:2}
+Expr1   =>  ( Expr4 ) 
+        |   Id
+\end{lstlisting}
+\caption{Grammar of expressions with proper precedence and associativity}
+\label{fig:1}
 \end{figure}
 \newpage
-\subsection{Predictive Grammars}
+\section{Left- and Right-recursive Grammars}
 \begin{figure}[h]
-    \begin{lstlisting}
-        Start   =>  Expr4
-
-        Expr4   =>  Expr3 Expr4'
-        Expr4'  =>  + Expr4 Expr3
-                |   ε
-        
-        Expr3   =>  Expr2 Expr3'
-        Expr3'  =>  - Expr3
-                |   ε
-        
-        Expr2   =>  Expr1 Expr2'
-        Expr2'  =>  ++ Expr2
-                |   ε
-        
-        Expr1   =>  Id Expr1'
-        Expr1'  =>  ( Expr4 )
-                |   ε
-    \end{lstlisting}
-    \caption{Right-recursive grammar of expressions with proper precedence and associativity}
-    \label{fig:3}
+\begin{lstlisting}
+Expr4   =>  Expr3 Expr4'
+Expr4'  =>  + Expr4 Expr3
+        |   ε
+    
+Expr3   =>  Expr2 Expr3'
+Expr3'  =>  - Expr3
+        |   ε
+    
+Expr2   =>  Expr1 Expr2'
+Expr2'  =>  ++ Expr2
+        |   ε
+    
+Expr1   =>  Id Expr1'
+Expr1'  =>  ( Expr4 )
+        |   ε
+\end{lstlisting}
+\caption{Right-recursive grammar of expressions with proper precedence and associativity}
+\label{fig:2}
 \end{figure}
-\subsection{Recursive-descent Parsing}
+\section{Predictive Grammars}
+Following grammar is a start-seperated and predictive grammar.
+A predictive grammer is one where it's possible decide the right rule by looking at the first token or first N tokens.
+\begin{figure}[h]
+\begin{lstlisting}
+Start   =>  Expr4
 
+Expr4   =>  Expr3 Expr4'
+Expr4'  =>  + Expr4 Expr3
+        |   ε
+
+Expr3   =>  Expr2 Expr3'
+Expr3'  =>  - Expr3
+        |   ε
+
+Expr2   =>  Expr1 Expr2'
+Expr2'  =>  ++ Expr2
+        |   ε
+
+Expr1   =>  Id Expr1'
+Expr1'  =>  ( Expr4 )
+        |   ε
+\end{lstlisting}
+\caption{Right-recursive grammar of expressions with proper precedence and associativity}
+\label{fig:3}
+\end{figure}
+\newpage
+\section{Recursive-descent Parsing}
+\lstinputlisting[basicstyle=\small, language=C]{parser.c}
 \end{flushleft}
 \end{document}
