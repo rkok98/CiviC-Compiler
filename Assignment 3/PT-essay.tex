@@ -11,7 +11,8 @@
 \usepackage{listings}
 
 \lstset{literate=%
-{=>}{$\Rightarrow{}$}{1}
+{=>}{$\Rightarrow{}$}{2}
+{ε}{$\epsilon{}$}{1}
 }
 
 %-------------------------------------------------------------------------------
@@ -50,22 +51,67 @@
 \begin{figure}[h]
     \begin{lstlisting}
     Expr4   =>  Expr4 + Expr3 
-            |  Expr
+            |   Expr
 
     Expr3   =>  - Expr3 
-            |  Expr
+            |   Expr
 
     Expr2   =>  Expr2 ++ 
-            |  Expr
+            |   Expr
             
     Expr1   =>  ( Expr4 ) 
-            |  Id
+            |   Id
     \end{lstlisting}
-    \caption{Grammar of expressions with proper precedence and associativity according to the C standard}
-    \label{fig:ThCoStep1}
+    \caption{Grammar of expressions with proper precedence and associativity}
+    \label{fig:1}
 \end{figure}
 \subsection{Left- and Right-recursive Grammars}
+\begin{figure}[h]
+    \begin{lstlisting}
+        Expr4   =>  Expr3 Expr4'
+        Expr4'  =>  + Expr4 Expr3
+                |   ε
+        
+        Expr3   =>  Expr2 Expr3'
+        Expr3'  =>  - Expr3
+                |   ε
+        
+        Expr2   =>  Expr1 Expr2'
+        Expr2'  =>  ++ Expr2
+                |   ε
+        
+        Expr1   =>  Id Expr1'
+        Expr1'  =>  ( Expr4 )
+                |   ε
+    \end{lstlisting}
+    \caption{Right-recursive grammar of expressions with proper precedence and associativity}
+    \label{fig:2}
+\end{figure}
+\newpage
 \subsection{Predictive Grammars}
+\begin{figure}[h]
+    \begin{lstlisting}
+        Start   =>  Expr4
+
+        Expr4   =>  Expr3 Expr4'
+        Expr4'  =>  + Expr4 Expr3
+                |   ε
+        
+        Expr3   =>  Expr2 Expr3'
+        Expr3'  =>  - Expr3
+                |   ε
+        
+        Expr2   =>  Expr1 Expr2'
+        Expr2'  =>  ++ Expr2
+                |   ε
+        
+        Expr1   =>  Id Expr1'
+        Expr1'  =>  ( Expr4 )
+                |   ε
+    \end{lstlisting}
+    \caption{Right-recursive grammar of expressions with proper precedence and associativity}
+    \label{fig:3}
+\end{figure}
 \subsection{Recursive-descent Parsing}
 
 \end{flushleft}
