@@ -44,11 +44,13 @@ static int yyerror( char *errname);
 
 %type <node> intval floatval boolval constant expr
 %type <node> stmts stmt assign varlet program
-%type <node> return exprstmt binop exprs monop 
+%type <node> return exprstmt exprs
 %type <node> vardecl fundef funbody block ifelse
 %type <node> decl decls globdecl globdef for dowhile
 %type <node> param while
 
+%type <cbinop> binop
+%type <cmonop> monop
 %type <ctype> type
 
 %start program
@@ -77,19 +79,19 @@ program: decls
 
 decls: decl decls
         {
-          $$ TBmakeDecls( $1, $2);
+            $$ = TBmakeDecls( $1, $2);
         }
-      | decl
+    |   decl
         {
-          $$ = TBmakeDecls( $1, NULL);
+            $$ = TBmakeDecls( $1, NULL);
         }
-      ;
+    ;
 
 decl: fundef
         {
           $$ = $1;
         }
-      | globdef
+    |   globdef
         {
           $$ = $1;
         }
