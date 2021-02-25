@@ -14,7 +14,7 @@
  * @{
  */
 
-
+#include <stdarg.h>
 #include "print.h"
 #include "traverse.h"
 #include "tree_basic.h"
@@ -28,9 +28,11 @@
  */
 struct INFO {
   bool firsterror;
+  size_t indentations;
 };
 
 #define INFO_FIRSTERROR(n) ((n)->firsterror)
+#define INFO_INDENTATIONS(n) ((n)->indentations)
 
 static info *MakeInfo()
 {
@@ -39,6 +41,7 @@ static info *MakeInfo()
   result = MEMmalloc(sizeof(info));
 
   INFO_FIRSTERROR(result) = FALSE;
+  INFO_INDENTATIONS(result) = 0;
   
   return result;
 }
@@ -51,7 +54,56 @@ static info *FreeInfo( info *info)
   return info;
 }
 
+/**
+ * 
+ */
+void printIndentations(info *info)
+{
+  if (info == NULL) {
+    return;
+  }
 
+  for (size_t i=0; i < INFO_INDENTATIONS(info); i++) {
+    printf("\t");
+  }
+}
+
+/**
+ * 
+ */
+void print(info *info, char *fmt, ...)
+{
+  printIndentations(info);
+
+  va_list args;
+  va_start (args, fmt);
+  vprintf (fmt, args);
+  va_end (args);
+}
+
+/** <!--******************************************************************-->
+ *
+ * @fn stype
+ *
+ * @brief returns the type specified as a string.
+ *
+ * @param type the type of the arg_node
+ *
+ * @return void
+ *
+ ***************************************************************************/
+const char *stype(type type)
+{
+  switch (type) {
+    case T_void:    return "void";
+    case T_bool:    return "bool";
+    case T_int:     return "int";
+    case T_float:   return "float";
+    case T_unknown: return "unknown";
+  }
+
+  return "unknown";
+}
 
 /** <!--******************************************************************-->
  *
@@ -561,7 +613,7 @@ PRTexprstmt (node * arg_node, info * arg_info)
 {
   DBUG_ENTER ("PRTexprstmt");
 
-  printTabs ( arg_info);
+  printIndentations ( arg_info);
 
   EXPRSTMT_EXPR( arg_node) = TRAVdo( EXPRSTMT_EXPR( arg_node), arg_info);
 
@@ -699,7 +751,7 @@ PRTfundef (node * arg_node, info * arg_info)
   if (FUNDEF_ISEXPORT(arg_node)) {
     printf("%s ", "export");
   }
-  else if (FUNDEF_ISEXTERN(arg_node)) {
+  else if (FUNDEF_ISEXPORT(arg_node)) {
     printf("%s ", "extern");
   }
 
@@ -716,11 +768,11 @@ PRTfundef (node * arg_node, info * arg_info)
   {
     print(arg_info, "\n{\n");
 
-    INFO_TABS(arg_info) += 1;
+    INFO_INDENTATIONS(arg_info) += 1;
 
     FUNDEF_FUNBODY( arg_node) = TRAVopt( FUNDEF_FUNBODY( arg_node), arg_info);
 
-    INFO_TABS(arg_info) -= 1;
+    INFO_INDENTATIONS(arg_info) -= 1;
     print(arg_info, "}\n");
   }
   
@@ -774,9 +826,12 @@ PRTifelse (node * arg_node, info * arg_info)
   IFELSE_COND( arg_node) = TRAVdo( IFELSE_COND( arg_node), arg_info);
   printf(" )\n");
   print(arg_info, "{\n");
-  INFO_TABS ( arg_info) += 1;
+
+  INFO_INDENTATIONS ( arg_info) += 1;
+  
   IFELSE_THEN( arg_node) = TRAVopt( IFELSE_THEN( arg_node), arg_info);
-  INFO_TABS ( arg_info) -= 1;
+  
+  INFO_INDENTATIONS ( arg_info) -= 1;
 
   print(arg_info, "}\n");
 
@@ -784,9 +839,11 @@ PRTifelse (node * arg_node, info * arg_info)
   {
     print(arg_info, "else\n");
     print(arg_info, "{\n");
-    INFO_TABS ( arg_info) += 1;
+    INFO_INDENTATIONS ( arg_info) += 1;
+
     IFELSE_ELSE( arg_node) = TRAVopt( IFELSE_ELSE( arg_node), arg_info);
-    INFO_TABS ( arg_info) -= 1;
+    
+    INFO_INDENTATIONS ( arg_info) -= 1;
     print(arg_info, "}\n");
   }
 
@@ -818,9 +875,11 @@ PRTwhile (node * arg_node, info * arg_info)
   printf ( " )\n");
   print ( arg_info, "{\n");
 
-  INFO_TABS ( arg_info)++;
+  INFO_INDENTATIONS ( arg_info)++;
+
   WHILE_BLOCK ( arg_node) = TRAVopt ( WHILE_BLOCK ( arg_node), arg_info);
-  INFO_TABS ( arg_info)--;
+  
+  INFO_INDENTATIONS ( arg_info)--;
 
   print ( arg_info, "}\n");
 
@@ -848,9 +907,11 @@ PRTdowhile (node * arg_node, info * arg_info)
   print ( arg_info, "do\n");
   print ( arg_info, "{\n");
 
-  INFO_TABS(arg_info)++;
+  INFO_INDENTATIONS(arg_info)++;
+
   DOWHILE_BLOCK( arg_node) = TRAVopt( DOWHILE_BLOCK( arg_node), arg_info);
-  INFO_TABS(arg_info)--;
+  
+  INFO_INDENTATIONS(arg_info)--;
 
   print ( arg_info, "}\n");
   print ( arg_info, "while ( ");
@@ -898,10 +959,11 @@ PRTfor (node * arg_node, info * arg_info)
 
   print(arg_info, "{\n");
 
-  INFO_TABS(arg_info)++;
+  INFO_INDENTATIONS(arg_info)++;
+
   FOR_BLOCK( arg_node) = TRAVopt( FOR_BLOCK( arg_node), arg_info);
   
-  INFO_TABS(arg_info)--;
+  INFO_INDENTATIONS(arg_info)--;
 
   print(arg_info, "}\n");
 
@@ -954,7 +1016,7 @@ PRTglobdef (node * arg_node, info * arg_info)
     printf("%s", "export ");
   }
 
-  int isExtern = GLOBDEF_ISEXTERN(arg_node) == 1;
+  int isExtern = GLOBDEF_ISEXPORT(arg_node) == 1;
 
   if (isExtern) {
     printf("%s", "extern ");
@@ -1022,7 +1084,7 @@ PRTvardecl (node * arg_node, info * arg_info)
 {
   DBUG_ENTER ("PRTvardecl");
 
-  printTabs(arg_info);
+  printIndentations(arg_info);
 
   printf("%s %s", stype(VARDECL_TYPE(arg_node)), VARDECL_NAME(arg_node));
 
@@ -1033,7 +1095,7 @@ PRTvardecl (node * arg_node, info * arg_info)
   }
 
   printf(";\n");
-  
+
   VARDECL_NEXT( arg_node) = TRAVopt( VARDECL_NEXT( arg_node), arg_info);
 
   DBUG_RETURN (arg_node);
@@ -1059,7 +1121,8 @@ PRTmonop (node * arg_node, info * arg_info)
   char *tmp;
   
   switch (MONOP_OP( arg_node)) {
-    case MO_minus:
+    // TODO: What are monops?
+    case MO_not:
       tmp = "-";
       break;
     case MO_neg:
