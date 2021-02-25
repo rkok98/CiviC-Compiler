@@ -53,7 +53,7 @@
 #
 
 
-src = global scanparse print codegen demo framework
+src = global scanparse print codegen framework
              
 
 
@@ -78,7 +78,4 @@ scanparse   = civic.tab.o civic.lex.o
 print       = print.o
 
 codegen     = gen_byte_code.o
-
-demo        = rename_identifiers.o opt_sub.o sum_ints.o
-
 

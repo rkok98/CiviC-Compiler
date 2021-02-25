@@ -24,39 +24,9 @@ SUBPHASE( scp,
           ALWAYS,
           ld)
 
-ENDPHASE( ld) 
-
-
-/******************************************************************************/
-
-
-PHASE( pet,
-       "Perform example transformations",
-       ALWAYS)
-
-SUBPHASE( ri, 
-          "Rename identifiers",
-          RIdoRenameIdentifiers, 
-          ALWAYS,
-          pet)      
-
-SUBPHASE( si, 
-          "Sum Integers",
-          SIdoSumInts, 
-          ALWAYS,
-          pet)   
-   
-SUBPHASE( os, 
-          "Optimise subtraction",
-          OSdoOptSub, 
-          ALWAYS,
-          pet)   
-      
-ENDPHASE( pet) 
-
+ENDPHASE( ld)
 
 /******************************************************************************/
-
 
 PHASE( cg,
        "Generating Code",
