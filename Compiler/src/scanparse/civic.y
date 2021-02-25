@@ -46,7 +46,7 @@ static int yyerror( char *errname);
 %type <node> stmts stmt assign varlet program
 %type <node> return exprstmt binop exprs monop 
 %type <node> vardecl fundef funbody block ifelse
-%type <node> decl decls globdef for dowhile
+%type <node> decl decls globdecl globdef for dowhile
 %type <node> param while
 
 %type <ctype> type
@@ -71,7 +71,7 @@ static int yyerror( char *errname);
 
 program: decls 
          {
-           parseresult = TBmakeProgram($1, NULL);
+           parseresult = TBmakeProgram($1);
          }
         ;
 
@@ -81,7 +81,7 @@ decls: decl decls
         }
       | decl
         {
-          $$ = TBmakeDecls( $1, NULL)
+          $$ = TBmakeDecls( $1, NULL);
         }
       ;
 
@@ -92,6 +92,12 @@ decl: fundef
       | globdef
         {
           $$ = $1;
+        }
+      ;
+
+globdecl: type ID SEMICOLON
+        {
+            $$ = TBmakeGlobdecl($1, STRcpy( $2));
         }
       ;
 
@@ -113,11 +119,6 @@ globdef: type ID SEMICOLON
             $$ = TBmakeGlobdef($2, STRcpy( $3), NULL, $5);
             GLOBDEF_ISEXPORT($$) = 1;
         }
-    |   EXTERN type ID SEMICOLON
-        {
-            $$ = TBmakeGlobdef($2, STRcpy( $3), NULL, NULL);
-            GLOBDEF_ISEXTERN($$) = 1;
-        }
     ;
 
 fundef: type ID PARENTHESIS_L PARENTHESIS_R  CURLY_L funbody CURLY_R
@@ -137,18 +138,6 @@ fundef: type ID PARENTHESIS_L PARENTHESIS_R  CURLY_L funbody CURLY_R
         {
             $$ = TBmakeFundef( $2, STRcpy( $3), $8, $5);
             FUNDEF_ISEXPORT($$) = 1;
-        }
-    |   EXTERN type ID PARENTHESIS_L PARENTHESIS_R SEMICOLON
-        {
-            $$ = TBmakeFundef( $2, STRcpy( $3), NULL, NULL);
-            FUNDEF_ISEXTERN($$) = 1;
-
-        }
-    |   EXTERN type ID PARENTHESIS_L param PARENTHESIS_R SEMICOLON
-        {
-            $$ = TBmakeFundef( $2, STRcpy( $3), NULL, $5);
-            FUNDEF_ISEXTERN($$) = 1;
-
         }
     ;
 
@@ -414,7 +403,7 @@ binop: PLUS      { $$ = BO_add; }
      | AND       { $$ = BO_and; }
      ;
 
-monop: NOT       { $$ = MO_not; }
+monop: MINUS     { $$ = MO_not; }
      | NEG       { $$ = MO_neg; }
      ;
 
