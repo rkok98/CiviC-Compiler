@@ -1103,7 +1103,6 @@ PRTmonop(node *arg_node, info *arg_info)
 
   switch (MONOP_OP(arg_node))
   {
-  // TODO: What are monops?
   case MO_not:
     tmp = "-";
     break;
