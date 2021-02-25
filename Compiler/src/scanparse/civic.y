@@ -103,7 +103,7 @@ decl: fundef
 
 globdecl: type ID SEMICOLON
         {
-            $$ = TBmakeGlobdecl($1, STRcpy( $2));
+            $$ = TBmakeGlobdecl($1, STRcpy( $2), NULL);
         }
       ;
 
