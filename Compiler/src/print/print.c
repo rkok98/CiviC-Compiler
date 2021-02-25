@@ -441,41 +441,6 @@ PRTerror(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
-/** <!-- ****************************************************************** -->
- * @brief Prints the given syntaxtree
- * 
- * @param syntaxtree a node structure
- * 
- * @return the unchanged nodestructure
- ******************************************************************************/
-
-node
-    *
-    PRTdoPrint(node *syntaxtree)
-{
-  info *info;
-
-  DBUG_ENTER("PRTdoPrint");
-
-  DBUG_ASSERT((syntaxtree != NULL), "PRTdoPrint called with empty syntaxtree");
-
-  printf("\n\n------------------------------\n\n");
-
-  info = MakeInfo();
-
-  TRAVpush(TR_prt);
-
-  syntaxtree = TRAVdo(syntaxtree, info);
-
-  TRAVpop();
-
-  info = FreeInfo(info);
-
-  printf("\n------------------------------\n\n");
-
-  DBUG_RETURN(syntaxtree);
-}
-
 /**
  * @}
  */
@@ -1154,4 +1119,38 @@ PRTmonop(node *arg_node, info *arg_info)
   MONOP_OPERAND(arg_node) = TRAVdo(MONOP_OPERAND(arg_node), arg_info);
 
   DBUG_RETURN(arg_node);
+}
+
+/** <!-- ****************************************************************** -->
+ * @brief Prints the given syntaxtree
+ * 
+ * @param syntaxtree a node structure
+ * 
+ * @return the unchanged nodestructure
+ ******************************************************************************/
+
+node *
+PRTdoPrint(node *syntaxtree)
+{
+  info *info;
+
+  DBUG_ENTER("PRTdoPrint");
+
+  DBUG_ASSERT((syntaxtree != NULL), "PRTdoPrint called with empty syntaxtree");
+
+  printf("\n\n------------------------------\n\n");
+
+  info = MakeInfo();
+
+  TRAVpush(TR_prt);
+
+  syntaxtree = TRAVdo(syntaxtree, info);
+
+  TRAVpop();
+
+  info = FreeInfo(info);
+
+  printf("\n------------------------------\n\n");
+
+  DBUG_RETURN(syntaxtree);
 }
