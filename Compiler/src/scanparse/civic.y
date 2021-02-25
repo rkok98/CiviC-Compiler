@@ -95,6 +95,10 @@ decl: fundef
         {
           $$ = $1;
         }
+    |   globdecl
+        {
+          $$ = $1;
+        }
       ;
 
 globdecl: type ID SEMICOLON
