@@ -38,13 +38,36 @@
 \begin{document}
 \maketitle
 
-\begin{flushleft}
+%-------------------------------------------------------------------------------
+%	INTRODUCTIE
+%-------------------------------------------------------------------------------
 
+\section{Introduction}
+\begin{flushleft}
+\par This report provides information regarding the third assignment 
+     "Syntactic Analysis" of the course Compiler Construction lectured by Dhr. dr. C.U. Grelck. 
+     The goal of this assignment is to derive pseudo code for a top-down recursive-descent parse. 
+     To accomplish this we will start to rewrite the given grammar to according to the C standard. 
+     From there we can convert the left-recursive grammar into a right-recursive grammar and convert it into a start-seperated, predictive grammar.
+     With this solution we can create psudo code for the goal of this assignment.
+     
+     The given grammer for this assignment:
+     \begin{lstlisting}
+        Expr    =>  Id
+                |   Expr + Expr
+                |   - Expr
+                |   Expr ++
+                |   ( Expr )
+        \end{lstlisting}
 %-------------------------------------------------------------------------------
 %	METHODE
 %-------------------------------------------------------------------------------
-
+\newpage
 \section{Precedence and Associativity}
+\par The first part of the assignment is to rewrite the given grammar such that properly
+expresses precedence and associativity accordingto the C standard. In C there are 17 precedence levels to check on.
+So we have to device our grammar into multiple levels. For this grammar we need 4 levels (+, -, ++ and (...) / id). 
+If we seperate these we will get the following grammar:
 \begin{figure}[h]
 \begin{lstlisting}
 Expr4   =>  Expr4 + Expr3 
@@ -64,6 +87,10 @@ Expr1   =>  ( Expr4 )
 \end{figure}
 \newpage
 \section{Left- and Right-recursive Grammars}
+\par Based on the grammar we created in the first part of the assignment, we can now convert it into a
+right-recursive grammar. A right-recursive grammar is said to be right recursive if it has right recursion.
+This means the tree of the grammar will grow to the right. If we change our grammar into a right-recursive grammar,
+we will get:
 \begin{figure}[h]
 \begin{lstlisting}
 Expr4   =>  Expr3 Expr4'
@@ -85,6 +112,9 @@ Expr1'  =>  ( Expr4 )
 \caption{Right-recursive grammar of expressions with proper precedence and associativity}
 \label{fig:2}
 \end{figure}
+\par In this grammar we can see that each level in the grammar gets a new inner level named with prime and ends with an ε (epsilon)
+which means an end of line.
+
 \section{Predictive Grammars}
 Following grammar is a start-seperated and predictive grammar.
 A predictive grammer is one where it's possible decide the right rule by looking at the first token or first N tokens.
