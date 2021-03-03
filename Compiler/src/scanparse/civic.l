@@ -69,6 +69,10 @@
 "float"                    { FILTER( FLOAT); }
 "bool"                     { FILTER( BOOL); }
 
+"extern"                   { FILTER( EXTERN); }
+"export"                   { FILTER( EXPORT); }
+"return"                   { FILTER( RETURN); }
+
 "if"                       { FILTER( IF); }
 "else"                     { FILTER( ELSE); }
 "do"                       { FILTER( DO);}
