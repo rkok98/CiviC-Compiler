@@ -14,9 +14,9 @@
 %	GEGEVENS VOOR IN DE TITEL
 %-------------------------------------------------------------------------------
 
-\assignment{Assignment 3}
+\assignment{Assignment 4}
 \assignmenttype{Essay}
-\title{Syntactic Analysis}
+\title{Semantic Analysis}
 
 \author{René Kok}
 \uvanetid{13671146}
@@ -45,38 +45,60 @@
 \newpage
 \section{Scoping and symbol tables}
 Consider the following CiviC nested function definition:
-\begin{lstlisting}
+\begin{lstlisting}[basicstyle=\small, language=C]
 int d = 2;
 
 int foo(int a) {
-    int b = 1; 
-    int c;
+  int b = 1; 
+  int c;
 
-    int f(int x) { 
-        int b = x + b;
-        return b; 
-    }
+  int f(int x) { 
+      int b = x + b;
+      return b; 
+  }
 
-    int g(int x) { 
-        c = f( x - b); 
-        return c + a;
-    }
+  int g(int x) { 
+      c = f( x - b); 
+      return c + a;
+  }
     
-    c = c + g( d - b); 
-    return c;
+  c = c + g( d - b); 
+  return c;
 }
 \end{lstlisting}
 \paragraph{a). What is the value of foo(8), and, more importantly, why?\\}
 aaaaa
+
+\newpage
 \paragraph{b). Mark every occurrence of a variable identifier in statement position by an arrow to the declaration\\}
-aaaaa
+\includegraphics[width=8cm]{images/1b.pdf}
 \paragraph{c). Annotate each scope (level) with its symbol table.\\}
 baaa
 \paragraph{d). Annotate each variable identifier in statement position by a number indicating the relative scope distance to the corresponding declaration.\\}
 aaaa
-
+\newpage
 \section{Lambda lifting}
+\begin{lstlisting}[basicstyle=\small, language=C]
+int d = 2;
 
+int f(int x, int b) {
+	int b = x + b;
+	return b;
+}
+
+int g(int x, int a, int b, int *c) {
+	*c = f(x - b);
+	return *c + a;
+}
+
+int foo(int a, int d) {
+	int b = 1;
+	int c;
+
+	c = c + g(d - b, *c, b, a);
+	return c;
+}
+\end{lstlisting}
 \section{Function overloading}
 
 \end{flushleft}
