@@ -32,8 +32,12 @@
 
 %%
 
-"("                        { FILTER( BRACKET_L); }
-")"                        { FILTER( BRACKET_R); }
+"("                        { FILTER( PARENTHESIS_L); }
+")"                        { FILTER( PARENTHESIS_R); }
+"{"                        { FILTER( CURLY_L); }
+"}"                        { FILTER( CURLY_R); }
+"["                        { FILTER( BRACKET_L); }
+"]"                        { FILTER( BRACKET_R); }
 ","                        { FILTER( COMMA); }
 ";"                        { FILTER( SEMICOLON); }
 
