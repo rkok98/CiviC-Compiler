@@ -78,6 +78,7 @@ baaa
 aaaa
 \newpage
 \section{Lambda lifting}
+\textbf{Manually apply the lambda lifting transformation to the code example of Assignment 4.1.} 
 \begin{lstlisting}[basicstyle=\small, language=C]
 int d = 2;
 
@@ -99,7 +100,14 @@ int foo(int a, int d) {
 	return c;
 }
 \end{lstlisting}
+\newpage
 \section{Function overloading}
+\textbf{Assume we would extend CiviC by function overloading. Describe how 
+this extension would affect semantic analysis in the CiviC compiler in general, 
+and how you would solve the corresponding problems in detail.\\}
+The compiler wouldn't be able to distinguish similarly named functions.
+The determination of which function to use for a particular call should 
+be resolved at compile time by adding the name of the parameter types to the function name as shown in // TODO: FIGURE.
 
 \end{flushleft}
 \end{document}
