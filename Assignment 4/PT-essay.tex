@@ -107,7 +107,31 @@ this extension would affect semantic analysis in the CiviC compiler in general,
 and how you would solve the corresponding problems in detail.\\}
 The compiler wouldn't be able to distinguish similarly named functions.
 The determination of which function to use for a particular call should 
-be resolved at compile time by adding the name of the parameter types to the function name as shown in // TODO: FIGURE.
-
+be resolved at compile time by adding the name of the parameter types to the function name as shown in table \ref{tab:function-overloading} below.
+\begin{table}[h!]
+  \begin{center}
+      \begin{tabular}{l|c} % <-- Alignments: 1st column left, 2nd middle and 3rd right, with vertical lines in between
+          \textbf{Original overloaded} & \textbf{Compiler resolved} \\
+          \hline
+          \begin{lstlisting}[basicstyle=\small, language=C]
+int foo(int a);
+int foo(float a);
+int foo(const char* a);
+int foo(int a, int b);
+int foo(float a, float b);
+          \end{lstlisting}
+            &
+          \begin{lstlisting}[basicstyle=\small, language=C]
+int foo_int(int a);
+int foo_float(float a);
+int foo_char_p(const char* a);
+int foo_int_int(int a, int b);
+int foo_float_float(float a, float b);
+          \end{lstlisting}
+      \end{tabular}
+      \caption{Implementing Function Overloading}
+      \label{tab:function-overloading}
+  \end{center}
+\end{table}
 \end{flushleft}
 \end{document}
