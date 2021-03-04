@@ -39,13 +39,17 @@
 
 \section{Introduction}
 \begin{flushleft}
+\par This report provides information regarding the fourth assignment 
+   "Semantic Analysis" of the course Compiler Construction lectured by Dhr. dr. C.U. Grelck. 
+   The goal of this assignment is to derive scoping and symbol tables, apply lambda lifting and 
+   resolving function overloading.
 %-------------------------------------------------------------------------------
 %	METHODE
 %-------------------------------------------------------------------------------
 \newpage
 \section{Scoping and symbol tables}
 Consider the following CiviC nested function definition:
-\begin{lstlisting}[basicstyle=\small, language=C]
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=CiviC nested function definition, captionpos=b]
 int d = 2;
 
 int foo(int a) {
@@ -79,8 +83,8 @@ aaaaa
 \includegraphics[width=14cm]{images/1d.pdf}
 \newpage
 \section{Lambda lifting}
-\textbf{Manually apply the lambda lifting transformation to the code example of Assignment 4.1.} 
-\begin{lstlisting}[basicstyle=\small, language=C]
+\textbf{Manually apply the lambda lifting transformation to the code example of listing \ref{lst:code}.}
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:lambda, caption=Lambda lifting transformation, captionpos=b]
 int d = 2;
 
 int f(int x, int b) {
