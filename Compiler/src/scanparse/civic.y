@@ -87,7 +87,7 @@ decls: decl decls
         }
     ;
 
-decl: fundef
+decl:   fundef
         {
           $$ = $1;
         }
