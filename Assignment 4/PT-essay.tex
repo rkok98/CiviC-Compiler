@@ -71,24 +71,28 @@ int foo(int a) {
 }
 \end{lstlisting}
 \paragraph{a). What is the value of foo(8), and, more importantly, why?\\}
-value of foo(8) = 9
+The result of foo(8), or any given integer as argument yields an undefined behaviour.
+This is because c is not static, not defined locally or because c is not initialized.
+
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:foo8, caption=Execution steps of running foo(8), captionpos=b]
-  int d = 2;
-  foo(8) {
-      int b = 1;
-      int c;
-      g(1) {
-          f(0) {
-              c = 1
-              return local b = 1;
-          }
-          return 1 + 8;
-      }
-      
-      c = 1 + 8;
-      return c = 9;
-  }
+int d = 2;
+foo(8) {
+    int b = 1;
+    int c;
+    g(1) {
+        f(0) {
+            c = 1
+            return local b = 1;
+        }
+
+        return 1 + 8;
+    }
+    
+    c = undefined behaviour + 9;
+    return c = undefined behaviour;
+}
 \end{lstlisting}
+
 \newpage
 \paragraph{b). Mark every occurrence of a variable identifier in statement position by an arrow to the declaration\\}
 \includegraphics[width=7.5cm]{images/1b.pdf}
