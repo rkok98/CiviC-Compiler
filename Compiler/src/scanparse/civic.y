@@ -101,9 +101,9 @@ decl:   fundef
         }
       ;
 
-globdecl: type ID SEMICOLON
+globdecl: EXTERN type ID SEMICOLON
         {
-            $$ = TBmakeGlobdecl($1, STRcpy( $2), NULL);
+            $$ = TBmakeGlobdecl($2, STRcpy( $3), NULL);
         }
       ;
 
