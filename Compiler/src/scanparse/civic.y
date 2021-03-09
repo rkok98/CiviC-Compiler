@@ -207,7 +207,7 @@ stmt: assign
         {
             $$ = $1;
         }
-    |   exprstmt
+    |   expr stmt
         {
             $$ = $1;
         }
@@ -292,12 +292,6 @@ return: RETURN SEMICOLON
 exprstmt: expr SEMICOLON
         {
             $$ = TBmakeExprstmt( $1);
-        }
-    ;
-
-assign: varlet LET expr SEMICOLON
-        {
-            $$ = TBmakeAssign( $1, $3);
         }
     ;
 
