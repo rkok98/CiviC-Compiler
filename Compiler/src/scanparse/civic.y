@@ -207,7 +207,7 @@ stmt: assign
         {
             $$ = $1;
         }
-    |   expr stmt
+    |   exprstmt
         {
             $$ = $1;
         }
@@ -297,9 +297,9 @@ exprstmt: expr SEMICOLON
 
 assign: varlet LET expr SEMICOLON
         {
-          $$ = TBmakeAssign( $1, $3);
+            $$ = TBmakeAssign( $1, $3);
         }
-        ;
+    ;
 
 varlet: ID
         {
