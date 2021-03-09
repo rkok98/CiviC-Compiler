@@ -33,7 +33,7 @@ static int yyerror( char *errname);
 
 %token PARENTHESIS_L PARENTHESIS_R CURLY_L CURLY_R BRACKET_L BRACKET_R COMMA SEMICOLON
 %token MINUS PLUS STAR SLASH PERCENT LE LT GE GT EQ NE OR AND LET NEG
-%token INT FLOAT BOOL VOID TRUEVAL FALSEVAL
+%token INT BOOL VOID TRUEVAL FALSEVAL
 %token EXTERN EXPORT RETURN
 %token IF ELSE DO WHILE FOR
 
@@ -45,7 +45,7 @@ static int yyerror( char *errname);
 %type <node> intval floatval boolval constant expr
 %type <node> stmts stmt assign varlet program
 %type <node> return exprstmt exprs
-%type <node> vardecl fundef funbody block ifelse
+%type <node> vardecl fundecl fundef funbody block ifelse
 %type <node> decl decls globdecl globdef for dowhile
 %type <node> param while
 
@@ -87,23 +87,28 @@ decls: decl decls
         }
     ;
 
-decl:   fundef
+decl:   fundecl
         {
-          $$ = $1;
+            $$ = $1;
+        }
+    |
+        fundef
+        {
+            $$ = $1;
         }
     |   globdef
         {
-          $$ = $1;
+            $$ = $1;
         }
     |   globdecl
         {
-          $$ = $1;
+            $$ = $1;
         }
       ;
 
-globdecl: type ID SEMICOLON
+globdecl: EXTERN type ID SEMICOLON
         {
-            $$ = TBmakeGlobdecl($1, STRcpy( $2), NULL);
+            $$ = TBmakeGlobdecl($2, STRcpy( $3), NULL);
         }
       ;
 
@@ -124,6 +129,16 @@ globdef: type ID SEMICOLON
         {
             $$ = TBmakeGlobdef($2, STRcpy( $3), NULL, $5);
             GLOBDEF_ISEXPORT($$) = 1;
+        }
+    ;
+
+fundecl: EXTERN type ID PARENTHESIS_L PARENTHESIS_R SEMICOLON
+        {
+            $$ = TBmakeFundecl( $2, STRcpy( $3), NULL);
+        }
+    |   EXTERN type ID PARENTHESIS_L param PARENTHESIS_R SEMICOLON
+        {
+            $$ = TBmakeFundecl( $2, STRcpy( $3), $5);
         }
     ;
 
@@ -301,19 +316,13 @@ assign: varlet LET expr SEMICOLON
         }
     ;
 
-assign: varlet LET expr SEMICOLON
-        {
-          $$ = TBmakeAssign( $1, $3);
-        }
-        ;
-
 varlet: ID
         {
           $$ = TBmakeVarlet( STRcpy( $1), NULL, NULL);
         }
         ;
 
-exprs: expr COMMA exprs
+exprs:  expr COMMA exprs
         {
             $$ = TBmakeExprs($1, $3);
         }
@@ -323,8 +332,7 @@ exprs: expr COMMA exprs
         }
     ;
 
-expr: 
-    constant
+expr:   constant
         {
             $$ = $1;
         }
@@ -335,6 +343,10 @@ expr:
     |   PARENTHESIS_L expr binop expr PARENTHESIS_R
         {
             $$ = TBmakeBinop( $3, $2, $4);
+        }
+    |   expr binop expr
+        {
+            $$ = TBmakeBinop( $2, $1, $3);
         }
     |   monop expr
         {

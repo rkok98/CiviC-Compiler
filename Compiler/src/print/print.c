@@ -714,6 +714,33 @@ PRTfundefs(node *arg_node, info *arg_info)
  ***************************************************************************/
 
 node *
+PRTfundecl(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTfundecl");
+
+  printf("extern %s %s", stype(FUNDECL_TYPE(arg_node)), FUNDECL_NAME(arg_node));
+
+  printf(" ( ");
+  FUNDECL_PARAMS(arg_node) = TRAVopt(FUNDECL_PARAMS(arg_node), arg_info);
+  printf(" );\n");
+
+  DBUG_RETURN(arg_node);
+}
+
+/** <!--******************************************************************-->
+ *
+ * @fn PRTfundef
+ *
+ * @brief Prints the node and its sons/attributes
+ *
+ * @param arg_node letrec node to process
+ * @param arg_info pointer to info structure
+ *
+ * @return processed node
+ *
+ ***************************************************************************/
+
+node *
 PRTfundef(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTfundef");
@@ -721,10 +748,6 @@ PRTfundef(node *arg_node, info *arg_info)
   if (FUNDEF_ISEXPORT(arg_node))
   {
     printf("%s ", "export");
-  }
-  else if (FUNDEF_ISEXPORT(arg_node))
-  {
-    printf("%s ", "extern");
   }
 
   printf("%s %s", stype(FUNDEF_TYPE(arg_node)), FUNDEF_NAME(arg_node));
