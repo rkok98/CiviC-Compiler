@@ -344,6 +344,10 @@ expr:   constant
         {
             $$ = TBmakeBinop( $3, $2, $4);
         }
+    |   expr binop expr
+        {
+            $$ = TBmakeBinop( $2, $1, $3);
+        }
     |   monop expr
         {
             $$ = TBmakeMonop( $1, $2);
