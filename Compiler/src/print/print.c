@@ -749,10 +749,6 @@ PRTfundef(node *arg_node, info *arg_info)
   {
     printf("%s ", "export");
   }
-  else if (FUNDEF_ISEXPORT(arg_node))
-  {
-    printf("%s ", "extern");
-  }
 
   printf("%s %s", stype(FUNDEF_TYPE(arg_node)), FUNDEF_NAME(arg_node));
 
