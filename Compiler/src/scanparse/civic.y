@@ -322,7 +322,7 @@ varlet: ID
         }
         ;
 
-exprs: expr COMMA exprs
+exprs:  expr COMMA exprs
         {
             $$ = TBmakeExprs($1, $3);
         }
@@ -332,8 +332,7 @@ exprs: expr COMMA exprs
         }
     ;
 
-expr: 
-    constant
+expr:   constant
         {
             $$ = $1;
         }

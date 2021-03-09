@@ -722,7 +722,7 @@ PRTfundecl(node *arg_node, info *arg_info)
 
   printf(" ( ");
   FUNDECL_PARAMS(arg_node) = TRAVopt(FUNDECL_PARAMS(arg_node), arg_info);
-  printf(" );");
+  printf(" );\n");
 
   DBUG_RETURN(arg_node);
 }
