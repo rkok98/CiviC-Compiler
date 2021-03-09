@@ -45,7 +45,7 @@ static int yyerror( char *errname);
 %type <node> intval floatval boolval constant expr
 %type <node> stmts stmt assign varlet program
 %type <node> return exprstmt exprs
-%type <node> vardecl fundef funbody block ifelse
+%type <node> vardecl fundecl fundef funbody block ifelse
 %type <node> decl decls globdecl globdef for dowhile
 %type <node> param while
 
@@ -87,17 +87,22 @@ decls: decl decls
         }
     ;
 
-decl:   fundef
+decl:   fundecl
         {
-          $$ = $1;
+            $$ = $1;
+        }
+    |
+        fundef
+        {
+            $$ = $1;
         }
     |   globdef
         {
-          $$ = $1;
+            $$ = $1;
         }
     |   globdecl
         {
-          $$ = $1;
+            $$ = $1;
         }
       ;
 
@@ -124,6 +129,16 @@ globdef: type ID SEMICOLON
         {
             $$ = TBmakeGlobdef($2, STRcpy( $3), NULL, $5);
             GLOBDEF_ISEXPORT($$) = 1;
+        }
+    ;
+
+fundecl: EXTERN type ID PARENTHESIS_L PARENTHESIS_R SEMICOLON
+        {
+            $$ = TBmakeFundecl( $2, STRcpy( $3), NULL);
+        }
+    |   EXTERN type ID PARENTHESIS_L param PARENTHESIS_R SEMICOLON
+        {
+            $$ = TBmakeFundecl( $2, STRcpy( $3), $5);
         }
     ;
 

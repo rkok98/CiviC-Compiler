@@ -56,6 +56,7 @@
     </nodeset>
     <nodeset name="Decl">
         <target>
+            <node name="FunDecl"/>
             <node name="FunDef"/>
             <node name="GlobDecl"/>
             <node name="GlobDef"/>
@@ -292,6 +293,49 @@
             </son>
         </sons>
         <attributes/>
+    </node>
+    <node name="FunDecl">
+        <sons>
+            <son name="Params">
+                <targets>
+                    <target mandatory="no">
+                        <node name="Param"/>
+                        <phases>
+                            <all/>
+                        </phases>
+                    </target>
+                </targets>
+            </son>
+        </sons>
+        <attributes>
+            <attribute name="Type">
+                <type name="Type">
+                    <targets>
+                        <target mandatory="yes">
+                            <any/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </type>
+            </attribute>
+            <attribute name="Name">
+                <type name="String">
+                    <targets>
+                        <target mandatory="yes">
+                            <any/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </type>
+            </attribute>
+        </attributes>
+        <flags>
+            <flag name="IsExport" />
+        </flags>
     </node>
     <node name="FunDef">
         <sons>
