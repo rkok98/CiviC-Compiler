@@ -175,7 +175,7 @@ steps:
 
 \begin{lstlisting}
     C [[ while ( Expr ) Block Rest ]]
-    => CX [[ C[[body]] if ( Expr ){ do Block while ( Expr ) } Rest ]]
+    => CX [[ { do Block while ( Expr ) } Rest ]]
 
     Block => {[Statement]*}
           |  Statement
