@@ -15,11 +15,11 @@
 %-------------------------------------------------------------------------------
 
 % Vul de naam van de opdracht in.
-\assignment{Assignment 2}
+\assignment{Assignment 5}
 % Vul het soort opdracht in.
 \assignmenttype{Essay}
 % Vul de titel van de eindopdracht in.
-\title{Lexicographic Analysis}
+\title{Code Transformation and Optimisation}
 
 % Vul de volledige namen van alle auteurs in.
 \author{René Kok}
@@ -60,16 +60,127 @@
 
 \section{Introduction}
 \begin{flushleft}
-\par A
-
+\par This report provides information regarding the fifth assignment 
+"Code Transformation and Optimisation" of the course Compiler Construction by Dhr.
+dr. C.U. Grelck. The goal of this assignment is to transform the given code into 
+a Static Single Assignment Form (SSA), apply the loop unswitching optimisation and
+devise a formal compilation scheme that systematically eliminates all occurrences of 
+while-loops.
 %-------------------------------------------------------------------------------
 %	METHODE
 %-------------------------------------------------------------------------------
 
 \newpage
-\section{Assignment}
+\section{Code Transformation and Optimisation}
+Consider the following CiviC code fragment:
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=CiviC code fragment, captionpos=b]
+    i = 0;
+    while (i < n) {
+        j = 0;
+        while (j < m) {
+            if (i < j) {
+                val = val + i;
+            } else if (j == i) {
+                val = val - 1;
+            } else {
+                val = val + j;
+            }
+            j = j + 1;
+        }
+        i = i + 1;
+    }
+\end{lstlisting}
 
-\subsection{Test}
+\subsection{Static Single Assignment Form}
+Transform the above code into Static Single Assignment Form (SSA).
+
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Static Single Assignment Form (SSA), captionpos=b]
+    i_0 = 0;
+    p_0 = i_0 < n_0;
+    while (phi(p_0, p_1)) {
+        j_0 = 0;
+        i_1 = phi(i_0, i_2);
+        y_0 = j_0 < m_0;
+    
+        while (phi(y_0, y_1)) {
+            j_1 = phi(j_0, j_2);
+    
+            if (i_1 < j_1 ) {
+                val_2 = phi(val_0, val_7);
+                val_1 = val_2 + i_1;
+            } else if ( j_1 == i_1 ) {
+                val_4 = phi(val_0, val_7);
+                val_3 = val_4 - 1;
+            } else {
+                val_6 = phi(val_0, val_7);
+                val_5 = val_6 + j_1; 
+            }
+    
+            val_7 = phi(val_1, val_3, val_5);
+    
+            j_2 = j_1 + 1;
+            y_1 = j_2 < m_0;
+        }
+        i_2 = i_1 + 1;
+        p_1 = i_2 < n_0;
+    }
+\end{lstlisting}    
+
+\subsection{Machine-Independent Optimisation}
+Apply the loop unswitching optimisation to the (original) code above.
+
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Loop unswitching optimisation, captionpos=b]
+    i = 0;
+    while (i < n ) {
+        j = 0;
+
+        while (j < m && i < j) {
+            val = val + i ;
+            j = j + 1;
+        }
+
+        if (j < m && j == i) { 
+            val = val - 1;
+            j = j + 1;
+        }
+
+        while (j < m) {
+            val = val + i ;
+            j = j + 1;
+        }
+
+        i = i + 1;
+    }
+\end{lstlisting}    
+
+\subsection{Compilation Schemes}
+Devise a formal compilation scheme that systematically eliminates all occurrences of
+while-loops in the body of a CiviC function definition and replaces them by semantically 
+equivalent code without while-loops.
+
+To replace while-loops with semantically equivalent code, we need to know what our possibilities
+are. An option is to use a never ending for-loop with a break-if statement, but this is not supported
+in the CiviC language. An other option is to use recursive functions with a return-if statement (this
+ is supported by the CiviC language). Last option is to use do-while-loops which is also supported 
+by the CiviC language.
+We will replace the while-loops in a body of a CiviC function with do-while-loops with the following
+steps:
+
+1. Check with pattern matching for while-loops in the code.
+
+2. Recursively loop until no next pattern is found
+
+3. Replace while-loop by do-while-loop:
+
+
+\begin{lstlisting}
+    C [[ while ( Expr ) Block Rest ]]
+    => CX [[ C[[body]] if ( Expr ){ do Block while ( Expr ) } Rest ]]
+
+    Block => {[Statement]*}
+          |  Statement
+\end{lstlisting}
+
 
 \end{flushleft}
 \end{document}
