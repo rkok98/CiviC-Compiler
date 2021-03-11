@@ -19,8 +19,6 @@ extern node *PRTbinop(node *arg_node, info *arg_info);
 extern node *PRTfloat(node *arg_node, info *arg_info);
 extern node *PRTnum(node *arg_node, info *arg_info);
 extern node *PRTbool(node *arg_node, info *arg_info);
-extern node *PRTsymboltableentry(node *arg_node, info *arg_info);
-extern node *PRTerror(node *arg_node, info *arg_info);
 
 extern node *PRTprogram(node *arg_node, info *arg_info);
 extern node *PRTdecls(node *arg_node, info *arg_info);
@@ -44,6 +42,11 @@ extern node *PRTglobdef(node *arg_node, info *arg_info);
 extern node *PRTparam(node *arg_node, info *arg_info);
 extern node *PRTvardecl(node *arg_node, info *arg_info);
 extern node *PRTmonop(node *arg_node, info *arg_info);
+
+extern node *PRTsymboltable(node *arg_node, info *arg_info);
+extern node *PRTsymboltableentry(node *arg_node, info *arg_info);
+
+extern node *PRTerror(node *arg_node, info *arg_info);
 
 extern node *PRTdoPrint(node *syntaxtree);
 

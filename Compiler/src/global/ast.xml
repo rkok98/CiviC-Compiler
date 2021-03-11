@@ -77,6 +77,16 @@
                         </target>
                     </targets>
                 </son>
+                <son name="SymbolTable">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="SymbolTable"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
             </sons>
             <attributes>
             </attributes>
@@ -1074,6 +1084,121 @@
                 </attribute>
             </attributes>
             <flags/>
+        </node>
+        <!-- Symbol Table-->
+        <node name="SymbolTable">
+            <description>Symbol table entry</description>
+            <sons>
+                <son name="Entries">
+                    <description>ST body</description>
+                    <targets>
+                        <target mandatory="yes">
+                            <node name="SymbolTableEntry" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+            <attributes>
+                <attribute name="Parent">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+            </attributes>
+        </node>
+
+        <node name="SymbolTableEntry">
+            <description>Symbol table entries</description>
+            <sons>
+                <son name="Next">
+                    <description>ST body</description>
+                    <targets>
+                        <target mandatory="no">
+                            <node name="SymbolTableEntry" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+            <attributes>
+                <attribute name="Name">
+                    <type name="String">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Type">
+                    <type name="Type">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Params">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="IsFunction">
+                    <type name="Bool">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="import">
+                    <type name="Bool">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Export">
+                    <type name="Bool">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+            </attributes>
         </node>
     </syntaxtree>
 </definition>
