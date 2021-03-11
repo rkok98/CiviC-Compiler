@@ -1,3 +1,10 @@
 {
-    "cSpell.language": "nl,en,en-GB"
+    "cSpell.language": "nl,en,en-GB",
+    "files.associations": {
+        "list": "c",
+        "typeinfo": "c",
+        "__locale": "cpp",
+        "cstring": "cpp",
+        "iterator": "c"
+    }
 }
