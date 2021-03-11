@@ -57,7 +57,7 @@ node *CAglobdecl(node *arg_node, info *arg_info)
     DBUG_ENTER("CAglobdecl");
 
     node *table = INFO_SYMBOL_TABLE(arg_info);
-    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDECL_NAME(arg_node)), GLOBDECL_TYPE(arg_node), 0, 0, 0, NULL);
+    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDECL_NAME(arg_node)), GLOBDECL_TYPE(arg_node), 0, 0, 0, NULL, NULL);
 
     STinsert(table, entry);
 
@@ -69,9 +69,43 @@ node *CAglobdef(node *arg_node, info *arg_info)
     DBUG_ENTER("CAglobdef");
 
     node *table = INFO_SYMBOL_TABLE(arg_info);
-    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDEF_NAME(arg_node)), GLOBDEF_TYPE(arg_node), 0, 0, 0, NULL);
+    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDEF_NAME(arg_node)), GLOBDEF_TYPE(arg_node), 0, 0, 0, NULL, NULL);
 
     STinsert(table, entry);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *CAfundecl(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("CAfundecl");
+
+    // TODO: Do I need to create a symbol table for fundecl?
+
+    node *table = INFO_SYMBOL_TABLE(arg_info);
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDECL_NAME(arg_node)), FUNDECL_TYPE(arg_node), 0, 0, 0, NULL, NULL);
+
+    STinsert(table, entry);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *CAfundef(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("CAfundef");
+
+    node *table = INFO_SYMBOL_TABLE(arg_info);
+
+    info *fundef_info = MakeInfo(table);
+
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), 0, 0, 0, NULL, INFO_SYMBOL_TABLE(fundef_info));
+
+    STinsert(table, entry);
+
+    FUNDEF_PARAMS(arg_node) = TRAVopt(FUNDEF_PARAMS(arg_node), fundef_info);
+    FUNDEF_FUNBODY(arg_node) = TRAVopt(FUNDEF_FUNBODY(arg_node), fundef_info);
+
+    fundef_info = FreeInfo(fundef_info);
 
     DBUG_RETURN(arg_node);
 }
@@ -80,15 +114,15 @@ extern node *CAdoContextAnalysis(node *syntaxtree)
 {
     DBUG_ENTER("CAdoContextAnalysis");
 
-    info *info = MakeInfo(NULL);
+    info *arg_info = MakeInfo(NULL);
 
     TRAVpush(TR_ca);
-    syntaxtree = TRAVdo(syntaxtree, info);
+    syntaxtree = TRAVdo(syntaxtree, arg_info);
     TRAVpop();
 
-    STprint(INFO_SYMBOL_TABLE(info));
+    STprint(INFO_SYMBOL_TABLE(arg_info), 0);
 
-    FreeInfo(info);
+    arg_info = FreeInfo(arg_info);
 
     DBUG_RETURN(syntaxtree);
 }

@@ -1,3 +1,9 @@
-int a = 1;
-int b = 1;
-int c = 1;
+extern int d;
+
+int a = 10;
+
+export int main() {
+    int y = 10;
+    printInt(a);
+    return 0;
+}

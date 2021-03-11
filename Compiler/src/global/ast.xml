@@ -33,6 +33,8 @@
                     <node name="Program" />
                     <node name="GlobDecl" />
                     <node name="GlobDef" />
+                    <node name="FunDecl" />
+                    <node name="FunDef" />
                 </travuser>
             </traversal>
         </general>
@@ -1138,6 +1140,16 @@
                         </target>
                     </targets>
                 </son>
+                <son name="NextTable">
+                <targets>
+                    <target mandatory="no">
+                        <node name="SymbolTable"/>
+                        <phases>
+                            <all/>
+                        </phases>
+                    </target>
+                </targets>
+            </son>
             </sons>
             <attributes>
                 <attribute name="Name">

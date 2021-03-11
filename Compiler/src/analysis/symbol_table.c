@@ -69,28 +69,31 @@ node *STfind(node *symbol_table, char *name, int *store)
 node *STlast(node *symbol_table)
 {
     DBUG_ENTER("STlast");
-    
-    if (!SYMBOLTABLE_ENTRIES(symbol_table)) {
+
+    if (!SYMBOLTABLE_ENTRIES(symbol_table))
+    {
         DBUG_RETURN(NULL);
     }
 
     node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
-    
-    while (SYMBOLTABLEENTRY_NEXT(entry)) {
+
+    while (SYMBOLTABLEENTRY_NEXT(entry))
+    {
         entry = SYMBOLTABLEENTRY_NEXT(entry);
     }
 
     DBUG_RETURN(entry);
 }
 
-void STprint(node *symbol_table)
+void STprint(node *symbol_table, size_t tabs)
 {
-    STprintentry(SYMBOLTABLE_ENTRIES(symbol_table), 0);
+    STprintentry(SYMBOLTABLE_ENTRIES(symbol_table), tabs);
 }
 
 void STprintentry(node *symbol_table, size_t tabs)
 {
-    if (symbol_table == NULL) {
+    if (symbol_table == NULL)
+    {
         return;
     }
 
@@ -119,6 +122,12 @@ void STprintentry(node *symbol_table, size_t tabs)
     }
 
     printf(", Name: %s\n", SYMBOLTABLEENTRY_NAME(symbol_table));
+
+    if (SYMBOLTABLEENTRY_NEXTTABLE(symbol_table))
+    {
+        printf("BBB");
+        STprint(SYMBOLTABLEENTRY_NEXTTABLE(symbol_table), tabs + 1);
+    }
 
     STprintentry(SYMBOLTABLEENTRY_NEXT(symbol_table), tabs);
 }
