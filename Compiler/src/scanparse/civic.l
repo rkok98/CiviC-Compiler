@@ -62,8 +62,13 @@
 
 "void"                     { FILTER( VOID); }
 
-"true"                     { FILTER( TRUEVAL); }
-"false"                    { FILTER( FALSEVAL); }
+"true"                     { yylval.cbool = TRUE;
+                             FILTER(BOOLVAL);
+                           }
+                           
+"false"                    { yylval.cbool = FALSE;
+                             FILTER(BOOLVAL);
+                           }
 
 "int"                      { FILTER( INT); }
 "float"                    { FILTER( FLOAT); }
