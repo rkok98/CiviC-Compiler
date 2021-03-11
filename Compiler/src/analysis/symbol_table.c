@@ -19,7 +19,7 @@ node *STinsert(node *symbol_table, node *entry)
         return NULL;
     }
 
-    node *last = STlast(entry);
+    node *last = STlast(symbol_table);
 
     if (!last)
     {
@@ -67,15 +67,13 @@ node *STfind(node *symbol_table, char *name, int *store)
 
 node *STlast(node *symbol_table)
 {
-    if (!SYMBOLTABLEENTRY_NEXT(symbol_table))
-    {
+    if (!SYMBOLTABLE_ENTRIES(symbol_table)) {
         return NULL;
     }
 
-    node *entry = SYMBOLTABLEENTRY_NEXT(symbol_table);
-
-    while (SYMBOLTABLEENTRY_NEXT(entry))
-    {
+    node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
+    
+    while (SYMBOLTABLEENTRY_NEXT(entry)) {
         entry = SYMBOLTABLEENTRY_NEXT(entry);
     }
 
