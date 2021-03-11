@@ -110,6 +110,25 @@ node *CAfundef(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
+node *CAvardecl(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("CAvardecl");
+
+    node *table = INFO_SYMBOL_TABLE ( arg_info);
+
+    if (VARDECL_INIT ( arg_node)) {
+        VARDECL_INIT ( arg_node) = TRAVopt(VARDECL_INIT ( arg_node), arg_info);
+    }
+
+    node *entry = TBmakeSymboltableentry(STRcpy(VARDECL_NAME(arg_node)), VARDECL_TYPE(arg_node), 0, 0, 0, NULL, NULL);
+
+    STinsert(table, entry);
+
+    VARDECL_NEXT( arg_node) = TRAVopt ( VARDECL_NEXT( arg_node), arg_info);
+
+    DBUG_RETURN(arg_node);
+}
+
 extern node *CAdoContextAnalysis(node *syntaxtree)
 {
     DBUG_ENTER("CAdoContextAnalysis");

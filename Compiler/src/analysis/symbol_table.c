@@ -125,7 +125,6 @@ void STprintentry(node *symbol_table, size_t tabs)
 
     if (SYMBOLTABLEENTRY_NEXTTABLE(symbol_table))
     {
-        printf("BBB");
         STprint(SYMBOLTABLEENTRY_NEXTTABLE(symbol_table), tabs + 1);
     }
 
