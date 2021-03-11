@@ -1,18 +1,19 @@
 #include "string.h"
 #include "symbol_table.h"
+#include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
 #include "dbug.h"
 
 #include "memory.h"
-#include "free.h"
-#include "str.h"
 #include "ctinfo.h"
+#include "str.h"
 
 node *STinsert(node *symbol_table, node *entry)
 {
     DBUG_ENTER("STinsert");
-    if (find(symbol_table, SYMBOLTABLEENTRY_NAME(entry) != NULL))
+
+    if (STfind(symbol_table, SYMBOLTABLEENTRY_NAME(entry), NULL) != NULL)
     {
         CTIerror("Redefinition of var %s at line %d, column %d", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry), NODE_COL(entry));
         return NULL;
@@ -32,26 +33,36 @@ node *STinsert(node *symbol_table, node *entry)
     DBUG_RETURN(entry);
 }
 
-node *STfind(node *symbol_table, const char *entry)
+node *STfind(node *symbol_table, char *name, int *store)
 {
-    DBUG_ENTER("STfind");
+    node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
 
-    if (symbol_table == NULL)
+    if (store)
     {
-        return NULL;
+        *store = 0;
     }
 
-    if (SYMBOLTABLEENTRY_TABLE(symbol_table) != NULL)
+    while (entry)
     {
-        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(symbol_table), entry);
+        if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
+        {
+            return entry;
+        }
+
+        entry = SYMBOLTABLEENTRY_NEXT(entry);
+
+        if (store)
+        {
+            (*store)++;
+        }
     }
 
-    if (strcmp(SYMBOLTABLEENTRY_NAME(symbol_table), entry) != 0)
+    if (store)
     {
-        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(symbol_table), entry);
+        *store = -1;
     }
 
-    DBUG_RETURN(symbol_table);
+    return NULL;
 }
 
 node *STlast(node *symbol_table)
@@ -73,13 +84,14 @@ node *STlast(node *symbol_table)
 
 void STprint(node *symbol_table)
 {
-    STdisplayEntry(SYMBOLTABLE_ENTRY(symbol_table), 0);
+    STprintentry(SYMBOLTABLE_ENTRIES(symbol_table), 0);
 }
 
 void STprintentry(node *symbol_table, size_t tabs)
 {
-    if (symbol_table == NULL)
+    if (symbol_table == NULL) {
         return;
+    }
 
     for (size_t i = 0; i < tabs; i++)
     {
@@ -107,8 +119,5 @@ void STprintentry(node *symbol_table, size_t tabs)
 
     printf(", Name: %s\n", SYMBOLTABLEENTRY_NAME(symbol_table));
 
-    if (SYMBOLTABLEENTRY_TABLE(symbol_table) != NULL)
-        STdisplay(SYMBOLTABLEENTRY_TABLE(symbol_table), tabs + 1);
-
-    STdisplayEntry(SYMBOLTABLEENTRY_NEXT(symbol_table), tabs);
+    STprintentry(SYMBOLTABLEENTRY_NEXT(symbol_table), tabs);
 }

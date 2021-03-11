@@ -10,6 +10,8 @@
 #include "str.h"
 #include "ctinfo.h"
 
+#include "symbol_table.h"
+
 struct INFO
 {
     node *table;
@@ -50,6 +52,30 @@ extern node *CAprogram(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
+node *CAglobdecl(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("CAglobdecl");
+
+    node *table = INFO_SYMBOL_TABLE(arg_info);
+    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDECL_NAME(arg_node)), GLOBDECL_TYPE(arg_node), 0, 0, 0, NULL);
+
+    STinsert(table, entry);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *CAglobdef(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("CAglobdef");
+
+    node *table = INFO_SYMBOL_TABLE(arg_info);
+    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDEF_NAME(arg_node)), GLOBDEF_TYPE(arg_node), 0, 0, 0, NULL);
+
+    STinsert(table, entry);
+
+    DBUG_RETURN(arg_node);
+}
+
 extern node *CAdoContextAnalysis(node *syntaxtree)
 {
     DBUG_ENTER("CAdoContextAnalysis");
@@ -60,9 +86,8 @@ extern node *CAdoContextAnalysis(node *syntaxtree)
     syntaxtree = TRAVdo(syntaxtree, info);
     TRAVpop();
 
-    STdisplay(INFO_SYMBOL_TABLE(info), 0);
+    STprint(INFO_SYMBOL_TABLE(info));
 
-    // free the pointer
     FreeInfo(info);
 
     DBUG_RETURN(syntaxtree);

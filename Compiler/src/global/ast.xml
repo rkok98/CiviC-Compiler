@@ -31,6 +31,8 @@
             <traversal id="CA" name="Context Analysis" default="sons" include="context_analysis.h">
                 <travuser>
                     <node name="Program" />
+                    <node name="GlobDecl" />
+                    <node name="GlobDef" />
                 </travuser>
             </traversal>
         </general>

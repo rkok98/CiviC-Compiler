@@ -79,7 +79,7 @@ print       = print.o
 
 codegen     = gen_byte_code.o
 
-analysis    = context_analysis.o
+analysis    = symbol_table.o context_analysis.o
 
 
 
