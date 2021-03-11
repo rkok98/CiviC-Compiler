@@ -340,10 +340,6 @@ expr:   constant
         {
             $$ = TBmakeVar( STRcpy( $1), NULL, NULL);
         }
-    |   PARENTHESIS_L expr binop expr PARENTHESIS_R
-        {
-            $$ = TBmakeBinop( $3, $2, $4);
-        }
     |   expr binop expr
         {
             $$ = TBmakeBinop( $2, $1, $3);
