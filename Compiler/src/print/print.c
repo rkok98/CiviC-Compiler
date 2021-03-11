@@ -970,7 +970,7 @@ PRTglobdecl(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTglobdecl");
 
-  printf("extern %s %s;\n", stype(GLOBDEF_TYPE(arg_node)), GLOBDEF_NAME(arg_node));
+  printf("extern %s %s;\n", stype(GLOBDECL_TYPE(arg_node)), GLOBDECL_NAME(arg_node));
 
   DBUG_RETURN(arg_node);
 }
