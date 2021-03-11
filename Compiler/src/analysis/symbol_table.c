@@ -35,6 +35,7 @@ node *STinsert(node *symbol_table, node *entry)
 
 node *STfind(node *symbol_table, char *name, int *store)
 {
+    DBUG_ENTER("STfind");
     node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
 
     if (store)
@@ -46,7 +47,7 @@ node *STfind(node *symbol_table, char *name, int *store)
     {
         if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
         {
-            return entry;
+            DBUG_RETURN(entry);
         }
 
         entry = SYMBOLTABLEENTRY_NEXT(entry);
@@ -62,13 +63,15 @@ node *STfind(node *symbol_table, char *name, int *store)
         *store = -1;
     }
 
-    return NULL;
+    DBUG_RETURN(NULL);
 }
 
 node *STlast(node *symbol_table)
 {
+    DBUG_ENTER("STlast");
+    
     if (!SYMBOLTABLE_ENTRIES(symbol_table)) {
-        return NULL;
+        DBUG_RETURN(NULL);
     }
 
     node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
@@ -77,7 +80,7 @@ node *STlast(node *symbol_table)
         entry = SYMBOLTABLEENTRY_NEXT(entry);
     }
 
-    return entry;
+    DBUG_RETURN(entry);
 }
 
 void STprint(node *symbol_table)
