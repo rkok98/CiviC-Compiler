@@ -39,7 +39,6 @@ static int yyerror( char *errname);
 %token VOID RETURN EXTERN EXPORT
 %token OTHER
 
-
 %token <cint> INTVAL
 %token <cflt> FLOATVAL
 %token <id> ID
@@ -69,7 +68,6 @@ static int yyerror( char *errname);
 %nonassoc PARENTHESIS_L
 %nonassoc PARENTHESIS_R
 %nonassoc ELSE
-
 
 %%
 
@@ -334,23 +332,27 @@ exprs:  expr COMMA exprs
         }
     ;
 
-expr:   
-        PARENTHESIS_L expr PARENTHESIS_R
+expr: 
+    constant
         {
-            $$ = $2;
+            $$ = $1;
+        }
+    |   ID
+        {
+            $$ = TBmakeVar( STRcpy( $1), NULL, NULL);
         }
     |   binop
         {
             $$ = $1;
         }
-    |   constant
+    |   monop
         {
             $$ = $1;
         }
-    |   monop expr
+    |   PARENTHESIS_L expr PARENTHESIS_R
         {
-            $$ = $1;
-        }        
+            $$ = $2;
+        }
     |   PARENTHESIS_L type PARENTHESIS_R expr %prec CAST
         {
             $$ = TBmakeCast( $2, $4);
@@ -362,10 +364,6 @@ expr:
     |   ID PARENTHESIS_L PARENTHESIS_R
         {
             $$ = TBmakeFuncall( STRcpy( $1), NULL, NULL);
-        }
-    |   ID
-        {
-            $$ = TBmakeVar( STRcpy( $1), NULL, NULL);
         }
     ;
 
