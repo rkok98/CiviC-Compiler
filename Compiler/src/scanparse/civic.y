@@ -44,24 +44,23 @@ static int yyerror( char *errname);
 
 %type <node> intval floatval boolval constant expr
 %type <node> stmts stmt assign varlet program
-%type <node> return exprstmt exprs
+%type <node> return exprstmt binop exprs monop
 %type <node> vardecl fundecl fundef funbody block ifelse
 %type <node> decl decls globdecl globdef for dowhile
 %type <node> param while
 
-%type <cbinop> binop
-%type <cmonop> monop
 %type <ctype> type
 
 %start program
 
+%right LET
 %left OR
 %left AND
 %left EQ NE
-%left LT GT LET LE GE
+%left LE LT GE GT
 %left PLUS MINUS
 %left STAR SLASH PERCENT
-%left NEG
+%right NOT CAST
 
 %nonassoc ID
 %nonassoc PARENTHESIS_L
@@ -332,26 +331,23 @@ exprs:  expr COMMA exprs
         }
     ;
 
-expr:   constant
-        {
-            $$ = $1;
-        }
-    |   ID
-        {
-            $$ = TBmakeVar( STRcpy( $1), NULL, NULL);
-        }
-    |   expr binop expr
-        {
-            $$ = TBmakeBinop( $2, $1, $3);
-        }
-    |   monop expr
-        {
-            $$ = TBmakeMonop( $1, $2);
-        }
-    |   PARENTHESIS_L expr PARENTHESIS_R
+expr:   
+        PARENTHESIS_L expr PARENTHESIS_R
         {
             $$ = $2;
         }
+    |   binop
+        {
+            $$ = $1;
+        }
+    |   constant
+        {
+            $$ = $1;
+        }
+    |   monop expr
+        {
+            $$ = $1;
+        }        
     |   PARENTHESIS_L type PARENTHESIS_R expr
         {
             $$ = TBmakeCast( $2, $4);
@@ -363,6 +359,10 @@ expr:   constant
     |   ID PARENTHESIS_L PARENTHESIS_R
         {
             $$ = TBmakeFuncall( STRcpy( $1), NULL, NULL);
+        }
+    |   ID
+        {
+            $$ = TBmakeVar( STRcpy( $1), NULL, NULL);
         }
     ;
 
@@ -402,23 +402,25 @@ boolval: TRUEVAL
          }
        ;
 
-binop: PLUS      { $$ = BO_add; }
-     | MINUS     { $$ = BO_sub; }
-     | STAR      { $$ = BO_mul; }
-     | SLASH     { $$ = BO_div; }
-     | PERCENT   { $$ = BO_mod; }
-     | LE        { $$ = BO_le;  }
-     | LT        { $$ = BO_lt;  }
-     | GE        { $$ = BO_ge;  }
-     | GT        { $$ = BO_gt;  }
-     | EQ        { $$ = BO_eq;  }
-     | NE        { $$ = BO_ne;  }
-     | OR        { $$ = BO_or;  }
-     | AND       { $$ = BO_and; }
-     ;
+monop:
+      MINUS expr   { $$ = TBmakeMonop(MO_neg, $2); }
+    | NOT expr     { $$ = TBmakeMonop(MO_not, $2); }
+    ;
 
-monop: MINUS     { $$ = MO_not; }
-     | NEG       { $$ = MO_neg; }
+binop: 
+       expr PLUS expr      { $$ = TBmakeBinop(BO_add, $1, $3); }
+     | expr MINUS expr     { $$ = TBmakeBinop(BO_sub, $1, $3); }
+     | expr STAR expr      { $$ = TBmakeBinop(BO_mul, $1, $3); }
+     | expr SLASH expr     { $$ = TBmakeBinop(BO_div, $1, $3); }
+     | expr PERCENT expr   { $$ = TBmakeBinop(BO_mod, $1, $3); }
+     | expr LE expr        { $$ = TBmakeBinop(BO_le,  $1, $3); }
+     | expr LT expr        { $$ = TBmakeBinop(BO_lt,  $1, $3); }
+     | expr GE expr        { $$ = TBmakeBinop(BO_ge,  $1, $3); }
+     | expr GT expr        { $$ = TBmakeBinop(BO_gt,  $1, $3); }
+     | expr EQ expr        { $$ = TBmakeBinop(BO_eq,  $1, $3); }
+     | expr NE expr        { $$ = TBmakeBinop(BO_ne,  $1, $3); }
+     | expr OR expr        { $$ = TBmakeBinop(BO_or,  $1, $3); }
+     | expr AND expr       { $$ = TBmakeBinop(BO_and, $1, $3); }
      ;
 
 type: INT        { $$ = T_int;   }
