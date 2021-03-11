@@ -62,8 +62,13 @@
 
 "void"                     { FILTER( VOID); }
 
-"true"                     { FILTER( TRUEVAL); }
-"false"                    { FILTER( FALSEVAL); }
+"true"                     { yylval.cbool = TRUE;
+                             FILTER(BOOLVAL);
+                           }
+                           
+"false"                    { yylval.cbool = FALSE;
+                             FILTER(BOOLVAL);
+                           }
 
 "int"                      { FILTER( INT); }
 "float"                    { FILTER( FLOAT); }
@@ -85,7 +90,7 @@
                            }
 
 [0-9]+                     { yylval.cint=atoi(yytext);
-                             FILTER( NUM);
+                             FILTER( INTVAL);
                            }
 
 [0-9]*[.][0-9]+            { yylval.cflt = atof(yytext);  
