@@ -10,12 +10,48 @@
 #include "str.h"
 #include "ctinfo.h"
 
-extern node *CAprogram (node * arg_node, info * arg_info) {
-    DBUG_ENTER("CAprogram");
-    DBUG_RETURN( arg_node);
+struct INFO
+{
+    node *table;
+};
+
+#define INFO_SYMBOL_TABLE(n) ((n)->table)
+
+static info *MakeInfo(node *parent)
+{
+    info *result;
+
+    DBUG_ENTER("MakeInfo");
+
+    result = (info *)MEMmalloc(sizeof(info));
+
+    node *table = TBmakeSymboltable(NULL, NULL);
+    INFO_SYMBOL_TABLE(result) = table;
+
+    DBUG_RETURN(result);
 }
 
-extern node *CAdoContextAnalysis(node *syntaxtree) {
+static info *FreeInfo(info *info)
+{
+    DBUG_ENTER("FreeInfo");
+
+    info = MEMfree(info);
+
+    DBUG_RETURN(info);
+}
+
+extern node *CAprogram(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("CAprogram");
+
+    PROGRAM_SYMBOLTABLE(arg_node) = INFO_SYMBOL_TABLE(arg_info);
+    PROGRAM_DECLS(arg_node) = TRAVopt(PROGRAM_DECLS(arg_node), arg_info);
+
+    DBUG_RETURN(arg_node);
+}
+
+extern node *CAdoContextAnalysis(node *syntaxtree)
+{
     DBUG_ENTER("CAdoContextAnalysis");
-    DBUG_RETURN( syntaxtree);
+    DBUG_RETURN(syntaxtree);
 }
