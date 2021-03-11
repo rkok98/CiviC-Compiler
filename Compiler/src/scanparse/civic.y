@@ -25,6 +25,7 @@ static int yyerror( char *errname);
  char               *id;
  int                 cint;
  float               cflt;
+ bool                cbool;
  binop               cbinop;
  monop               cmonop;
  type                ctype;
@@ -33,16 +34,17 @@ static int yyerror( char *errname);
 
 %token PARENTHESIS_L PARENTHESIS_R CURLY_L CURLY_R BRACKET_L BRACKET_R COMMA SEMICOLON
 %token MINUS PLUS STAR SLASH PERCENT LE LT GE GT EQ NE OR AND LET NEG
-%token INT BOOL VOID TRUEVAL FALSEVAL
+%token INT FLOAT BOOL VOID TRUEVAL FALSEVAL
 %token EXTERN EXPORT RETURN
 %token IF ELSE DO WHILE FOR
 
 
-%token <cint> NUM
-%token <cflt> FLOAT
+%token <cint> INTVAL
+%token <cflt> FLOATVAL
 %token <id> ID
+%token <cbool> BOOLVAL
 
-%type <node> intval floatval boolval constant expr
+%type <node> constant expr
 %type <node> stmts stmt assign varlet program
 %type <node> return exprstmt binop exprs monop
 %type <node> vardecl fundecl fundef funbody block ifelse
@@ -348,7 +350,7 @@ expr:
         {
             $$ = $1;
         }        
-    |   PARENTHESIS_L type PARENTHESIS_R expr
+    |   PARENTHESIS_L type PARENTHESIS_R expr %prec CAST
         {
             $$ = TBmakeCast( $2, $4);
         }
@@ -366,41 +368,19 @@ expr:
         }
     ;
 
-constant: floatval
+constant: FLOATVAL
           {
-            $$ = $1;
+            $$ = $$ = TBmakeFloat( $1);
           }
-        | intval
+        | INTVAL
           {
-            $$ = $1;
+            $$ = TBmakeNum( $1);
           }
-        | boolval
+        | BOOLVAL
           {
-            $$ = $1;
+            $$ = TBmakeBool($1);
           }
         ;
-
-floatval: FLOAT
-           {
-             $$ = TBmakeFloat( $1);
-           }
-         ;
-
-intval: NUM
-        {
-          $$ = TBmakeNum( $1);
-        }
-      ;
-
-boolval: TRUEVAL
-         {
-           $$ = TBmakeBool( TRUE);
-         }
-       | FALSEVAL
-         {
-           $$ = TBmakeBool( FALSE);
-         }
-       ;
 
 monop:
       MINUS expr   { $$ = TBmakeMonop(MO_neg, $2); }

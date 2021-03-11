@@ -85,7 +85,7 @@
                            }
 
 [0-9]+                     { yylval.cint=atoi(yytext);
-                             FILTER( NUM);
+                             FILTER( INTVAL);
                            }
 
 [0-9]*[.][0-9]+            { yylval.cflt = atof(yytext);  
