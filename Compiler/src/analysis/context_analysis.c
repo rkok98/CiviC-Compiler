@@ -53,5 +53,17 @@ extern node *CAprogram(node *arg_node, info *arg_info)
 extern node *CAdoContextAnalysis(node *syntaxtree)
 {
     DBUG_ENTER("CAdoContextAnalysis");
+
+    info *info = MakeInfo(NULL);
+
+    TRAVpush(TR_ca);
+    syntaxtree = TRAVdo(syntaxtree, info);
+    TRAVpop();
+
+    STdisplay(INFO_SYMBOL_TABLE(info), 0);
+
+    // free the pointer
+    FreeInfo(info);
+
     DBUG_RETURN(syntaxtree);
 }
