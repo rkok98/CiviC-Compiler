@@ -9,7 +9,9 @@ extern node *STfind(node *symbol_table, char *name, int *store);
 
 extern node *STlast(node *symbol_table);
 
-extern void STprint(node *symbol_table, size_t tabs);
+extern void STprint(node *symbol_table);
 extern void STprintentry(node *symbol_table, size_t tabs);
+extern void STprintindentation(size_t n);
+extern const char *STentrytype(type type);
 
 #endif

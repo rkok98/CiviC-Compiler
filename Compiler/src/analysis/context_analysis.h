@@ -11,6 +11,7 @@ extern node *CAfundecl(node *arg_node, info *arg_info);
 extern node *CAfundef(node *arg_node, info *arg_info);
 
 extern node *CAvardecl(node *arg_node, info *arg_info);
+extern node *CAvarlet(node *arg_node, info *arg_info);
 
 extern node *CAdoContextAnalysis(node *syntaxtree);
 

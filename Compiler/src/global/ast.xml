@@ -36,6 +36,7 @@
                     <node name="FunDecl" />
                     <node name="FunDef" />
                     <node name="VarDecl" />
+                    <node name="VarLet" />
                 </travuser>
             </traversal>
         </general>
@@ -1113,6 +1114,17 @@
                 </son>
             </sons>
             <attributes>
+                <attribute name="NestingLevel">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
                 <attribute name="Parent">
                     <type name="Link">
                         <targets>
@@ -1142,15 +1154,15 @@
                     </targets>
                 </son>
                 <son name="NextTable">
-                <targets>
-                    <target mandatory="no">
-                        <node name="SymbolTable"/>
-                        <phases>
-                            <all/>
-                        </phases>
-                    </target>
-                </targets>
-            </son>
+                    <targets>
+                        <target mandatory="no">
+                            <node name="SymbolTable"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
             </sons>
             <attributes>
                 <attribute name="Name">
@@ -1197,18 +1209,7 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="import">
-                    <type name="Bool">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
-                <attribute name="Export">
+                <attribute name="IsExport">
                     <type name="Bool">
                         <targets>
                             <target mandatory="yes">

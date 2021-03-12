@@ -85,48 +85,54 @@ node *STlast(node *symbol_table)
     DBUG_RETURN(entry);
 }
 
-void STprint(node *symbol_table, size_t tabs)
+void STprint(node *symbol_table)
 {
-    STprintentry(SYMBOLTABLE_ENTRIES(symbol_table), tabs);
+    printf("\n");
+    STprintindentation(SYMBOLTABLE_NESTINGLEVEL(symbol_table));
+    printf("%-10s %-10s %-10s\n", "Symbol:", "Type:", "Scope Level:");
+    STprintentry(SYMBOLTABLE_ENTRIES(symbol_table), SYMBOLTABLE_NESTINGLEVEL(symbol_table));
 }
 
-void STprintentry(node *symbol_table, size_t tabs)
+void STprintentry(node *entry, size_t nesting_level)
 {
-    if (symbol_table == NULL)
+    if (entry == NULL)
     {
         return;
     }
 
-    for (size_t i = 0; i < tabs; i++)
+    STprintindentation(nesting_level);
+    printf("%-10s %-10s %-10zu\n", SYMBOLTABLEENTRY_NAME(entry), STentrytype(SYMBOLTABLEENTRY_TYPE(entry)), nesting_level);
+
+    if (SYMBOLTABLEENTRY_NEXTTABLE(entry))
+    {
+        STprint(SYMBOLTABLEENTRY_NEXTTABLE(entry));
+    }
+
+    STprintentry(SYMBOLTABLEENTRY_NEXT(entry), nesting_level);
+}
+
+void STprintindentation(size_t n)
+{
+    for (size_t i = 0; i < n; i++)
     {
         printf("\t");
     }
+}
 
-    printf("Type: ");
-    switch (SYMBOLTABLEENTRY_TYPE(symbol_table))
+const char *STentrytype(type type)
+{
+    switch (type)
     {
     case T_void:
-        printf("void");
-        break;
+        return "void";
     case T_bool:
-        printf("bool");
-        break;
+        return "bool";
     case T_int:
-        printf("int");
-        break;
+        return "int";
     case T_float:
-        printf("float");
-        break;
+        return "float";
     case T_unknown:
         DBUG_ASSERT(0, "unknown type detected!");
+        return "Unknown";
     }
-
-    printf(", Name: %s\n", SYMBOLTABLEENTRY_NAME(symbol_table));
-
-    if (SYMBOLTABLEENTRY_NEXTTABLE(symbol_table))
-    {
-        STprint(SYMBOLTABLEENTRY_NEXTTABLE(symbol_table), tabs + 1);
-    }
-
-    STprintentry(SYMBOLTABLEENTRY_NEXT(symbol_table), tabs);
 }

@@ -7,6 +7,8 @@
         "cstring": "cpp",
         "iterator": "c",
         "dbug.h": "c",
-        "traverse.h": "c"
+        "traverse.h": "c",
+        "string": "c",
+        "iosfwd": "c"
     }
 }
