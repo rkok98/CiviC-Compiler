@@ -84,8 +84,6 @@ node *CAfundecl(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAfundecl");
 
-    // TODO: Do I need to create a symbol table for fundecl?
-
     node *table = INFO_SYMBOL_TABLE(arg_info);
     node *entry = TBmakeSymboltableentry(STRcpy(FUNDECL_NAME(arg_node)), FUNDECL_TYPE(arg_node), 0, 0, NULL, NULL);
 
@@ -102,9 +100,14 @@ node *CAfundef(node *arg_node, info *arg_info)
 
     info *fundef_info = MakeInfo(parent_table);
     node *fundef_table = INFO_SYMBOL_TABLE(fundef_info);
-    SYMBOLTABLE_NESTINGLEVEL(fundef_table) = SYMBOLTABLE_NESTINGLEVEL(parent_table) + 1;
 
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), 0, 0, NULL, INFO_SYMBOL_TABLE(fundef_info));
+    // Configure fundef symboltable
+    SYMBOLTABLE_PARENT(fundef_table) = parent_table;
+    SYMBOLTABLE_NESTINGLEVEL(fundef_table) = SYMBOLTABLE_NESTINGLEVEL(parent_table) + 1;
+    
+    FUNDEF_SYMBOLTABLE(arg_node) = fundef_table;
+
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), 1, FUNDEF_ISEXPORT(arg_node), NULL, INFO_SYMBOL_TABLE(fundef_info));
 
     STinsert(parent_table, entry);
 
@@ -159,8 +162,6 @@ extern node *CAdoContextAnalysis(node *syntaxtree)
     TRAVpush(TR_ca);
     syntaxtree = TRAVdo(syntaxtree, arg_info);
     TRAVpop();
-
-    STprint(INFO_SYMBOL_TABLE(arg_info));
 
     arg_info = FreeInfo(arg_info);
 

@@ -1,9 +1,1 @@
-extern int d;
-
-int a = 10;
-
-export int main() {
-    int y = 10;
-    printInt(a);
-    return 0;
-}
+bool b = !b;

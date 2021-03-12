@@ -407,6 +407,17 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="SymbolTable">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
             </attributes>
             <flags>
                 <flag name="IsExport" />
@@ -445,10 +456,7 @@
                     </targets>
                 </son>
             </sons>
-            <attributes>
-            </attributes>
-            <flags>
-            </flags>
+            <attributes />
         </node>
         <node name="IfElse">
             <sons>

@@ -58,7 +58,7 @@
 
 "="                        { FILTER( LET);   }
 
-"!"                        { FILTER( NEG);   }
+"!"                        { FILTER( NOT);   }
 
 "void"                     { FILTER( VOID); }
 

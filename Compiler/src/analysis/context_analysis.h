@@ -3,16 +3,16 @@
 
 #include "types.h"
 
-extern node *CAprogram(node *arg_node, info *arg_info);
-extern node *CAglobdecl(node *arg_node, info *arg_info);
-extern node *CAglobdef(node *arg_node, info *arg_info);
+node *CAprogram(node *arg_node, info *arg_info);
+node *CAglobdecl(node *arg_node, info *arg_info);
+node *CAglobdef(node *arg_node, info *arg_info);
 
-extern node *CAfundecl(node *arg_node, info *arg_info);
-extern node *CAfundef(node *arg_node, info *arg_info);
+node *CAfundecl(node *arg_node, info *arg_info);
+node *CAfundef(node *arg_node, info *arg_info);
 
-extern node *CAvardecl(node *arg_node, info *arg_info);
-extern node *CAvarlet(node *arg_node, info *arg_info);
+node *CAvardecl(node *arg_node, info *arg_info);
+node *CAvarlet(node *arg_node, info *arg_info);
 
-extern node *CAdoContextAnalysis(node *syntaxtree);
+node *CAdoContextAnalysis(node *syntaxtree);
 
 #endif
