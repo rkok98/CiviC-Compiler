@@ -1154,7 +1154,7 @@ node *PRTsymboltable(node *arg_node, info *arg_info)
   DBUG_ENTER("PRTsymboltable");
 
   printf("Symbol Table:\n\n");
-  printf("\t%-10s %-10s %-15s %-15s\n", "Symbol:", "Type:", "Is Function:", "Is Export:");
+  printf("\t%-10s %-10s %-15s %-15s %-15s\n", "Symbol:", "Type:", "Is Function:", "Is Export:", "Is Parameter");
   SYMBOLTABLE_ENTRIES(arg_node) = TRAVopt(SYMBOLTABLE_ENTRIES(arg_node), arg_info);
 
   DBUG_RETURN(arg_node);
@@ -1176,14 +1176,7 @@ node *PRTsymboltableentry(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTsymboltableentry");
 
-  printf("\t%-10s %-10s %-15s %-15s\n", SYMBOLTABLEENTRY_NAME(arg_node), stype(SYMBOLTABLEENTRY_TYPE(arg_node)), SYMBOLTABLEENTRY_ISFUNCTION(arg_node) ? "true" : "false" , SYMBOLTABLEENTRY_ISEXPORT(arg_node) ? "true" : "false");
-
-  if (SYMBOLTABLEENTRY_PARAMS(arg_node) != NULL)
-  {
-    printf("\t");
-    SYMBOLTABLEENTRY_PARAMS(arg_node) = TRAVdo(SYMBOLTABLEENTRY_PARAMS(arg_node), arg_info);
-    printf("\n");
-  }
+  printf("\t%-10s %-10s %-15s %-15s %-15s\n", SYMBOLTABLEENTRY_NAME(arg_node), stype(SYMBOLTABLEENTRY_TYPE(arg_node)), SYMBOLTABLEENTRY_ISFUNCTION(arg_node) ? "True" : "False", SYMBOLTABLEENTRY_ISEXPORT(arg_node) ? "True" : "False", SYMBOLTABLEENTRY_ISPARAMETER(arg_node) ? "True" : "False");
 
   if (SYMBOLTABLEENTRY_NEXT(arg_node) != NULL)
   {
