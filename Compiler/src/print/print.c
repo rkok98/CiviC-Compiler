@@ -1154,7 +1154,7 @@ node *PRTsymboltable(node *arg_node, info *arg_info)
   DBUG_ENTER("PRTsymboltable");
 
   printf("Symbol Table:\n\n");
-  printf("\t%-10s %-10s %-15s %-15s %-15s\n", "Symbol:", "Type:", "Is Function:", "Is Export:", "Is Parameter");
+  printf("\t%-10s %-10s %-15s %-15s %-15s\n", "Symbol:", "Type:", "Is Function:", "Is Export:", "Is Parameter:");
   SYMBOLTABLE_ENTRIES(arg_node) = TRAVopt(SYMBOLTABLE_ENTRIES(arg_node), arg_info);
 
   DBUG_RETURN(arg_node);
