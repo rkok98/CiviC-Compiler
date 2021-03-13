@@ -92,7 +92,7 @@ Consider the following CiviC code fragment:
 \end{lstlisting}
 
 \subsection{Static Single Assignment Form}
-Transform the above code into Static Single Assignment Form (SSA).
+\textbf{Transform the above code into Static Single Assignment Form (SSA).}
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Static Single Assignment Form (SSA), captionpos=b]
     i_0 = 0;
@@ -127,7 +127,7 @@ Transform the above code into Static Single Assignment Form (SSA).
 \end{lstlisting}    
 
 \subsection{Machine-Independent Optimisation}
-Apply the loop unswitching optimisation to the (original) code above.
+\textbf{Apply the loop unswitching optimisation to the (original) code above.}
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Loop unswitching optimisation, captionpos=b]
     i = 0;
@@ -154,9 +154,9 @@ Apply the loop unswitching optimisation to the (original) code above.
 \end{lstlisting}    
 
 \subsection{Compilation Schemes}
-Devise a formal compilation scheme that systematically eliminates all occurrences of
+\textbf{Devise a formal compilation scheme that systematically eliminates all occurrences of
 while-loops in the body of a CiviC function definition and replaces them by semantically 
-equivalent code without while-loops.
+equivalent code without while-loops.}
 
 To replace while-loops with semantically equivalent code, we need to know what our possibilities
 are. An option is to use a never ending for-loop with a break-if statement, but this is not supported
@@ -166,11 +166,11 @@ by the CiviC language.
 We will replace the while-loops in a body of a CiviC function with do-while-loops with the following
 steps:
 
-1. Check with pattern matching for while-loops in the code.
-
-2. Recursively loop until no next pattern is found
-
-3. Replace while-loop by do-while-loop:
+\begin{enumerate}
+    \item Check with pattern matching for while-loops in the code.
+    \item Recursively loop until no next pattern is found
+    \item Replace while-loop by do-while-loop:
+\end{enumerate}
 
 
 \begin{lstlisting}
