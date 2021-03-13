@@ -27,8 +27,7 @@ static info *MakeInfo(node *parent)
 
     result = (info *)MEMmalloc(sizeof(info));
 
-    node *table = TBmakeSymboltable(0, NULL, NULL);
-    INFO_SYMBOL_TABLE(result) = table;
+    INFO_SYMBOL_TABLE(result) = NULL;
 
     DBUG_RETURN(result);
 }
