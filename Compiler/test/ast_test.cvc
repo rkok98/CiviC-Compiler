@@ -1,4 +1,7 @@
+int y = 10;
 int foo(int a, float b,int c)
 {
+    int x = 9;
+    int a = 0;
     return a + b + c;
 }

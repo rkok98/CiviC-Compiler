@@ -13,9 +13,11 @@ node *STinsert(node *symbol_table, node *entry)
 {
     DBUG_ENTER("STinsert");
 
-    if (STfind(symbol_table, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
+    node *first_entry = SYMBOLTABLE_ENTRIES(symbol_table);
+
+    if (STfind(first_entry, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
     {
-        CTIerror("Redefinition of var %s at line %d, column %d", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry), NODE_COL(entry));
+        CTIerror("Variable/Function '%s' at line %d is already defined.", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry) + 1);
         return NULL;
     }
 
@@ -33,19 +35,22 @@ node *STinsert(node *symbol_table, node *entry)
     DBUG_RETURN(entry);
 }
 
-node *STfind(node *symbol_table, char *name)
+node *STfind(node *entry, char *name)
 {
     DBUG_ENTER("STfind");
-    node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
 
-    while (entry)
+    if (entry == NULL)
     {
-        if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
-        {
-            DBUG_RETURN(entry);
-        }
+        DBUG_RETURN(NULL);
+    }
 
-        entry = SYMBOLTABLEENTRY_NEXT(entry);
+    if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
+    {
+        DBUG_RETURN(entry);
+    }
+
+    if (SYMBOLTABLEENTRY_NEXT(entry) != NULL) {
+        DBUG_RETURN(STfind(SYMBOLTABLEENTRY_NEXT(entry), name));
     }
 
     DBUG_RETURN(NULL);
