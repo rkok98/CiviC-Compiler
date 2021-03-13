@@ -9,6 +9,9 @@
         "dbug.h": "c",
         "traverse.h": "c",
         "string": "c",
-        "iosfwd": "c"
+        "iosfwd": "c",
+        "__node_handle": "c",
+        "types.h": "c",
+        "variable_initialisation.h": "c"
     }
 }

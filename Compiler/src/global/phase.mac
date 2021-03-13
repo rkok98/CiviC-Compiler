@@ -37,6 +37,12 @@ SUBPHASE( ca,
           ALWAYS,
           ac)
 
+SUBPHASE( vi,
+          "Initializing Variables",
+          VIinitializeVariables, 
+          ALWAYS,
+          ac)
+
 ENDPHASE(ac)
 
 /******************************************************************************/

@@ -40,6 +40,13 @@
                     <node name="VarLet" />
                 </travuser>
             </traversal>
+
+            <traversal id="VI" name="Variable Initialisation" default="sons" include="variable_initialisation.h">
+                <travuser>
+                    <node name="Program" />
+                    <node name="GlobDef" />
+                </travuser>
+            </traversal>
         </general>
     </phases>
     <nodesets>
