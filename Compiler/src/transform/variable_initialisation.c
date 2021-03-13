@@ -11,6 +11,7 @@
 #include "str.h"
 #include "ctinfo.h"
 #include "copy.h"
+#include "types.h"
 
 struct INFO
 {
@@ -46,20 +47,17 @@ static info *FreeInfo(info *info)
 
 node *VIprogram(node *arg_node, info *arg_info)
 {
-    return arg_node;
-}
+    DBUG_ENTER("VIprogram");
 
-node *VIfunbody(node *arg_node, info *arg_info)
-{
-    return arg_node;
+    node *init_body = TBmakeFunbody(NULL, NULL, NULL);
+    node *init_function = TBmakeFundef(T_void, "__init", init_body, NULL);
+
+    // CONTINUE
+
+    DBUG_ENTER(arg_node);
 }
 
 node *VIglobdef(node *arg_node, info *arg_info)
-{
-    return arg_node;
-}
-
-node *VIvardecl(node *arg_node, info *arg_info)
 {
     return arg_node;
 }
