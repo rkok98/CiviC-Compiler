@@ -13,7 +13,7 @@ node *STinsert(node *symbol_table, node *entry)
 {
     DBUG_ENTER("STinsert");
 
-    if (STfind(symbol_table, SYMBOLTABLEENTRY_NAME(entry), NULL) != NULL)
+    if (STfind(symbol_table, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
     {
         CTIerror("Redefinition of var %s at line %d, column %d", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry), NODE_COL(entry));
         return NULL;
@@ -33,15 +33,10 @@ node *STinsert(node *symbol_table, node *entry)
     DBUG_RETURN(entry);
 }
 
-node *STfind(node *symbol_table, char *name, int *store)
+node *STfind(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfind");
     node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
-
-    if (store)
-    {
-        *store = 0;
-    }
 
     while (entry)
     {
@@ -51,16 +46,6 @@ node *STfind(node *symbol_table, char *name, int *store)
         }
 
         entry = SYMBOLTABLEENTRY_NEXT(entry);
-
-        if (store)
-        {
-            (*store)++;
-        }
-    }
-
-    if (store)
-    {
-        *store = -1;
     }
 
     DBUG_RETURN(NULL);
