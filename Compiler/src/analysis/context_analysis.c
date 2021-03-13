@@ -27,7 +27,8 @@ static info *MakeInfo(node *parent)
 
     result = (info *)MEMmalloc(sizeof(info));
 
-    INFO_SYMBOL_TABLE(result) = NULL;
+    node *table = TBmakeSymboltable(0, parent, NULL);
+    INFO_SYMBOL_TABLE(result) = table;
 
     DBUG_RETURN(result);
 }
@@ -45,10 +46,8 @@ extern node *CAprogram(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAprogram");
 
-    node *table = TBmakeSymboltable(0, NULL, NULL);
-
+    node *table = INFO_SYMBOL_TABLE(arg_info);
     PROGRAM_SYMBOLTABLE(arg_node) = table;
-    INFO_SYMBOL_TABLE(arg_info) = table;
 
     PROGRAM_DECLS(arg_node) = TRAVopt(PROGRAM_DECLS(arg_node), arg_info);
 
@@ -114,8 +113,6 @@ node *CAfundef(node *arg_node, info *arg_info)
     info *fundef_info = MakeInfo(parent_table);
     node *fundef_table = INFO_SYMBOL_TABLE(fundef_info);
 
-    // Configure fundef symboltable
-    SYMBOLTABLE_PARENT(fundef_table) = parent_table;
     SYMBOLTABLE_NESTINGLEVEL(fundef_table) = SYMBOLTABLE_NESTINGLEVEL(parent_table) + 1;
 
     FUNDEF_SYMBOLTABLE(arg_node) = fundef_table;
