@@ -19,16 +19,13 @@ struct INFO
 
 #define INFO_SYMBOL_TABLE(n) ((n)->table)
 
-static info *MakeInfo(node *parent)
+static info *MakeInfo(void)
 {
     info *result;
 
     DBUG_ENTER("MakeInfo");
 
     result = (info *)MEMmalloc(sizeof(info));
-
-    node *table = TBmakeSymboltable(0, parent, NULL);
-    INFO_SYMBOL_TABLE(result) = table;
 
     DBUG_RETURN(result);
 }
@@ -46,7 +43,9 @@ extern node *CAprogram(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAprogram");
 
-    node *table = INFO_SYMBOL_TABLE(arg_info);
+    node *table = TBmakeSymboltable(0, NULL, NULL);
+    
+    INFO_SYMBOL_TABLE(arg_info) = table;
     PROGRAM_SYMBOLTABLE(arg_node) = table;
 
     PROGRAM_DECLS(arg_node) = TRAVopt(PROGRAM_DECLS(arg_node), arg_info);
@@ -110,11 +109,10 @@ node *CAfundef(node *arg_node, info *arg_info)
 
     node *parent_table = INFO_SYMBOL_TABLE(arg_info);
 
-    info *fundef_info = MakeInfo(parent_table);
-    node *fundef_table = INFO_SYMBOL_TABLE(fundef_info);
+    info *fundef_info = MakeInfo();
+    node *fundef_table = TBmakeSymboltable(SYMBOLTABLE_NESTINGLEVEL(parent_table) + 1, parent_table, NULL);
 
-    SYMBOLTABLE_NESTINGLEVEL(fundef_table) = SYMBOLTABLE_NESTINGLEVEL(parent_table) + 1;
-
+    INFO_SYMBOL_TABLE(fundef_info) = fundef_table;
     FUNDEF_SYMBOLTABLE(arg_node) = fundef_table;
 
     node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), 1, FUNDEF_ISEXPORT(arg_node), 0, NULL, INFO_SYMBOL_TABLE(fundef_info));
@@ -167,7 +165,7 @@ extern node *CAdoContextAnalysis(node *syntaxtree)
 {
     DBUG_ENTER("CAdoContextAnalysis");
 
-    info *arg_info = MakeInfo(NULL);
+    info *arg_info = MakeInfo();
 
     TRAVpush(TR_ca);
     syntaxtree = TRAVdo(syntaxtree, arg_info);
