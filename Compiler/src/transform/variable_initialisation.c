@@ -17,13 +17,11 @@ struct INFO
 {
     node *symbol_table;
     node *init_function;
-    node *first_statement;
     node *last_statement;
 };
 
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_INIT_FUNCTION(n) ((n)->init_function)
-#define INFO_FIRST_STATEMENT(n) ((n)->first_statement)
 #define INFO_LAST_STATEMENT(n) ((n)->last_statement)
 
 static info *MakeInfo(void)
@@ -36,7 +34,6 @@ static info *MakeInfo(void)
 
     INFO_SYMBOL_TABLE(result) = NULL;
     INFO_INIT_FUNCTION(result) = NULL;
-    INFO_FIRST_STATEMENT(result) = NULL;
     INFO_LAST_STATEMENT(result) = NULL;
 
     DBUG_RETURN(result);
@@ -55,40 +52,21 @@ node *VIprogram(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("VIprogram");
 
-    // set the symbol table
-    INFO_SYMBOL_TABLE(arg_info) = PROGRAM_SYMBOLTABLE(arg_node);
+    node *init_body = TBmakeFunbody(NULL, NULL, NULL);
+    node *init_function = TBmakeFundef(T_void, STRcpy("__init"), init_body, NULL);
 
-    // traverse over the decls
-    PROGRAM_DECLS(arg_node) = TRAVopt(PROGRAM_DECLS(arg_node), arg_info);
+    node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
+    FUNDEF_SYMBOLTABLE(init_function) = init_symbol_table;
 
-    // get the added statements
-    node *stmts = INFO_FIRST_STATEMENT(arg_info);
+    INFO_INIT_FUNCTION(arg_info) = init_function;
 
-    // do we need to append statements?
-    if (stmts == NULL) {
-        DBUG_RETURN(arg_node);
+    node *declarations = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
+
+    if (INFO_LAST_STATEMENT(arg_info) != NULL) {
+        PROGRAM_DECLS(arg_node) = TBmakeDecls(init_function, declarations);
+    } else {
+        FREEdoFreeTree(init_function);
     }
-
-    // Create the __init function
-    node *funbod = TBmakeFunbody(NULL, NULL, stmts);
-    node *init = TBmakeFundef(T_void, STRcpy("__init"), funbod, NULL);
-    FUNDEF_ISEXPORT(init) = 1;
-
-    // prepend the __init function to other DECLS
-    PROGRAM_DECLS(arg_node) = TBmakeDecls(init, PROGRAM_DECLS(arg_node));
-
-    // refernce to the symbol table
-    node *table = INFO_SYMBOL_TABLE(arg_info);
-
-    // create a new symbol table for this function definition
-    node *inittable = TBmakeSymboltable(1, NULL, NULL);
-    SYMBOLTABLE_PARENT(inittable) = table;
-
-    // create the symbol table
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(init)), FUNDEF_TYPE(init), 1, 0, 0, NULL, inittable);
-
-    // add the entry to the symbol table
-    STinsert(table, entry);
 
     DBUG_RETURN(arg_node);
 }
@@ -98,26 +76,25 @@ node *VIglobdef(node *arg_node, info *arg_info)
     DBUG_ENTER("VIglobdef");
 
     node *expr = GLOBDEF_INIT(arg_node);
+    expr = TRAVopt(expr, arg_info);
 
-    // do we have expressions?
-    if (expr == NULL) DBUG_RETURN(arg_node);
-    
-    node *varlet = TBmakeVarlet(STRcpy(GLOBDEF_NAME(arg_node)), arg_node, NULL);
-    node *assign = TBmakeAssign(varlet, COPYdoCopy(expr));
+    if(expr) {
+        node *init_function = INFO_INIT_FUNCTION(arg_info);
 
-    FREEdoFreeTree(expr);
-    GLOBDEF_INIT(arg_node) = NULL;
+        node *varlet = TBmakeVarlet(STRcpy(GLOBDEF_NAME(arg_node)), arg_node, NULL);
+        node *assign = TBmakeAssign(varlet, COPYdoCopy(expr));
 
-    if (INFO_FIRST_STATEMENT(arg_info) == NULL)
-    {
-        INFO_FIRST_STATEMENT(arg_info) = TBmakeStmts(assign, NULL);
-        INFO_LAST_STATEMENT(arg_info) = INFO_FIRST_STATEMENT(arg_info);
-    }
-    else
-    {
-        node *node = TBmakeStmts(assign, NULL);
-        STMTS_NEXT(INFO_LAST_STATEMENT(arg_info)) = node;
-        INFO_LAST_STATEMENT(arg_info) = node;
+        node *new_statements = TBmakeStmts(assign, NULL);
+
+        node *last_statements = INFO_LAST_STATEMENT(arg_info);
+        if (!last_statements) {
+            FUNBODY_STMTS(FUNDEF_FUNBODY(init_function)) = new_statements;
+        } else {
+            STMTS_NEXT(last_statements) = new_statements;
+        }
+
+        INFO_LAST_STATEMENT(arg_info) = new_statements;
+        GLOBDEF_INIT(arg_node) = NULL;
     }
 
     DBUG_RETURN(arg_node);
