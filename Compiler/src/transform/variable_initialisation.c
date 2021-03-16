@@ -17,10 +17,12 @@ struct INFO
 {
     node *symbol_table;
     node *init_function;
+    node *statements;
 };
 
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_INIT_FUNCTION(n) ((n)->init_function)
+#define INFO_STATEMENTS(n) ((n)->symbol_table)
 
 static info *MakeInfo(void)
 {
@@ -32,6 +34,7 @@ static info *MakeInfo(void)
 
     INFO_SYMBOL_TABLE(result) = NULL;
     INFO_INIT_FUNCTION(result) = NULL;
+    INFO_STATEMENTS(result) = NULL;
 
     DBUG_RETURN(result);
 }
@@ -50,7 +53,7 @@ node *VIprogram(node *arg_node, info *arg_info)
     DBUG_ENTER("VIprogram");
 
     node *init_body = TBmakeFunbody(NULL, NULL, NULL);
-    node *init_function = TBmakeFundef(T_void, STRcpy("__init"), init_body, NULL);
+    node *init_function = TBmakeFundef(T_void, "__init", init_body, NULL);
 
     node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
     FUNDEF_SYMBOLTABLE(init_function) = init_symbol_table;
@@ -67,6 +70,27 @@ node *VIprogram(node *arg_node, info *arg_info)
 node *VIglobdef(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("VIglobdef");
+
+    node *expr = GLOBDEF_INIT(arg_node);
+    expr = TRAVopt(expr, arg_info);
+
+    if(expr) {
+        node *init_function = INFO_INIT_FUNCTION(arg_info);
+        
+        node *new_statement = TBmakeAssign(NULL, expr);
+        node *new_statements = TBmakeStmts(new_statement, NULL);
+
+        node *last_statements = INFO_STATEMENTS(arg_info);
+
+        if (!last_statements) {
+            FUNBODY_STMTS(FUNDEF_FUNBODY(init_function)) = new_statements;
+        } else {
+            STMTS_NEXT(last_statements) = new_statements;
+        }
+
+        INFO_STATEMENTS(arg_info) = new_statements;
+        GLOBDEF_INIT(arg_node) = NULL;
+    }
 
     DBUG_RETURN(arg_node);
 }
