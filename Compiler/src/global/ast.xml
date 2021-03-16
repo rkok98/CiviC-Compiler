@@ -41,7 +41,7 @@
                 </travuser>
             </traversal>
 
-            <traversal id="VI" name="Variable Initialisation" default="sons" include="variable_initialisation.h">
+            <traversal id="GVI" name="Global Variable Initialisation" default="sons" include="global_variable_initialisation.h">
                 <travuser>
                     <node name="Program" />
                     <node name="GlobDef" />

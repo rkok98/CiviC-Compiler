@@ -1,4 +1,4 @@
-#include "variable_initialisation.h"
+#include "global_variable_initialisation.h"
 
 #include "symbol_table.h"
 #include "types.h"
@@ -48,15 +48,12 @@ static info *FreeInfo(info *info)
     DBUG_RETURN(info);
 }
 
-node *VIprogram(node *arg_node, info *arg_info)
+node *GVIprogram(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("VIprogram");
 
     node *init_body = TBmakeFunbody(NULL, NULL, NULL);
     node *init_function = TBmakeFundef(T_void, STRcpy("__init"), init_body, NULL);
-
-    node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
-    FUNDEF_SYMBOLTABLE(init_function) = init_symbol_table;
 
     INFO_INIT_FUNCTION(arg_info) = init_function;
 
@@ -74,7 +71,7 @@ node *VIprogram(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *VIglobdef(node *arg_node, info *arg_info)
+node *GVIglobdef(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("VIglobdef");
 
@@ -107,13 +104,13 @@ node *VIglobdef(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *VIinitializeVariables(node *syntaxtree)
+node *GVIinitializeGlobalVariables(node *syntaxtree)
 {
-    DBUG_ENTER("CVinitializeVariables");
+    DBUG_ENTER("GVIinitializeGlobalVariables");
 
     info *info = MakeInfo();
 
-    TRAVpush(TR_vi);
+    TRAVpush(TR_gvi);
     syntaxtree = TRAVdo(syntaxtree, info);
     TRAVpop();
 

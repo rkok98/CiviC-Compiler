@@ -31,17 +31,17 @@ PHASE( ac,
        "Analyzing Code",
        ALWAYS)
 
-SUBPHASE( ca,
+SUBPHASE(  ca,
           "Running Context Analysis",
-          CAdoContextAnalysis, 
-          ALWAYS,
-          ac)
+           CAdoContextAnalysis, 
+           ALWAYS,
+           ac)
 
-SUBPHASE( vi,
-          "Initializing Variables",
-          VIinitializeVariables, 
-          ALWAYS,
-          ac)
+SUBPHASE(  vi,
+          "Initializing Global Variables",
+           GVIinitializeGlobalVariables, 
+           ALWAYS,
+           ac)
 
 ENDPHASE(ac)
 

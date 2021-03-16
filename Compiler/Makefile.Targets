@@ -81,7 +81,7 @@ codegen     = gen_byte_code.o
 
 analysis    = symbol_table.o context_analysis.o
 
-transform   = variable_initialisation.o
+transform   = global_variable_initialisation.o
 
 
 
