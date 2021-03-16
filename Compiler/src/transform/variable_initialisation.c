@@ -62,9 +62,12 @@ node *VIprogram(node *arg_node, info *arg_info)
 
     node *declarations = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
 
-    if (INFO_LAST_STATEMENT(arg_info) != NULL) {
+    if (INFO_LAST_STATEMENT(arg_info) != NULL)
+    {
         PROGRAM_DECLS(arg_node) = TBmakeDecls(init_function, declarations);
-    } else {
+    }
+    else
+    {
         FREEdoFreeTree(init_function);
     }
 
@@ -75,25 +78,29 @@ node *VIglobdef(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("VIglobdef");
 
-    node *expr = GLOBDEF_INIT(arg_node);
-    expr = TRAVopt(expr, arg_info);
+    node *globdef_init = GLOBDEF_INIT(arg_node);
+    globdef_init = TRAVopt(globdef_init, arg_info);
 
-    if(expr) {
+    if (globdef_init)
+    {
         node *init_function = INFO_INIT_FUNCTION(arg_info);
 
-        node *varlet = TBmakeVarlet(STRcpy(GLOBDEF_NAME(arg_node)), arg_node, NULL);
-        node *assign = TBmakeAssign(varlet, COPYdoCopy(expr));
+        node *globdef_varlet = TBmakeVarlet(STRcpy(GLOBDEF_NAME(arg_node)), arg_node, NULL);
+        node *globdef_assign = TBmakeAssign(globdef_varlet, COPYdoCopy(globdef_init));
 
-        node *new_statements = TBmakeStmts(assign, NULL);
+        node *new_statement = TBmakeStmts(globdef_assign, NULL);
 
-        node *last_statements = INFO_LAST_STATEMENT(arg_info);
-        if (!last_statements) {
-            FUNBODY_STMTS(FUNDEF_FUNBODY(init_function)) = new_statements;
-        } else {
-            STMTS_NEXT(last_statements) = new_statements;
+        node *last_statement = INFO_LAST_STATEMENT(arg_info);
+        if (!last_statement)
+        {
+            FUNBODY_STMTS(FUNDEF_FUNBODY(init_function)) = new_statement;
+        }
+        else
+        {
+            STMTS_NEXT(last_statement) = new_statement;
         }
 
-        INFO_LAST_STATEMENT(arg_info) = new_statements;
+        INFO_LAST_STATEMENT(arg_info) = new_statement;
         GLOBDEF_INIT(arg_node) = NULL;
     }
 
