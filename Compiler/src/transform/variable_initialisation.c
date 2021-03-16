@@ -50,16 +50,25 @@ node *VIprogram(node *arg_node, info *arg_info)
     DBUG_ENTER("VIprogram");
 
     node *init_body = TBmakeFunbody(NULL, NULL, NULL);
-    node *init_function = TBmakeFundef(T_void, "__init", init_body, NULL);
+    node *init_function = TBmakeFundef(T_void, STRcpy("__init"), init_body, NULL);
 
-    // CONTINUE
+    node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
+    FUNDEF_SYMBOLTABLE(init_function) = init_symbol_table;
 
-    DBUG_ENTER(arg_node);
+    INFO_INIT_FUNCTION(arg_info) = init_function;
+
+    node *declarations = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
+
+    PROGRAM_DECLS(arg_node) = TBmakeDecls(init_function, declarations);
+
+    DBUG_RETURN(arg_node);
 }
 
 node *VIglobdef(node *arg_node, info *arg_info)
 {
-    return arg_node;
+    DBUG_ENTER("VIglobdef");
+
+    DBUG_RETURN(arg_node);
 }
 
 node *VIinitializeVariables(node *syntaxtree)
