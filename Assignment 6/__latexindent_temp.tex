@@ -2,7 +2,7 @@
 %	PACKAGES EN DOCUMENT CONFIGURATIE
 %-------------------------------------------------------------------------------
 
-\documentclass{uva-inf-article}
+\documentclass[hidelinks]{uva-inf-article}
 \usepackage[english]{babel}
 
 \usepackage{tikz}
@@ -15,11 +15,11 @@
 %-------------------------------------------------------------------------------
 
 % Vul de naam van de opdracht in.
-\assignment{Assignment 2}
+\assignment{Assignment 6}
 % Vul het soort opdracht in.
 \assignmenttype{Essay}
 % Vul de titel van de eindopdracht in.
-\title{Lexicographic Analysis}
+\title{Code Generation}
 
 % Vul de volledige namen van alle auteurs in.
 \author{René Kok}
@@ -59,107 +59,44 @@
 %-------------------------------------------------------------------------------
 
 \section{Introduction}
-\lipsum[1]
-
+\begin{flushleft}
+\par This report provides information regarding the sixth assignment 
+"Code Generation" of the course Compiler Construction by Dhr.
+dr. C.U. Grelck. The goal of this assignment is to  Manually generate CiviC-VM assembly code, apply the loop unswitching optimisation and
+devise a formal compilation scheme that systematically eliminates all occurrences of 
+while-loops.
 %-------------------------------------------------------------------------------
 %	METHODE
 %-------------------------------------------------------------------------------
 
 \newpage
-\section{Assignment}
+\section{Code Generation}
+Consider the following CiviC function definition:
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=CiviC function definition, captionpos=b]
+    int factorial ( int x )
+    {
+        int res ;
+        if ( x <= 1) res = 1;
+        else res = x * factorial ( x - 1);
+        return res ;
+    }
 
-\subsection{Thompson’s Construction}
-\lipsum[1]
-\begin{figure}[h]
-    \centering
-    \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
-        \node[state, initial](2){2};
-        \node[state, right=of 2](3){3};
-        \node[state, accepting, right=of 3](4){4};
-        \path[->] 
-        (2) edge node {a} (3)
-        (3) edge node {c} (4);
-    \end{tikzpicture}
-    \caption{Step 1 creating non-deterministic finite automaton for ”(ac$\mid$ab)*}
-    \end{figure}
+\end{lstlisting}
 
-    \begin{figure}[h]
-        \centering
-        \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto]
-            \node[state, initial](2){2};
-            \node[state, right=of 2](3){3};
-            \node[state, accepting, right=of 3](4){4};
-            \node[state, initial, below=of 2](5){5};
-            \node[state, right=of 5](6){6};
-            \node[state, accepting, right=of 6](7){7};
-            \path[->] 
-            (2) edge node {a} (3)
-            (3) edge node {c} (4) 
-            (5) edge node {a} (6)
-            (6) edge node {b} (7);
-        \end{tikzpicture}
-        \caption{Step 2 creating non-deterministic finite automaton for ”(ac$\mid$ab)*}
-        \end{figure}
-
-        \begin{figure}[h]
-            \centering
-        \begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
-            \node[state, initial](1){1};
-            \node[state, right=of 1](5){5};
-            \node[state, above=of 5](2){2};
-            \node[state, right=of 2](3){3};
-            \node[state, right=of 3](4){4};
-            \node[state, right=of 5](6){6};
-            \node[state, right=of 6](7){7};
-            \node[state, accepting, right=of 7](8){8};
-            \path[->] 
-            (1) edge node {$\epsilon$} (2)
-                edge node {$\epsilon$} (5)
-            (2) edge node {a} (3)
-            (3) edge node {c} (4)
-            (4) edge node {$\epsilon$} (8)
-            (5) edge node {a} (6)
-            (6) edge node {b} (7)
-            (7) edge node {$\epsilon$} (8);
-        \end{tikzpicture}
-        \caption{Step 3 creating non-deterministic finite automaton for ”(ac$\mid$ab)*}
-        \end{figure}        
+\textbf{Manually generate CiviC-VM assembly code for the above function definition. Make use of
+labels to mark destinations of jump instructions.}
 
 
-\begin{figure}[h]
-    \centering
-\begin{tikzpicture}[shorten >=1pt,node distance=2cm,on grid,auto] 
-    \node[state, initial](0) {0};
-    \node[state, below right=of 0](1){1};
-    \node[state, right=of 1](5){5};
-    \node[state, above=of 5](2){2};
-    \node[state, right=of 2](3){3};
-    \node[state, right=of 3](4){4};
-    \node[state, right=of 5](6){6};
-    \node[state, right=of 6](7){7};
-    \node[state, right=of 7](8){8};
-    \node[state, accepting, above right=of 8](9){9};
-    \path[->] 
-    (0) edge node {$\epsilon$} (1)
-        edge [bend left] node {$\epsilon$} (9)
-    (1) edge node {$\epsilon$} (2)
-        edge node {$\epsilon$} (5)
-    (2) edge node {a} (3)
-    (3) edge node {c} (4)
-    (4) edge node {$\epsilon$} (8)
-    (5) edge node {a} (6)
-    (6) edge node {b} (7)
-    (7) edge node {$\epsilon$} (8)
-    (8) edge node {$\epsilon$} (9)
-        edge [bend left] node {$\epsilon$} (1);
-\end{tikzpicture}
-\caption{Final non-deterministic finite automaton for "(ac$\mid$ab)*"}
-\end{figure}
-\subsection{Subset Construction}
-\lipsum[1]
-\subsection{Hopcroft’s Algorithm}
-\lipsum[1]
-\subsection{Direct-coded Scanner}
-\lipsum[1]
-\lstinputlisting[language=C]{code.c}
+\textbf{Point out the relationship between assembly code and source code through line by line
+comments in the assembly code.}
+
+
+\textbf{Add the number of bytes required for each line of CiviC-VM assembly code. Assume here
+jump instructions would take byte code offsets as arguments and not labels.}
+
+
+\textbf{Compute the proper byte code offset for each jump instruction. Consult the CiviC-VM
+manual for details on individual instructions.}
+
+\end{flushleft}
 \end{document}

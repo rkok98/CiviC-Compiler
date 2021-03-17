@@ -15,11 +15,11 @@
 %-------------------------------------------------------------------------------
 
 % Vul de naam van de opdracht in.
-\assignment{Assignment 5}
+\assignment{Assignment 6}
 % Vul het soort opdracht in.
 \assignmenttype{Essay}
 % Vul de titel van de eindopdracht in.
-\title{Code Transformation and Optimisation}
+\title{Code Generation}
 
 % Vul de volledige namen van alle auteurs in.
 \author{René Kok}
@@ -60,127 +60,117 @@
 
 \section{Introduction}
 \begin{flushleft}
-\par This report provides information regarding the fifth assignment 
-"Code Transformation and Optimisation" of the course Compiler Construction by Dhr.
-dr. C.U. Grelck. The goal of this assignment is to transform the given code into 
-a Static Single Assignment Form (SSA), apply the loop unswitching optimisation and
-devise a formal compilation scheme that systematically eliminates all occurrences of 
-while-loops.
+\par This report provides information regarding the sixth assignment 
+"Code Generation" of the course Compiler Construction by Dhr.
+dr. C.U. Grelck. The goal of this assignment is to manually generate CiviC-VM 
+assembly code, point out the relationship between assembly code and source code,
+add the number of bytes required for each line of CiviC-VM assembly code, compute 
+the proper byte code offset for each jump instruction and lastly devise a 
+compilation scheme that replaces each occurrence of a for-loop in the body of 
+a CiviC function by semantically equivalent CiviC code
 %-------------------------------------------------------------------------------
 %	METHODE
 %-------------------------------------------------------------------------------
 
 \newpage
-\section{Code Transformation and Optimisation}
-Consider the following CiviC code fragment:
-\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=CiviC code fragment, captionpos=b]
-    i = 0;
-    while (i < n) {
-        j = 0;
-        while (j < m) {
-            if (i < j) {
-                val = val + i;
-            } else if (j == i) {
-                val = val - 1;
-            } else {
-                val = val + j;
-            }
-            j = j + 1;
-        }
-        i = i + 1;
+\section{Code Generation}
+Consider the following CiviC function definition:
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=CiviC function definition, captionpos=b]
+    int factorial ( int x )
+    {
+        int res ;
+        if ( x <= 1) res = 1;
+        else res = x * factorial ( x - 1);
+        return res ;
     }
 \end{lstlisting}
 
-\subsection{Static Single Assignment Form}
-\textbf{Transform the above code into Static Single Assignment Form (SSA).}
+\textbf{A) Manually generate CiviC-VM assembly code for the above function definition. Make use of
+labels to mark destinations of jump instructions.}
 
-\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Static Single Assignment Form (SSA), captionpos=b]
-    i_0 = 0;
-    p_0 = i_0 < n_0;
-    while (phi(p_0, p_1)) {
-        j_0 = 0;
-        i_1 = phi(i_0, i_2);
-        y_0 = j_0 < m_0;
-    
-        while (phi(y_0, y_1)) {
-            j_1 = phi(j_0, j_2);
-    
-            if (i_1 < j_1 ) {
-                val_2 = phi(val_0, val_7);
-                val_1 = val_2 + i_1;
-            } else if ( j_1 == i_1 ) {
-                val_4 = phi(val_0, val_7);
-                val_3 = val_4 - 1;
-            } else {
-                val_6 = phi(val_0, val_7);
-                val_5 = val_6 + j_1; 
-            }
-    
-            val_7 = phi(val_1, val_3, val_5);
-    
-            j_2 = j_1 + 1;
-            y_1 = j_2 < m_0;
-        }
-        i_2 = i_1 + 1;
-        p_1 = i_2 < n_0;
-    }
-\end{lstlisting}    
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Assembly code, captionpos=b]
+    factorial:    
+        esr 1               // Add factorial function
 
-\subsection{Machine-Independent Optimisation}
-\textbf{Apply the loop unswitching optimisation to the (original) code above.}
+        iload_0             // Add (local) int x to stack
+        iloadc 0            // Add constant 1 to stack
+        ile                 // Int less or equal (x <= 1)
+        branch_f L1         // Continue at L1 if above value is true
+        iloadc 0            // Add constant 1 to stack 
+        istore 1            // Assign constant 1 to res 
+        jump L2             // Jump to L2 (skip the else statement (L1:))
 
-\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Loop unswitching optimisation, captionpos=b]
-    i = 0;
-    while (i < n ) {
-        j = 0;
+    L1:                     // L1 label
+        iload_0             // Load (local) var x
+        isrg factorial      // Load factorial() function 
+        iload_0             // Load (local) var x
+        iloadc 0            // Load constant 1
+        isub                // Subtract the numbers x - 1
+        jsr factorial 1     // Call factorial() with 1 param
+        imul                // Multiply the outcome -> x*factorial(x-1)
+        istore 1            // Store the outcome (res = ...outcome)
 
-        while (j < m && i < j) {
-            val = val + i ;
-            j = j + 1;
-        }
-
-        if (j < m && j == i) { 
-            val = val - 1;
-            j = j + 1;
-        }
-
-        while (j < m) {
-            val = val + i ;
-            j = j + 1;
-        }
-
-        i = i + 1;
-    }
-\end{lstlisting}    
-
-\subsection{Compilation Schemes}
-\textbf{Devise a formal compilation scheme that systematically eliminates all occurrences of
-while-loops in the body of a CiviC function definition and replaces them by semantically 
-equivalent code without while-loops.}
-
-To replace while-loops with semantically equivalent code, we need to know what our possibilities
-are. An option is to use a never ending for-loop with a break-if statement, but this is not supported
-in the CiviC language. An other option is to use recursive functions with a return-if statement (this
- is supported by the CiviC language). Last option is to use do-while-loops which is also supported 
-by the CiviC language.
-We will replace the while-loops in a body of a CiviC function with do-while-loops with the following
-steps:
-
-\begin{enumerate}
-    \item Check with pattern matching for while-loops in the code.
-    \item Recursively loop until no next pattern is found
-    \item Replace while-loop by do-while-loop:
-\end{enumerate}
-
-
-\begin{lstlisting}
-    C [[ while ( Expr ) Block Rest ]]
-    => CX [[ { do Block while ( Expr ) } Rest ]]
-
-    Block => {[Statement]*}
-          |  Statement
+    L2:                     // end label (if statement)
+        iload_1             // Add res to stack
+        ireturn             // Return int res 
 \end{lstlisting}
 
 
+
+\textbf{B) Point out the relationship between assembly code and source code through line by line
+comments in the assembly code.}
+\par Answer added to Listing of answer A above.
+
+\textbf{C) Add the number of bytes required for each line of CiviC-VM assembly code. Assume here
+jump instructions would take byte code offsets as arguments and not labels.}
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Assembly code with number of bytes, captionpos=b]
+    factorial:    
+        esr 1               // 2 bytes
+    
+        iload_0             // 1 byte
+        iloadc 0            // 3 bytes
+        ile                 // 1 byte
+        branch_f L1         // 2 bytes      // Jump 7 bytes
+        iloadc 0            // 3 bytes
+        istore 1            // 2 bytes
+        jump L2             // 2 bytes      // Jump 14 bytes
+    
+    L2:                   
+        iload_0             // 1 byte
+        isrg factorial      // 2 bytes
+        iload_0             // 1 byte
+        iloadc 0            // 3 bytes
+        isub                // 1 byte
+        jsr factorial 1     // 3 bytes      // Jump -26 bytes
+        imul                // 1 bytes
+        istore 1            // 2 bytes
+    
+    L2:                    
+        iload_1             // 1 byte
+        ireturn             // 1 byte
+    \end{lstlisting}
+    
+
+\textbf{D) Compute the proper byte code offset for each jump instruction. Consult the CiviC-VM
+manual for details on individual instructions.}
+\par Answer added to Listing of answer C above.
+
+\newpage
+\section{Compilation Schemes Revisited}
+\textbf{Devise a compilation scheme that replaces each occurrence of a for-loop in the body of a CiviC
+function by semantically equivalent CiviC code that makes use of while-loops and/or do/whileloops instead. As a simplification consider only for-loops without a step specification, and assume
+that CiviC would support arbitrary interleaving of variable declarations and statements in function
+bodies as in C99 proper.}
+
+\begin{lstlisting}[caption=Compilation Scheme, captionpos=b]
+
+C [[ for (int i = lower, upper) { body } Rest ]]
+-> CX [[
+        while(lower != upper){ 
+            C[[body]] upper = upper + 1 
+        } 
+        C[[Rest]] 
+    ]]
+\end{lstlisting}
 \end{flushleft}
 \end{document}
