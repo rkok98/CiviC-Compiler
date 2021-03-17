@@ -94,7 +94,7 @@
                            }
 
 [0-9]*[.][0-9]+            { yylval.cflt = atof(yytext);  
-                              FILTER( FLOAT);
+                              FILTER( FLOATVAL);
                               printf( "A float: %s (%g)\n", yytext,
                               atof( yytext ) );
                            }                           
