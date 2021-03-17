@@ -49,6 +49,13 @@ SUBPHASE(  lvi,
            ALWAYS,
            ac)
 
+
+SUBPHASE(  tc,
+          "Type checking",
+           TCdoTypeChecking, 
+           ALWAYS,
+           ac)
+
 ENDPHASE(ac)
 
 /******************************************************************************/
