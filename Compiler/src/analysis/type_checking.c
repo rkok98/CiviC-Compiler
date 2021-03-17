@@ -1,10 +1,10 @@
 #include "type_checking.h"
+#include "symbol_table.h"
 
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
 #include "dbug.h"
-#include "symbol_table.h"
 
 #include "free.h"
 #include "str.h"
@@ -93,6 +93,77 @@ node *TCfundef(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
+node *TCvardecl(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCvardecl");
+
+    if (VARDECL_INIT(arg_node))
+    {
+        VARDECL_INIT(arg_node) = TRAVdo(VARDECL_INIT(arg_node), arg_info);
+
+        type vardecl_expected_type = VARDECL_TYPE(arg_node);
+        type vardecl_actual_type = INFO_TYPE(arg_info);
+
+        if (vardecl_actual_type != vardecl_expected_type)
+        {
+            CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(vardecl_expected_type), get_type(vardecl_actual_type));
+        }
+    }
+
+    VARDECL_NEXT(arg_node) = TRAVopt(VARDECL_NEXT(arg_node), arg_info);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *TCvarlet(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCvarlet");
+
+    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VARLET_NAME(arg_node));
+    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *TCassign(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCassign");
+
+    ASSIGN_LET(arg_node) = TRAVdo(ASSIGN_LET(arg_node), arg_info);
+    type assign_expected_type = INFO_TYPE(arg_info);
+
+    ASSIGN_EXPR(arg_node) = TRAVdo(ASSIGN_EXPR(arg_node), arg_info);
+    type assign_actual_type = INFO_TYPE(arg_info);
+
+    if (assign_actual_type != assign_expected_type)
+    {
+        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual type: %s", get_type(assign_expected_type), get_type(assign_actual_type));
+    }
+
+    DBUG_RETURN(arg_node);
+}
+
+node *TCreturn(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCreturn");
+
+    type return_expected_type = INFO_RETURN_TYPE(arg_info);
+    type return_actual_type = T_void;
+
+    if (RETURN_EXPR(arg_node))
+    {
+        RETURN_EXPR(arg_node) = TRAVdo(RETURN_EXPR(arg_node), arg_info);
+        return_actual_type = INFO_TYPE(arg_info);
+    }
+
+    if (return_actual_type != return_expected_type)
+    {
+        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(return_expected_type), get_type(return_actual_type));
+    }
+
+    DBUG_RETURN(arg_node);
+}
+
 /**
 node *TCfuncall(node *arg_node, info *arg_info)
 {
@@ -155,24 +226,6 @@ node *TCcast(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *TCmonop(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCmonop");
-
-    monop monop_op = MONOP_OP(arg_node);
-
-    MONOP_OPERAND(arg_node) = TRAVdo(MONOP_OPERAND(arg_node), arg_info);
-    
-    type monop_type = INFO_TYPE(arg_info);
-
-    if ((monop_op == MO_neg && monop_type == T_bool) || (monop_op == MO_not && monop_type != T_bool))
-    {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply operator %s to type %s at %d:%d", get_monop(monop_op), get_type(monop_type));
-    }
-
-    DBUG_RETURN(arg_node);
-}
-
 node *TCbinop(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCbinop");
@@ -202,100 +255,6 @@ node *TCbinop(node *arg_node, info *arg_info)
 
     DBUG_RETURN(arg_node);
 }
-
-node *TCassign(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCassign");
-
-    ASSIGN_LET(arg_node) = TRAVdo(ASSIGN_LET(arg_node), arg_info);
-    type assign_expected_type = INFO_TYPE(arg_info);
-
-    ASSIGN_EXPR(arg_node) = TRAVdo(ASSIGN_EXPR(arg_node), arg_info);
-    type assign_actual_type = INFO_TYPE(arg_info);
-
-    if (assign_actual_type != assign_expected_type)
-    {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual type: %s", get_type(assign_expected_type), get_type(assign_actual_type));
-    }
-
-    DBUG_RETURN(arg_node);
-}
-
-node *TCvarlet(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCvarlet");
-
-    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VARLET_NAME(arg_node));
-
-    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
-
-    DBUG_RETURN(arg_node);
-}
-
-node *TCvardecl(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCvardec");
-
-    if (VARDECL_INIT(arg_node))
-    {
-        VARDECL_INIT(arg_node) = TRAVdo(VARDECL_INIT(arg_node), arg_info);
-
-        type expected_type = VARDECL_TYPE(arg_node);
-        type actual_type = INFO_TYPE(arg_info);
-
-        if (actual_type != expected_type)
-        {
-            CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(expected_type), get_type(actual_type));
-        }
-    }
-
-    VARDECL_NEXT(arg_node) = TRAVopt(VARDECL_NEXT(arg_node), arg_info);
-
-    DBUG_RETURN(arg_node);
-}
-
-node *TCifelse(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCifelse");
-
-    IFELSE_COND(arg_node) = TRAVdo(IFELSE_COND(arg_node), arg_info);
-
-    type expected_type = T_bool;
-    type actual_type = INFO_TYPE(arg_info);
-    if (actual_type != expected_type)
-    {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(expected_type), get_type(actual_type));
-    }
-
-    /* Traverse child nodes */
-    IFELSE_THEN(arg_node) = TRAVdo(IFELSE_THEN(arg_node), arg_info);
-    IFELSE_ELSE(arg_node) = TRAVopt(IFELSE_ELSE(arg_node), arg_info);
-
-    DBUG_RETURN(arg_node);
-}
-
-node *TCreturn(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCreturn");
-
-    type expected_type = INFO_RETURN_TYPE(arg_info);
-    type actual_type = T_void;
-
-    if (RETURN_EXPR(arg_node))
-    {
-        RETURN_EXPR(arg_node) = TRAVdo(RETURN_EXPR(arg_node), arg_info);
-        actual_type = INFO_TYPE(arg_info);
-    }
-
-    if (actual_type != expected_type)
-    {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(expected_type), get_type(actual_type));
-    }
-
-    DBUG_RETURN(arg_node);
-}
-
-/* ************************************************* */
 
 node *TCdoTypeChecking(node *syntaxtree)
 {
