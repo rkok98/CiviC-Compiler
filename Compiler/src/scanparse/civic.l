@@ -11,6 +11,7 @@
 #include "civic.tab.h"
 #include "globals.h"
 #include "ctinfo.h"
+#include "limits.h"
 
 
 #define FILTER(token) \
@@ -89,8 +90,15 @@
                              FILTER( ID);
                            }
 
-[0-9]+                     { yylval.cint=atoi(yytext);
-                             FILTER( INTVAL);
+[0-9]+                     { long integer = strtol(yytext, NULL, 10);
+                             if (integer > INT_MAX || integer < INT_MIN) {
+                                CTIerror("Integer %s out of range", yytext);
+                             }
+                             else
+                             {
+                                yylval.cint=atoi(yytext);
+                                FILTER( INTVAL);
+                             }
                            }
 
 [0-9]*[.][0-9]+            { yylval.cflt = atof(yytext);  
