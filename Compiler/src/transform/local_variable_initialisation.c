@@ -12,12 +12,15 @@
 #include "ctinfo.h"
 #include "copy.h"
 #include "types.h"
+#include "print.h"
 
 struct INFO
 {
+    node *first_statement;
     node *last_statement;
 };
 
+#define INFO_FIRST_STATEMENT(n) ((n)->first_statement)
 #define INFO_LAST_STATEMENT(n) ((n)->last_statement)
 
 static info *MakeInfo(void)
@@ -29,6 +32,7 @@ static info *MakeInfo(void)
     result = (info *)MEMmalloc(sizeof(info));
 
     INFO_LAST_STATEMENT(result) = NULL;
+    INFO_FIRST_STATEMENT(result) = NULL;
 
     DBUG_RETURN(result);
 }
@@ -48,7 +52,15 @@ node *LVIfunbody(node *arg_node, info *arg_info)
 
     info *funbody_info = MakeInfo();
 
-    FUNBODY_VARDECLS(arg_node) = TRAVopt(FUNBODY_VARDECLS(arg_node), funbody_info);
+    TRAVopt(FUNBODY_VARDECLS(arg_node), funbody_info);
+
+    if (INFO_LAST_STATEMENT(funbody_info))
+    {
+        STMTS_NEXT(INFO_LAST_STATEMENT(funbody_info)) = FUNBODY_STMTS(arg_node);
+        FUNBODY_STMTS(arg_node) = INFO_FIRST_STATEMENT(funbody_info);
+    }
+
+    funbody_info = FreeInfo(funbody_info);
 
     DBUG_RETURN(arg_node);
 }
@@ -59,7 +71,7 @@ node *LVIvardecl(node *arg_node, info *arg_info)
 
     node *vardecl_init = VARDECL_INIT(arg_node);
 
-    if (vardecl_init == NULL)
+    if (!vardecl_init)
     {
         VARDECL_NEXT(arg_node) = TRAVopt(VARDECL_NEXT(arg_node), arg_info);
         DBUG_RETURN(arg_node);
@@ -73,8 +85,9 @@ node *LVIvardecl(node *arg_node, info *arg_info)
 
     node *node = TBmakeStmts(vardecl_assign, NULL);
 
-    if (!INFO_LAST_STATEMENT(arg_info))
+    if (INFO_FIRST_STATEMENT(arg_info) == NULL)
     {
+        INFO_FIRST_STATEMENT(arg_info) = node;
         INFO_LAST_STATEMENT(arg_info) = node;
     }
     else
