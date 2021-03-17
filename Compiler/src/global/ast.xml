@@ -47,6 +47,14 @@
                     <node name="GlobDef" />
                 </travuser>
             </traversal>
+
+            <traversal id="LVI" name="Local Variable Initialisation" default="sons" include="local_variable_initialisation.h">
+                <travuser>
+                    <node name="FunBody" />
+                    <node name="VarDecl" />
+                </travuser>
+            </traversal>
+
         </general>
     </phases>
     <nodesets>

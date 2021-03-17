@@ -37,9 +37,15 @@ SUBPHASE(  ca,
            ALWAYS,
            ac)
 
-SUBPHASE(  vi,
+SUBPHASE(  gvi,
           "Initializing Global Variables",
            GVIinitializeGlobalVariables, 
+           ALWAYS,
+           ac)
+
+SUBPHASE(  lvi,
+          "Initializing Local Variables",
+           LVIinitializeLocalVariables, 
            ALWAYS,
            ac)
 

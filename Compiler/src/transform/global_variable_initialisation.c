@@ -15,12 +15,10 @@
 
 struct INFO
 {
-    node *symbol_table;
     node *init_function;
     node *last_statement;
 };
 
-#define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_INIT_FUNCTION(n) ((n)->init_function)
 #define INFO_LAST_STATEMENT(n) ((n)->last_statement)
 
@@ -32,7 +30,6 @@ static info *MakeInfo(void)
 
     result = (info *)MEMmalloc(sizeof(info));
 
-    INFO_SYMBOL_TABLE(result) = NULL;
     INFO_INIT_FUNCTION(result) = NULL;
     INFO_LAST_STATEMENT(result) = NULL;
 
@@ -59,7 +56,8 @@ node *GVIprogram(node *arg_node, info *arg_info)
 
     node *declarations = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
 
-    if (INFO_LAST_STATEMENT(arg_info) != NULL)
+
+    if (INFO_LAST_STATEMENT(arg_info))
     {
         PROGRAM_DECLS(arg_node) = TBmakeDecls(init_function, declarations);
     }
