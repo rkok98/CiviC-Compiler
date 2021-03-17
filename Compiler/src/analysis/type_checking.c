@@ -1,21 +1,27 @@
 #include "type_checking.h"
+#include "symbol_table.h"
 
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
 #include "dbug.h"
+#include "print.h"
 
-#include "str.h"
 #include "memory.h"
+#include "free.h"
+#include "str.h"
+#include "ctinfo.h"
 
 struct INFO
 {
     node *symbol_table;
-    type *return_type;
+    type return_type;
+    type type;
 };
 
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_RETURN_TYPE(n) ((n)->return_type)
+#define INFO_TYPE(n) ((n)->type)
 
 static info *MakeInfo()
 {
@@ -25,7 +31,8 @@ static info *MakeInfo()
 
     result = (info *)MEMmalloc(sizeof(info));
     INFO_SYMBOL_TABLE(result) = NULL;
-    INFO_RETURN_TYPE(result) = NULL;
+    INFO_RETURN_TYPE(result) = T_unknown;
+    INFO_TYPE(result) = T_unknown;
 
     DBUG_RETURN(result);
 }
@@ -59,6 +66,26 @@ node *TCfundef(node *arg_node, info *arg_info)
     INFO_SYMBOL_TABLE(fundef_info) = fundef_table;
 
     FUNDEF_FUNBODY(arg_node) = TRAVopt(FUNDEF_FUNBODY(arg_node), fundef_info);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *TCreturn(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCreturn");
+
+    type expected_type = INFO_RETURN_TYPE(arg_info);
+
+    if (RETURN_EXPR(arg_node) == NULL && expected_type == T_void) {
+        DBUG_RETURN(arg_node);
+    }
+
+    RETURN_EXPR(arg_node) = TRAVopt(RETURN_EXPR(arg_node), arg_info);
+
+    if (INFO_RETURN_TYPE(arg_info) == INFO_TYPE(arg_info)) {
+        // TODO ERROR
+        CTIerrorLine(1, "KANKER");
+    }
 
     DBUG_RETURN(arg_node);
 }

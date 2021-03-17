@@ -59,6 +59,7 @@
                 <travuser>
                     <node name="Program" />
                     <node name="FunDef" />
+                    <node name="Return" />
                 </travuser>
             </traversal>
 
