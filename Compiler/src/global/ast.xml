@@ -58,6 +58,7 @@
             <traversal id="TC" name="Type Checking" default="sons" include="type_checking.h">
                 <travuser>
                     <node name="Program" />
+                    <node name="FunDef" />
                 </travuser>
             </traversal>
 

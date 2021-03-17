@@ -4,6 +4,7 @@
 #include "types.h"
 
 extern node *TCprogram(node *arg_node, info *arg_info);
+extern node *TCfundef(node *arg_node, info *arg_info);
 
 extern node *TCdoTypeChecking(node *syntaxtree);
 
