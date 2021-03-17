@@ -15,6 +15,7 @@ node *TCbinop(node *arg_node, info *arg_info);
 
 node *TCassign(node *arg_node, info *arg_info);
 node *TCvardecl(node *arg_node, info *arg_info);
+node *TCvarlet(node *arg_node, info *arg_info);
 node *TCifelse(node *arg_node, info *arg_info);
 node *TCwhile(node *arg_node, info *arg_info);
 node *TCdowhile(node *arg_node, info *arg_info);

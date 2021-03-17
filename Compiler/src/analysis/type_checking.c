@@ -33,7 +33,7 @@ static info *MakeInfo(void)
     INFO_TYPE(result) = T_unknown;
     INFO_RETURNTYPE(result) = T_unknown;
     CURRENT_SYMBOLTABLE(result) = NULL;
-    
+
     DBUG_RETURN(result);
 }
 
@@ -228,6 +228,7 @@ node *TCassign(node *arg_node, info *arg_info)
 
     if (actual_type != expected_type)
     {
+        printf("%s: Expected: %s, ACTUAL: %s\n", VARLET_NAME(ASSIGN_LET(arg_node)), get_type(expected_type), get_type(actual_type));
         type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
     }
 
@@ -235,6 +236,16 @@ node *TCassign(node *arg_node, info *arg_info)
     {
         assign_for_induction_var_error(NODE_LINE(arg_node), NODE_COL(arg_node));
     }
+
+    DBUG_RETURN(arg_node);
+}
+
+node *TCvarlet(node *arg_node, info *arg_info) {
+    DBUG_ENTER("TCvarlet");
+
+    node *entry = STfindInParents(CURRENT_SYMBOLTABLE(arg_info), VARLET_NAME(arg_node));
+
+    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
 
     DBUG_RETURN(arg_node);
 }
@@ -325,12 +336,13 @@ node *TCreturn(node *arg_node, info *arg_info)
 
     type expected_type = INFO_RETURNTYPE(arg_info);
     type actual_type = T_void;
+
     if (RETURN_EXPR(arg_node))
     {
         RETURN_EXPR(arg_node) = TRAVdo(RETURN_EXPR(arg_node), arg_info);
         actual_type = INFO_TYPE(arg_info);
     }
-    
+
     if (actual_type != expected_type)
     {
         type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
@@ -386,13 +398,12 @@ node *TCfundef(node *arg_node, info *arg_info)
     INFO_RETURNTYPE(arg_info) = FUNDEF_TYPE(arg_node);
 
     /* Traverse child nodes */
-    // FUNDEF_FUNHEADER(arg_node) = TRAVdo(FUNDEF_FUNHEADER(arg_node), arg_info);
     FUNDEF_FUNBODY(arg_node) = TRAVdo(FUNDEF_FUNBODY(arg_node), arg_info);
-    // FUNDEF(arg_node) = TRAVopt(FUNDEF_NEXT(arg_node), arg_info);
 
     CURRENT_SYMBOLTABLE(arg_info) = previous;
-    INFO_RETURNTYPE(arg_info) = previous_rettype;
 
+    INFO_RETURNTYPE(arg_info) = previous_rettype;
+    
     DBUG_RETURN(arg_node);
 }
 
@@ -428,48 +439,85 @@ node *TCdoTypeChecking(node *syntaxtree)
     DBUG_RETURN(syntaxtree);
 }
 
-bool isBooleanOperator(binop operator) {
-    return 
-    operator == BO_lt || operator == BO_le || operator == BO_gt || operator == BO_ge || 
-    operator == BO_eq || operator == BO_ne || operator == BO_or || operator == BO_and;
+bool isBooleanOperator(binop operator)
+{
+    return
+    operator== BO_lt ||
+    operator== BO_le ||
+    operator== BO_gt ||
+    operator== BO_ge ||
+    operator== BO_eq ||
+    operator== BO_ne ||
+    operator== BO_or ||
+    operator== BO_and;
 }
 
-char *get_type(type type){
-    switch(type){
-        case T_void: return "void";
-        case T_bool: return "bool";
-        case T_int: return "int";
-        case T_float: return "float";
-        case T_unknown: return "unknown";
-        default: return NULL;
+char *get_type(type type)
+{
+    switch (type)
+    {
+    case T_void:
+        return "void";
+    case T_bool:
+        return "bool";
+    case T_int:
+        return "int";
+    case T_float:
+        return "float";
+    case T_unknown:
+        return "unknown";
+    default:
+        return NULL;
     }
 }
 
-char *get_binop(binop op) {
-    switch (op) {
-        case BO_add: return "+";
-        case BO_sub: return "-";
-        case BO_mul: return "*";
-        case BO_div: return "/";
-        case BO_mod: return "%%";
-        case BO_lt: return "<";
-        case BO_le: return "<=";
-        case BO_gt: return ">";
-        case BO_ge: return ">=";
-        case BO_eq: return "==";
-        case BO_ne: return "!=";
-        case BO_or: return "||";
-        case BO_and: return "&&";
-        case BO_unknown: return "unknown";
+char *get_binop(binop op)
+{
+    switch (op)
+    {
+    case BO_add:
+        return "+";
+    case BO_sub:
+        return "-";
+    case BO_mul:
+        return "*";
+    case BO_div:
+        return "/";
+    case BO_mod:
+        return "%%";
+    case BO_lt:
+        return "<";
+    case BO_le:
+        return "<=";
+    case BO_gt:
+        return ">";
+    case BO_ge:
+        return ">=";
+    case BO_eq:
+        return "==";
+    case BO_ne:
+        return "!=";
+    case BO_or:
+        return "||";
+    case BO_and:
+        return "&&";
+    case BO_unknown:
+        return "unknown";
     }
     return NULL;
 }
 
-char *get_monop(monop op) {
-    switch (op) {
-        case MO_not: return "!";
-        case MO_neg: return "-";
-        case MO_unknown: return "unknown";
-        default: return NULL;
+char *get_monop(monop op)
+{
+    switch (op)
+    {
+    case MO_not:
+        return "!";
+    case MO_neg:
+        return "-";
+    case MO_unknown:
+        return "unknown";
+    default:
+        return NULL;
     }
 }

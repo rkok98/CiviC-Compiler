@@ -13,9 +13,7 @@ node *STinsert(node *symbol_table, node *entry)
 {
     DBUG_ENTER("STinsert");
 
-    node *first_entry = SYMBOLTABLE_ENTRIES(symbol_table);
-
-    if (STfind(first_entry, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
+    if (STfind(symbol_table, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
     {
         CTIerror("Variable/Function '%s' at line %d is already defined.", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry) + 1);
         return NULL;
@@ -35,23 +33,19 @@ node *STinsert(node *symbol_table, node *entry)
     DBUG_RETURN(entry);
 }
 
-node *STfind(node *entry, char *name)
+node *STfind(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfind");
+    node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
 
-    if (entry == NULL)
+    while (entry)
     {
-        DBUG_RETURN(NULL);
-    }
+        if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
+        {
+            DBUG_RETURN(entry);
+        }
 
-    if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
-    {
-        DBUG_RETURN(entry);
-    }
-
-    if (SYMBOLTABLEENTRY_NEXT(entry) != NULL)
-    {
-        DBUG_RETURN(STfind(SYMBOLTABLEENTRY_NEXT(entry), name));
+        entry = SYMBOLTABLEENTRY_NEXT(entry);
     }
 
     DBUG_RETURN(NULL);
@@ -61,16 +55,20 @@ node *STfindInParents(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfindInParents");
 
+    printf("AAA");
+
     node *entry = STfind(symbol_table, name);
 
-    if (entry) {
+    if (entry)
+    {
         DBUG_RETURN(entry);
     }
 
-    if (SYMBOLTABLE_PARENT(symbol_table)) {
+    if (SYMBOLTABLE_PARENT(symbol_table))
+    {       
         DBUG_RETURN(STfindInParents(SYMBOLTABLE_PARENT(symbol_table), name));
     }
-    
+
     DBUG_RETURN(NULL);
 }
 
