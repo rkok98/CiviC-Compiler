@@ -12,6 +12,8 @@
         "iosfwd": "c",
         "__node_handle": "c",
         "types.h": "c",
-        "variable_initialisation.h": "c"
+        "variable_initialisation.h": "c",
+        "functional": "c",
+        "ios": "c"
     }
 }

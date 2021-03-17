@@ -14,14 +14,14 @@
 
 struct INFO
 {
+    node *symbol_table;
     type type;
     type return_type;
-    node *symbol_table;
 };
 
-#define INFO_TYPE(n) ((n)->type)
-#define INFO_RETURNTYPE(n) ((n)->return_type)
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
+#define INFO_TYPE(n) ((n)->type)
+#define INFO_RETURN_TYPE(n) ((n)->return_type)
 
 static info *MakeInfo(void)
 {
@@ -30,9 +30,9 @@ static info *MakeInfo(void)
 
     result = (info *)MEMmalloc(sizeof(info));
 
-    INFO_TYPE(result) = T_unknown;
-    INFO_RETURNTYPE(result) = T_unknown;
     INFO_SYMBOL_TABLE(result) = NULL;
+    INFO_TYPE(result) = T_unknown;
+    INFO_RETURN_TYPE(result) = T_unknown;
 
     DBUG_RETURN(result);
 }
@@ -44,48 +44,9 @@ static info *FreeInfo(info *info)
     DBUG_RETURN(info);
 }
 
-/* ************************************************* */
-
-void type_error(type expected, type actual, int line, int col)
-{
-    CTIerror("TypeError: Expected %s, but found %s at line %d, column %d", get_type(expected), get_type(actual), line, col);
-}
-
-void binop_unequal_type_error(type left, type right, binop op, int line, int col)
-{
-    CTIerror("TypeError: Tried to apply %s to unequal types %s and %s at line %d, column %d", get_binop(op), get_type(left), get_type(right), line, col);
-}
-
-void binop_unsupported_type_error(type left, type right, binop op, int line, int col)
-{
-    CTIerror("TypeError: Tried to apply %s to unsupported types %s and %s at line %d, column %d", get_binop(op), get_type(left), get_type(right), line, col);
-}
-
-void monoptype_error(type type, monop op, int line, int col)
-{
-    CTIerror("TypeError: Tried to apply %s to type %s at line %d, column %d", get_monop(op), get_type(type), line, col);
-}
-
-void funcalltype_error(char *expected, char *actual, int line, int col)
-{
-    CTIerror("TypeError: Expected %s, but found %s at line %d, column %d", expected, actual, line, col);
-}
-
-void casttype_error(type cast_type, type expr_type, int line, int col)
-{
-    CTIerror("TypeError: Attempting to cast %s to %s at line %d, column %d", get_type(expr_type), get_type(cast_type), line, col);
-}
-
-void assign_for_induction_var_error(int line, int col)
-{
-    CTIerror("Error: Attempting to assign for induction var at line %d, column %d", line, col);
-}
-
-/* ************************************************* */
-
 node *TCnum(node *arg_node, info *arg_info)
 {
-    DBUG_ENTER("TCint");
+    DBUG_ENTER("TCnum");
     INFO_TYPE(arg_info) = T_int;
     DBUG_RETURN(arg_node);
 }
@@ -103,6 +64,35 @@ node *TCbool(node *arg_node, info *arg_info)
     INFO_TYPE(arg_info) = T_bool;
     DBUG_RETURN(arg_node);
 }
+
+node *TCprogram(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCprogram");
+
+    INFO_SYMBOL_TABLE(arg_info) = PROGRAM_SYMBOLTABLE(arg_node);
+    PROGRAM_DECLS(arg_node) = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *TCfundef(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCfundef");
+
+    node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
+    type return_type = INFO_RETURN_TYPE(arg_info);
+    
+    INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node);
+    INFO_RETURN_TYPE(arg_info) = FUNDEF_TYPE(arg_node);
+
+    FUNDEF_FUNBODY(arg_node) = TRAVdo(FUNDEF_FUNBODY(arg_node), arg_info);
+    
+    INFO_SYMBOL_TABLE(arg_info) = symbol_table;
+    INFO_RETURN_TYPE(arg_info) = return_type;
+
+    DBUG_RETURN(arg_node);
+}
+
 /**
 node *TCfuncall(node *arg_node, info *arg_info)
 {
@@ -157,7 +147,7 @@ node *TCcast(node *arg_node, info *arg_info)
 
     if (INFO_TYPE(arg_info) == T_void)
     {
-        casttype_error(CAST_TYPE(arg_node), INFO_TYPE(arg_info), NODE_LINE(arg_node), NODE_COL(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot cast %s to %s.", get_type(INFO_TYPE(arg_info)), get_type(CAST_TYPE(arg_node)));
     }
 
     INFO_TYPE(arg_info) = CAST_TYPE(arg_node);
@@ -169,13 +159,15 @@ node *TCmonop(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCmonop");
 
-    monop op = MONOP_OP(arg_node);
-    MONOP_OPERAND(arg_node) = TRAVdo(MONOP_OPERAND(arg_node), arg_info);
-    type type = INFO_TYPE(arg_info);
+    monop monop_op = MONOP_OP(arg_node);
 
-    if ((op == MO_not && type != T_bool) || (op == MO_neg && type == T_bool))
+    MONOP_OPERAND(arg_node) = TRAVdo(MONOP_OPERAND(arg_node), arg_info);
+    
+    type monop_type = INFO_TYPE(arg_info);
+
+    if ((monop_op == MO_neg && monop_type == T_bool) || (monop_op == MO_not && monop_type != T_bool))
     {
-        monoptype_error(type, op, NODE_LINE(arg_node), NODE_COL(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply operator %s to type %s at %d:%d", get_monop(monop_op), get_type(monop_type));
     }
 
     DBUG_RETURN(arg_node);
@@ -185,27 +177,22 @@ node *TCbinop(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCbinop");
 
-    binop op = BINOP_OP(arg_node);
+    binop binop_op = BINOP_OP(arg_node);
 
     BINOP_LEFT(arg_node) = TRAVdo(BINOP_LEFT(arg_node), arg_info);
-    type left_type = INFO_TYPE(arg_info);
+    type binop_left_type = INFO_TYPE(arg_info);
 
     BINOP_RIGHT(arg_node) = TRAVdo(BINOP_RIGHT(arg_node), arg_info);
-    type right_type = INFO_TYPE(arg_info);
+    type binop_right_type = INFO_TYPE(arg_info);
 
-    if (left_type != right_type)
+    if (binop_left_type != binop_right_type)
     {
-        binop_unequal_type_error(left_type, right_type, op, NODE_LINE(arg_node), NODE_COL(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", get_binop(binop_op), get_type(binop_left_type), get_type(binop_right_type));
     }
 
-    if ((op == BO_sub || op == BO_div || op == BO_lt || op == BO_le || op == BO_gt || op == BO_ge) && right_type == T_bool)
+    if (binop_op == BO_mod && binop_right_type != T_int)
     {
-        binop_unsupported_type_error(left_type, right_type, op, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    if (op == BO_mod && right_type != T_int)
-    {
-        binop_unsupported_type_error(left_type, right_type, op, NODE_LINE(arg_node), NODE_COL(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", get_binop(binop_op), get_type(binop_left_type), get_type(binop_right_type));
     }
 
     if (isBooleanOperator(BINOP_OP(arg_node)))
@@ -221,26 +208,21 @@ node *TCassign(node *arg_node, info *arg_info)
     DBUG_ENTER("TCassign");
 
     ASSIGN_LET(arg_node) = TRAVdo(ASSIGN_LET(arg_node), arg_info);
-    type expected_type = INFO_TYPE(arg_info);
+    type assign_expected_type = INFO_TYPE(arg_info);
 
     ASSIGN_EXPR(arg_node) = TRAVdo(ASSIGN_EXPR(arg_node), arg_info);
-    type actual_type = INFO_TYPE(arg_info);
+    type assign_actual_type = INFO_TYPE(arg_info);
 
-    if (actual_type != expected_type)
+    if (assign_actual_type != assign_expected_type)
     {
-        printf("%s: Expected: %s, ACTUAL: %s\n", VARLET_NAME(ASSIGN_LET(arg_node)), get_type(expected_type), get_type(actual_type));
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    if (STReq(STRsubStr(VARLET_NAME(ASSIGN_LET(arg_node)), 0, 4), "_for"))
-    {
-        assign_for_induction_var_error(NODE_LINE(arg_node), NODE_COL(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual type: %s", get_type(assign_expected_type), get_type(assign_actual_type));
     }
 
     DBUG_RETURN(arg_node);
 }
 
-node *TCvarlet(node *arg_node, info *arg_info) {
+node *TCvarlet(node *arg_node, info *arg_info)
+{
     DBUG_ENTER("TCvarlet");
 
     node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VARLET_NAME(arg_node));
@@ -263,7 +245,7 @@ node *TCvardecl(node *arg_node, info *arg_info)
 
         if (actual_type != expected_type)
         {
-            type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
+            CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(expected_type), get_type(actual_type));
         }
     }
 
@@ -282,7 +264,7 @@ node *TCifelse(node *arg_node, info *arg_info)
     type actual_type = INFO_TYPE(arg_info);
     if (actual_type != expected_type)
     {
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(expected_type), get_type(actual_type));
     }
 
     /* Traverse child nodes */
@@ -292,49 +274,11 @@ node *TCifelse(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *TCwhile(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCwhile");
-
-    WHILE_COND(arg_node) = TRAVdo(WHILE_COND(arg_node), arg_info);
-
-    type expected_type = T_bool;
-    type actual_type = INFO_TYPE(arg_info);
-    if (actual_type != expected_type)
-    {
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    /* Traverse child nodes */
-    WHILE_BLOCK(arg_node) = TRAVdo(WHILE_BLOCK(arg_node), arg_info);
-
-    DBUG_RETURN(arg_node);
-}
-
-node *TCdowhile(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCdowhile");
-
-    DOWHILE_COND(arg_node) = TRAVdo(DOWHILE_COND(arg_node), arg_info);
-
-    type expected_type = T_bool;
-    type actual_type = INFO_TYPE(arg_info);
-    if (actual_type != expected_type)
-    {
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    /* Traverse child nodes */
-    DOWHILE_BLOCK(arg_node) = TRAVdo(DOWHILE_BLOCK(arg_node), arg_info);
-
-    DBUG_RETURN(arg_node);
-}
-
 node *TCreturn(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCreturn");
 
-    type expected_type = INFO_RETURNTYPE(arg_info);
+    type expected_type = INFO_RETURN_TYPE(arg_info);
     type actual_type = T_void;
 
     if (RETURN_EXPR(arg_node))
@@ -345,79 +289,8 @@ node *TCreturn(node *arg_node, info *arg_info)
 
     if (actual_type != expected_type)
     {
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(expected_type), get_type(actual_type));
     }
-
-    DBUG_RETURN(arg_node);
-}
-
-/* ************************************************* */
-
-node *TCfor(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCfor");
-
-    type expected_type = T_int;
-
-    FOR_START(arg_node) = TRAVdo(FOR_START(arg_node), arg_info);
-    type actual_type = INFO_TYPE(arg_info);
-    if (actual_type != expected_type)
-    {
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    FOR_STOP(arg_node) = TRAVdo(FOR_STOP(arg_node), arg_info);
-    actual_type = INFO_TYPE(arg_info);
-    if (actual_type != expected_type)
-    {
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    FOR_STEP(arg_node) = TRAVopt(FOR_STEP(arg_node), arg_info);
-    actual_type = INFO_TYPE(arg_info);
-    if (actual_type != expected_type)
-    {
-        type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    /* Traverse other child nodes */
-    FOR_BLOCK(arg_node) = TRAVdo(FOR_BLOCK(arg_node), arg_info);
-
-    DBUG_RETURN(arg_node);
-}
-
-node *TCfundef(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCfundef");
-
-    node *previous = INFO_SYMBOL_TABLE(arg_info);
-    INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node);
-
-    type previous_rettype = INFO_RETURNTYPE(arg_info);
-
-    INFO_RETURNTYPE(arg_info) = FUNDEF_TYPE(arg_node);
-
-    /* Traverse child nodes */
-    FUNDEF_FUNBODY(arg_node) = TRAVdo(FUNDEF_FUNBODY(arg_node), arg_info);
-
-    INFO_SYMBOL_TABLE(arg_info) = previous;
-
-    INFO_RETURNTYPE(arg_info) = previous_rettype;
-    
-    DBUG_RETURN(arg_node);
-}
-
-node *TCprogram(node *arg_node, info *arg_info)
-{
-    DBUG_ENTER("TCprogram");
-
-    node *previous = INFO_SYMBOL_TABLE(arg_info);
-    INFO_SYMBOL_TABLE(arg_info) = PROGRAM_SYMBOLTABLE(arg_node);
-
-    /* Traverse the declarations */
-    PROGRAM_DECLS(arg_node) = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
-
-    INFO_SYMBOL_TABLE(arg_info) = previous;
 
     DBUG_RETURN(arg_node);
 }
