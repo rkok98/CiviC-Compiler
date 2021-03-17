@@ -76,13 +76,15 @@ node *TCreturn(node *arg_node, info *arg_info)
 
     type expected_type = INFO_RETURN_TYPE(arg_info);
 
-    if (RETURN_EXPR(arg_node) == NULL && expected_type == T_void) {
+    if (RETURN_EXPR(arg_node) == NULL && expected_type == T_void)
+    {
         DBUG_RETURN(arg_node);
     }
 
     RETURN_EXPR(arg_node) = TRAVopt(RETURN_EXPR(arg_node), arg_info);
 
-    if (INFO_RETURN_TYPE(arg_info) == INFO_TYPE(arg_info)) {
+    if (INFO_RETURN_TYPE(arg_info) == INFO_TYPE(arg_info))
+    {
         // TODO ERROR
         CTIerrorLine(1, "KANKER");
     }
@@ -105,4 +107,25 @@ node *TCdoTypeChecking(node *syntaxtree)
     arg_info = FreeInfo(arg_info);
 
     DBUG_RETURN(syntaxtree);
+}
+
+node *TCnum(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCint");
+    INFO_TYPE(arg_info) = T_int;
+    DBUG_RETURN(arg_node);
+}
+
+node *TCfloat(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCfloat");
+    INFO_TYPE(arg_info) = T_float;
+    DBUG_RETURN(arg_node);
+}
+
+node *TCbool(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("TCbool");
+    INFO_TYPE(arg_info) = T_bool;
+    DBUG_RETURN(arg_node);
 }

@@ -60,6 +60,10 @@
                     <node name="Program" />
                     <node name="FunDef" />
                     <node name="Return" />
+                    
+                    <node name="Num"/>
+                    <node name="Float"/>
+                    <node name="Bool"/>
                 </travuser>
             </traversal>
 
