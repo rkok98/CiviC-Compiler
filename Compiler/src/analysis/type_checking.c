@@ -16,12 +16,12 @@ struct INFO
 {
     type type;
     type return_type;
-    node *symboltable;
+    node *symbol_table;
 };
 
 #define INFO_TYPE(n) ((n)->type)
 #define INFO_RETURNTYPE(n) ((n)->return_type)
-#define CURRENT_SYMBOLTABLE(n) ((n)->symboltable)
+#define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 
 static info *MakeInfo(void)
 {
@@ -32,7 +32,7 @@ static info *MakeInfo(void)
 
     INFO_TYPE(result) = T_unknown;
     INFO_RETURNTYPE(result) = T_unknown;
-    CURRENT_SYMBOLTABLE(result) = NULL;
+    INFO_SYMBOL_TABLE(result) = NULL;
 
     DBUG_RETURN(result);
 }
@@ -109,7 +109,7 @@ node *TCfuncall(node *arg_node, info *arg_info)
     DBUG_ENTER("TCfuncall");
 
     char *name = FUNCALL_NAME(arg_node);
-    node *entry = STfindInParents(CURRENT_SYMBOLTABLE(arg_info), name);
+    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), name);
 
     node *current_param = SYMBOLTABLEENTRY_PARAMS(entry);
     char *expected = STRcat(name, "(");
@@ -243,7 +243,7 @@ node *TCassign(node *arg_node, info *arg_info)
 node *TCvarlet(node *arg_node, info *arg_info) {
     DBUG_ENTER("TCvarlet");
 
-    node *entry = STfindInParents(CURRENT_SYMBOLTABLE(arg_info), VARLET_NAME(arg_node));
+    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VARLET_NAME(arg_node));
 
     INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
 
@@ -390,8 +390,8 @@ node *TCfundef(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCfundef");
 
-    node *previous = CURRENT_SYMBOLTABLE(arg_info);
-    CURRENT_SYMBOLTABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node);
+    node *previous = INFO_SYMBOL_TABLE(arg_info);
+    INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node);
 
     type previous_rettype = INFO_RETURNTYPE(arg_info);
 
@@ -400,7 +400,7 @@ node *TCfundef(node *arg_node, info *arg_info)
     /* Traverse child nodes */
     FUNDEF_FUNBODY(arg_node) = TRAVdo(FUNDEF_FUNBODY(arg_node), arg_info);
 
-    CURRENT_SYMBOLTABLE(arg_info) = previous;
+    INFO_SYMBOL_TABLE(arg_info) = previous;
 
     INFO_RETURNTYPE(arg_info) = previous_rettype;
     
@@ -411,13 +411,13 @@ node *TCprogram(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCprogram");
 
-    node *previous = CURRENT_SYMBOLTABLE(arg_info);
-    CURRENT_SYMBOLTABLE(arg_info) = PROGRAM_SYMBOLTABLE(arg_node);
+    node *previous = INFO_SYMBOL_TABLE(arg_info);
+    INFO_SYMBOL_TABLE(arg_info) = PROGRAM_SYMBOLTABLE(arg_node);
 
     /* Traverse the declarations */
     PROGRAM_DECLS(arg_node) = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
 
-    CURRENT_SYMBOLTABLE(arg_info) = previous;
+    INFO_SYMBOL_TABLE(arg_info) = previous;
 
     DBUG_RETURN(arg_node);
 }
