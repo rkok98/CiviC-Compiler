@@ -1,0 +1,8 @@
+int x = 0;
+
+int foo(int a, float b,int c)
+{
+    int x = 10;
+    int y = 10;
+    return a + b + c;
+}

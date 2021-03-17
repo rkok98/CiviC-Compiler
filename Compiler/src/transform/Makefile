@@ -6,7 +6,7 @@
 # 
 # SAC COPYRIGHT NOTICE, LICENSE, AND DISCLAIMER
 # 
-# (c) Copyright 1994 - 2011 by
+# (c) Copyright 1994 - 2010 by
 # 
 #   SAC Development Team
 #   SAC Research Foundation
@@ -25,7 +25,7 @@
 # 
 # Permission to use this software is hereby granted free of charge
 # exclusively for the duration and purpose of the course 
-#   "Compilerbouw" 
+#   "Compilers and Operating Systems" 
 # of the MSc programme Grid Computing at the University of Amsterdam.
 # Redistribution of the software or any parts thereof as well as any
 # alteration  of the software or any parts thereof other than those 
@@ -49,66 +49,78 @@
 
 ###############################################################################
 #
-# Collection of source directories
+# Makefile for sac2c source directories
 #
-
-
-src = global scanparse print codegen framework analysis transform
-             
-
-
+# This Makefile is copied on demand into source directories.
+# Be sure not to edit these copies.
+#
 ###############################################################################
-#
-# Collection of object files
-#
-#  Note that the variable names must coincide with the directory names above.
-
-
-framework   = memory.o str.o ctinfo.o main_args.o dbug.o globals.o \
-              free_attribs.o free.o copy.o traverse.o scanparse.o main.o \
-              phase.o phase_drivers.o phase_info.o phase_options.o \
-              check_lib.o node_basic.o free_node.o copy_node.o \
-              traverse_tables.o traverse_helper.o check.o \
-              check_node.o check_attribs.o lookup_table.o
-
-global      = options.o usage.o myglobals.o
-
-scanparse   = civic.tab.o civic.lex.o
-
-print       = print.o
-
-codegen     = gen_byte_code.o
-
-analysis    = symbol_table.o context_analysis.o
-
-transform   = global_variable_initialisation.o local_variable_initialisation.o
 
 
 
 ###############################################################################
 #
-# Testing
+# General settings
 #
 
+PROJECT_ROOT = ../..
+
+include $(PROJECT_ROOT)/Makefile.Config
+
+TARGET = $(notdir $(PWD))
 
 
-# Subdirectories of "test/" to traverse into during testing. Enable
-# "nested_funs" and "arrays" when you start implementing those extensions.
-# "preprocess" is optional, for those who implemented the C preprocessor.
-TEST_DIRS := basic # nested_funs arrays preprocess
 
-# Flags to pass to your compiler when running tests (e.g., a verbosity level).
-TEST_CFLAGS := ""
+###############################################################################
+#
+# Dummy rules
+#
 
-# Whether to run tests that compare program output. Set to 1 after you have
-# implemented your assembly phase.
-TEST_RUN_FUNCTIONAL := 0
+.PHONY: clean all devel prod 
 
-# Path to toolchain files, relative to the root directory (used for functional
-# test).
-TEST_CIVAS := bin/civas
-TEST_CIVVM := bin/civvm
 
-# Path to your compiler binary, relative to the root directory.
-TEST_CIVCC := bin/civicc
+
+###############################################################################
+#
+# Start rules
+#
+
+all: devel
+
+devel:
+	@$(ECHO) ""
+	@$(ECHO) "Making current subdirectory (developer version)"
+	@$(MAKE) -C $(PROJECT_ROOT) TARGET="$(TARGET)" MODE="" CHECK_DEPS="yes" makesubdir
+
+prod:
+	@$(ECHO) ""
+	@$(ECHO) "Making current subdirectory (product version)"
+	@$(MAKE) -C $(PROJECT_ROOT) TARGET="$(TARGET)" MODE="prod" CHECK_DEPS="yes"makesubdir
+
+
+
+
+###############################################################################
+#
+# Rules for generating Makefiles
+#
+
+Makefile: $(PROJECT_ROOT)/Makefile.Source
+	@$(ECHO) "  Creating makefile: $@" 
+	@cp -f $< $@
+
+
+
+
+
+###############################################################################
+#
+# Rules for directory cleaning
+#
+
+clean:
+	@$(RM) *.o *.a *.bak *~ .*.d
+	@$(RM) $(patsubst %.xsl,%,$(wildcard *.xsl))
+	@$(RM) -r .sb SunWS_cache
+	@$(RM) *.lex.c *.tab.c *.tab.h y.output
 

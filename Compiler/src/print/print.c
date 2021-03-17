@@ -370,26 +370,6 @@ PRTvarlet(node *arg_node, info *arg_info)
 
 /** <!--******************************************************************-->
  *
- * @fn PRTsymboltableentry
- *
- * @brief Prints the node and its sons/attributes
- *
- * @param arg_node letrec node to process
- * @param arg_info pointer to info structure
- *
- * @return processed node
- *
- ***************************************************************************/
-
-node *PRTsymboltableentry(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("PRTsymboltableentry");
-
-  DBUG_RETURN(arg_node);
-}
-
-/** <!--******************************************************************-->
- *
  * @fn PRTerror
  *
  * @brief Prints the node and its sons/attributes
@@ -460,6 +440,13 @@ node *
 PRTprogram(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTprogram");
+
+  if (PROGRAM_SYMBOLTABLE(arg_node) != NULL)
+  {
+    printf("/**\n");
+    PROGRAM_SYMBOLTABLE(arg_node) = TRAVdo(PROGRAM_SYMBOLTABLE(arg_node), arg_info);
+    printf("\n*/\n\n");
+  }
 
   PROGRAM_DECLS(arg_node) = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
 
@@ -702,7 +689,7 @@ PRTfundefs(node *arg_node, info *arg_info)
 
 /** <!--******************************************************************-->
  *
- * @fn PRTfundef
+ * @fn PRTfundecl
  *
  * @brief Prints the node and its sons/attributes
  *
@@ -744,6 +731,13 @@ node *
 PRTfundef(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTfundef");
+
+  if (FUNDEF_SYMBOLTABLE(arg_node) != NULL)
+  {
+    printf("\n/**\n");
+    FUNDEF_SYMBOLTABLE(arg_node) = TRAVdo(FUNDEF_SYMBOLTABLE(arg_node), arg_info);
+    printf("\n*/\n");
+  }
 
   if (FUNDEF_ISEXPORT(arg_node))
   {
@@ -990,7 +984,7 @@ PRTglobdecl(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTglobdecl");
 
-  printf("extern %s %s;\n", stype(GLOBDEF_TYPE(arg_node)), GLOBDEF_NAME(arg_node));
+  printf("extern %s %s;\n", stype(GLOBDECL_TYPE(arg_node)), GLOBDECL_NAME(arg_node));
 
   DBUG_RETURN(arg_node);
 }
@@ -1127,10 +1121,10 @@ PRTmonop(node *arg_node, info *arg_info)
   switch (MONOP_OP(arg_node))
   {
   case MO_not:
-    tmp = "-";
+    tmp = "!";
     break;
   case MO_neg:
-    tmp = "!";
+    tmp = "-";
     break;
   case MO_unknown:
     DBUG_ASSERT(0, "unknown monop detected!");
@@ -1139,6 +1133,55 @@ PRTmonop(node *arg_node, info *arg_info)
   printf("%s", tmp);
 
   MONOP_OPERAND(arg_node) = TRAVdo(MONOP_OPERAND(arg_node), arg_info);
+
+  DBUG_RETURN(arg_node);
+}
+
+/** <!--******************************************************************-->
+ *
+ * @fn PRTsymboltable
+ *
+ * @brief Prints the node and its sons/attributes
+ *
+ * @param arg_node letrec node to process
+ * @param arg_info pointer to info structure
+ *
+ * @return processed node
+ *
+ ***************************************************************************/
+node *PRTsymboltable(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTsymboltable");
+
+  printf("Symbol Table:\n\n");
+  printf("\t%-10s %-10s %-15s %-15s %-15s\n", "Symbol:", "Type:", "Is Function:", "Is Export:", "Is Parameter:");
+  SYMBOLTABLE_ENTRIES(arg_node) = TRAVopt(SYMBOLTABLE_ENTRIES(arg_node), arg_info);
+
+  DBUG_RETURN(arg_node);
+}
+
+/** <!--******************************************************************-->
+ *
+ * @fn PRTsymboltableentry
+ *
+ * @brief Prints the node and its sons/attributes
+ *
+ * @param arg_node letrec node to process
+ * @param arg_info pointer to info structure
+ *
+ * @return processed node
+ *
+ ***************************************************************************/
+node *PRTsymboltableentry(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTsymboltableentry");
+
+  printf("\t%-10s %-10s %-15s %-15s %-15s\n", SYMBOLTABLEENTRY_NAME(arg_node), stype(SYMBOLTABLEENTRY_TYPE(arg_node)), SYMBOLTABLEENTRY_ISFUNCTION(arg_node) ? "True" : "False", SYMBOLTABLEENTRY_ISEXPORT(arg_node) ? "True" : "False", SYMBOLTABLEENTRY_ISPARAMETER(arg_node) ? "True" : "False");
+
+  if (SYMBOLTABLEENTRY_NEXT(arg_node) != NULL)
+  {
+    SYMBOLTABLEENTRY_NEXT(arg_node) = TRAVdo(SYMBOLTABLEENTRY_NEXT(arg_node), arg_info);
+  }
 
   DBUG_RETURN(arg_node);
 }

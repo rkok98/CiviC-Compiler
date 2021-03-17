@@ -73,7 +73,7 @@ static int yyerror( char *errname);
 
 program: decls 
          {
-           parseresult = TBmakeProgram($1);
+           parseresult = TBmakeProgram($1, NULL);
          }
         ;
 

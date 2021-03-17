@@ -7,7 +7,6 @@
 
 /******************************************************************************/
 
-
 PHASE( ld,
        "Loading CiviC program",
        ALWAYS)
@@ -25,6 +24,32 @@ SUBPHASE( scp,
           ld)
 
 ENDPHASE( ld)
+
+/******************************************************************************/
+
+PHASE( ac,
+       "Analyzing Code",
+       ALWAYS)
+
+SUBPHASE(  ca,
+          "Running Context Analysis",
+           CAdoContextAnalysis, 
+           ALWAYS,
+           ac)
+
+SUBPHASE(  gvi,
+          "Initializing Global Variables",
+           GVIinitializeGlobalVariables, 
+           ALWAYS,
+           ac)
+
+SUBPHASE(  lvi,
+          "Initializing Local Variables",
+           LVIinitializeLocalVariables, 
+           ALWAYS,
+           ac)
+
+ENDPHASE(ac)
 
 /******************************************************************************/
 
