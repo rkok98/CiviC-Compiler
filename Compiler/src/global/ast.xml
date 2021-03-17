@@ -57,13 +57,23 @@
 
             <traversal id="TC" name="Type Checking" default="sons" include="type_checking.h">
                 <travuser>
-                    <node name="Program" />
+                    <node name="For" />
                     <node name="FunDef" />
+                    <node name="Program" />
+                    <node name="Num" />
+                    <node name="Float" />
+                    <node name="Bool" />
+
+                    <node name="Cast" />
+                    <node name="MonOp" />
+                    <node name="BinOp" />
+                    <node name="Assign" />
+                    <node name="VarDecl" />
+                    <node name="IfElse" />
+                    <node name="While" />
+                    <node name="DoWhile" />
+                    <node name="For" />
                     <node name="Return" />
-                    
-                    <node name="Num"/>
-                    <node name="Float"/>
-                    <node name="Bool"/>
                 </travuser>
             </traversal>
 

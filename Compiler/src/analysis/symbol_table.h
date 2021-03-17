@@ -6,6 +6,7 @@
 extern node *STinsert(node *symbol_table, node *entry);
 
 extern node *STfind(node *symbol_table, char *name);
+extern node *STfindInParents(node *symbol_table, char *name);
 
 extern node *STlast(node *symbol_table);
 

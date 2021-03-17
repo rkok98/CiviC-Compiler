@@ -49,10 +49,28 @@ node *STfind(node *entry, char *name)
         DBUG_RETURN(entry);
     }
 
-    if (SYMBOLTABLEENTRY_NEXT(entry) != NULL) {
+    if (SYMBOLTABLEENTRY_NEXT(entry) != NULL)
+    {
         DBUG_RETURN(STfind(SYMBOLTABLEENTRY_NEXT(entry), name));
     }
 
+    DBUG_RETURN(NULL);
+}
+
+node *STfindInParents(node *symbol_table, char *name)
+{
+    DBUG_ENTER("STfindInParents");
+
+    node *entry = STfind(symbol_table, name);
+
+    if (entry) {
+        DBUG_RETURN(entry);
+    }
+
+    if (SYMBOLTABLE_PARENT(symbol_table)) {
+        DBUG_RETURN(STfindInParents(SYMBOLTABLE_PARENT(symbol_table), name));
+    }
+    
     DBUG_RETURN(NULL);
 }
 
@@ -73,56 +91,4 @@ node *STlast(node *symbol_table)
     }
 
     DBUG_RETURN(entry);
-}
-
-void STprint(node *symbol_table)
-{
-    printf("\n");
-    STprintindentation(SYMBOLTABLE_NESTINGLEVEL(symbol_table));
-    printf("%-10s %-10s %-10s\n", "Symbol:", "Type:", "Scope Level:");
-    STprintentry(SYMBOLTABLE_ENTRIES(symbol_table), SYMBOLTABLE_NESTINGLEVEL(symbol_table));
-}
-
-void STprintentry(node *entry, size_t nesting_level)
-{
-    if (entry == NULL)
-    {
-        return;
-    }
-
-    STprintindentation(nesting_level);
-    printf("%-10s %-10s %-10zu\n", SYMBOLTABLEENTRY_NAME(entry), STentrytype(SYMBOLTABLEENTRY_TYPE(entry)), nesting_level);
-
-    if (SYMBOLTABLEENTRY_NEXTTABLE(entry))
-    {
-        STprint(SYMBOLTABLEENTRY_NEXTTABLE(entry));
-    }
-
-    STprintentry(SYMBOLTABLEENTRY_NEXT(entry), nesting_level);
-}
-
-void STprintindentation(size_t n)
-{
-    for (size_t i = 0; i < n; i++)
-    {
-        printf("\t");
-    }
-}
-
-const char *STentrytype(type type)
-{
-    switch (type)
-    {
-    case T_void:
-        return "void";
-    case T_bool:
-        return "bool";
-    case T_int:
-        return "int";
-    case T_float:
-        return "float";
-    case T_unknown:
-        DBUG_ASSERT(0, "unknown type detected!");
-        return "Unknown";
-    }
 }
