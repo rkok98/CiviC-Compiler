@@ -41,20 +41,6 @@
                 </travuser>
             </traversal>
 
-            <traversal id="GVI" name="Global Variable Initialisation" default="sons" include="global_variable_initialisation.h">
-                <travuser>
-                    <node name="Program" />
-                    <node name="GlobDef" />
-                </travuser>
-            </traversal>
-
-            <traversal id="LVI" name="Local Variable Initialisation" default="sons" include="local_variable_initialisation.h">
-                <travuser>
-                    <node name="FunBody" />
-                    <node name="VarDecl" />
-                </travuser>
-            </traversal>
-
             <traversal id="TC" name="Type Checking" default="sons" include="type_checking.h">
                 <travuser>
                     <node name="For" />
@@ -63,7 +49,7 @@
                     <node name="Num" />
                     <node name="Float" />
                     <node name="Bool" />
-
+                    <!-- <node name="FunCall" /> -->
                     <node name="Cast" />
                     <node name="MonOp" />
                     <node name="BinOp" />
@@ -77,6 +63,19 @@
                 </travuser>
             </traversal>
 
+            <traversal id="GVI" name="Global Variable Initialisation" default="sons" include="global_variable_initialisation.h">
+                <travuser>
+                    <node name="Program" />
+                    <node name="GlobDef" />
+                </travuser>
+            </traversal>
+
+            <traversal id="LVI" name="Local Variable Initialisation" default="sons" include="local_variable_initialisation.h">
+                <travuser>
+                    <node name="FunBody" />
+                    <node name="VarDecl" />
+                </travuser>
+            </traversal>
         </general>
     </phases>
     <nodesets>

@@ -249,6 +249,7 @@ node *TCvardecl(node *arg_node, info *arg_info)
 
         type expected_type = VARDECL_TYPE(arg_node);
         type actual_type = INFO_TYPE(arg_info);
+
         if (actual_type != expected_type)
         {
             type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
@@ -329,6 +330,7 @@ node *TCreturn(node *arg_node, info *arg_info)
         RETURN_EXPR(arg_node) = TRAVdo(RETURN_EXPR(arg_node), arg_info);
         actual_type = INFO_TYPE(arg_info);
     }
+    
     if (actual_type != expected_type)
     {
         type_error(expected_type, actual_type, NODE_LINE(arg_node), NODE_COL(arg_node));
