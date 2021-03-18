@@ -38,6 +38,7 @@
                     <node name="Param" />
                     <node name="VarDecl" />
                     <node name="VarLet" />
+                    <node name="Var" />
                 </travuser>
             </traversal>
 

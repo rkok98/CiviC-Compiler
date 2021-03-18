@@ -44,7 +44,7 @@ extern node *CAprogram(node *arg_node, info *arg_info)
     DBUG_ENTER("CAprogram");
 
     node *table = TBmakeSymboltable(0, NULL, NULL);
-    
+
     INFO_SYMBOL_TABLE(arg_info) = table;
     PROGRAM_SYMBOLTABLE(arg_node) = table;
 
@@ -157,6 +157,20 @@ node *CAvarlet(node *arg_node, info *arg_info)
     STinsert(table, entry);
 
     VARDECL_NEXT(arg_node) = TRAVopt(VARDECL_NEXT(arg_node), arg_info);
+
+    DBUG_RETURN(arg_node);
+}
+
+node *CAvar(node *arg_node, info *arg_info)
+{
+    DBUG_ENTER("CAvar");
+
+    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VAR_NAME(arg_node));
+
+    if (!entry)
+    {      
+        CTIerrorLine(NODE_LINE(arg_node), "Undefined var: %s\n", VAR_NAME(arg_node));
+    }
 
     DBUG_RETURN(arg_node);
 }
