@@ -168,7 +168,7 @@ node *CAvar(node *arg_node, info *arg_info)
     node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VAR_NAME(arg_node));
 
     if (!entry)
-    {      
+    {
         CTIerrorLine(NODE_LINE(arg_node), "Undeclared var: %s\n", VAR_NAME(arg_node));
     }
 
