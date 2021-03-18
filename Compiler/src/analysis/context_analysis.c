@@ -148,15 +148,12 @@ node *CAvarlet(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAvarlet");
 
-    node *table = INFO_SYMBOL_TABLE(arg_info);
+    node *varlet_entry = STfindInParents(INFO_SYMBOL_TABLE ( arg_info), VARLET_NAME ( arg_node));
 
-    VARDECL_INIT(arg_node) = TRAVopt(VARDECL_INIT(arg_node), arg_info);
-
-    node *entry = TBmakeSymboltableentry(STRcpy(VARDECL_NAME(arg_node)), VARDECL_TYPE(arg_node), 0, 0, 0, NULL, NULL);
-
-    STinsert(table, entry);
-
-    VARDECL_NEXT(arg_node) = TRAVopt(VARDECL_NEXT(arg_node), arg_info);
+    if (!varlet_entry)
+    {
+        CTIerrorLine(NODE_LINE(arg_node), "Undeclared var: %s\n", VAR_NAME(arg_node));
+    }
 
     DBUG_RETURN(arg_node);
 }
@@ -165,9 +162,9 @@ node *CAvar(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAvar");
 
-    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VAR_NAME(arg_node));
+    node *var_entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VAR_NAME(arg_node));
 
-    if (!entry)
+    if (!var_entry)
     {
         CTIerrorLine(NODE_LINE(arg_node), "Undeclared var: %s\n", VAR_NAME(arg_node));
     }
