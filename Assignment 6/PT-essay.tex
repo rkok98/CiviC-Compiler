@@ -167,7 +167,7 @@ bodies as in C99 proper.}
 C [[ for (int i = lower, upper) { body } Rest ]]
 -> CX [[
         while(lower != upper){ 
-            C[[body]] upper = upper + 1 
+            C[[body]] lower = lower + 1 
         } 
         C[[Rest]] 
     ]]
