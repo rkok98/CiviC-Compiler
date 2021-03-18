@@ -136,7 +136,7 @@ node *TCassign(node *arg_node, info *arg_info)
 
     if (assign_actual_type != assign_expected_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual type: %s", HprintType(assign_expected_type), HprintType(assign_actual_type));
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Expected type: %s but actual type: %s", HprintType(assign_expected_type), HprintType(assign_actual_type));
     }
 
     DBUG_RETURN(arg_node);
@@ -157,7 +157,7 @@ node *TCreturn(node *arg_node, info *arg_info)
 
     if (return_actual_type != return_expected_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", HprintType(return_expected_type), HprintType(return_actual_type));
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Expected type: %s but actual: %s at %d:%d", HprintType(return_expected_type), HprintType(return_actual_type));
     }
 
     DBUG_RETURN(arg_node);
@@ -204,14 +204,20 @@ node *TCbinop(node *arg_node, info *arg_info)
     BINOP_RIGHT(arg_node) = TRAVdo(BINOP_RIGHT(arg_node), arg_info);
     type binop_right_type = INFO_TYPE(arg_info);
 
-    if (binop_left_type != binop_right_type)
+    // Validate if the left and right operand types are the same type.
+    // There's an exception for boolean and integer, a binary operator is compatible
+    // with a mix of both types.
+    if (binop_left_type != binop_right_type && 
+       (binop_left_type != T_bool && binop_left_type != T_int) && 
+       (binop_right_type != T_bool && binop_right_type != T_int))
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Cannot apply %s to type %s and type %s", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
     if (binop_op == BO_mod && binop_right_type != T_int)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
+
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Cannot apply %s to type %s and type %s", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
     if (HisBooleanOperator(BINOP_OP(arg_node)))

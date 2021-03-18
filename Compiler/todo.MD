@@ -14,7 +14,7 @@
 - [x] ./test/basic/check_success/parse_assign.cvc
 - [x] ./test/basic/check_success/parse_funbody.cvc
 - [x] ./test/basic/check_success/parse_globaldef.cvc
-- [ ] ./test/basic/check_success/parse_operators.cvc
+- [x] ./test/basic/check_success/parse_operators.cvc
 - [x] ./test/basic/check_success/vardec_init.cvc
 
 ## Combined extern var
