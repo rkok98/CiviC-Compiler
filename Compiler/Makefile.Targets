@@ -71,7 +71,7 @@ framework   = memory.o str.o ctinfo.o main_args.o dbug.o globals.o \
               traverse_tables.o traverse_helper.o check.o \
               check_node.o check_attribs.o lookup_table.o
 
-global      = options.o usage.o myglobals.o
+global      = options.o usage.o myglobals.o helpers.o
 
 scanparse   = civic.tab.o civic.lex.o
 

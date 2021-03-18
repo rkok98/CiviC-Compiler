@@ -1,5 +1,6 @@
 #include "type_checking.h"
 #include "symbol_table.h"
+#include "helpers.h"
 
 #include "types.h"
 #include "tree_basic.h"
@@ -106,7 +107,7 @@ node *TCvardecl(node *arg_node, info *arg_info)
 
         if (vardecl_actual_type != vardecl_expected_type)
         {
-            CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(vardecl_expected_type), get_type(vardecl_actual_type));
+            CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", HprintType(vardecl_expected_type), HprintType(vardecl_actual_type));
         }
     }
 
@@ -137,7 +138,7 @@ node *TCassign(node *arg_node, info *arg_info)
 
     if (assign_actual_type != assign_expected_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual type: %s", get_type(assign_expected_type), get_type(assign_actual_type));
+        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual type: %s", HprintType(assign_expected_type), HprintType(assign_actual_type));
     }
 
     DBUG_RETURN(arg_node);
@@ -158,7 +159,7 @@ node *TCreturn(node *arg_node, info *arg_info)
 
     if (return_actual_type != return_expected_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", get_type(return_expected_type), get_type(return_actual_type));
+        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", HprintType(return_expected_type), HprintType(return_actual_type));
     }
 
     DBUG_RETURN(arg_node);
@@ -218,7 +219,7 @@ node *TCcast(node *arg_node, info *arg_info)
 
     if (INFO_TYPE(arg_info) == T_void)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot cast %s to %s.", get_type(INFO_TYPE(arg_info)), get_type(CAST_TYPE(arg_node)));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot cast %s to %s.", HprintType(INFO_TYPE(arg_info)), HprintType(CAST_TYPE(arg_node)));
     }
 
     INFO_TYPE(arg_info) = CAST_TYPE(arg_node);
@@ -240,15 +241,15 @@ node *TCbinop(node *arg_node, info *arg_info)
 
     if (binop_left_type != binop_right_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", get_binop(binop_op), get_type(binop_left_type), get_type(binop_right_type));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
     if (binop_op == BO_mod && binop_right_type != T_int)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", get_binop(binop_op), get_type(binop_left_type), get_type(binop_right_type));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
-    if (isBooleanOperator(BINOP_OP(arg_node)))
+    if (HisBooleanOperator(BINOP_OP(arg_node)))
     {
         INFO_TYPE(arg_info) = T_bool;
     }
@@ -269,87 +270,4 @@ node *TCdoTypeChecking(node *syntaxtree)
     arg_info = FreeInfo(arg_info);
 
     DBUG_RETURN(syntaxtree);
-}
-
-bool isBooleanOperator(binop operator)
-{
-    return
-    operator== BO_lt ||
-    operator== BO_le ||
-    operator== BO_gt ||
-    operator== BO_ge ||
-    operator== BO_eq ||
-    operator== BO_ne ||
-    operator== BO_or ||
-    operator== BO_and;
-}
-
-char *get_type(type type)
-{
-    switch (type)
-    {
-    case T_void:
-        return "void";
-    case T_bool:
-        return "bool";
-    case T_int:
-        return "int";
-    case T_float:
-        return "float";
-    case T_unknown:
-        return "unknown";
-    default:
-        return NULL;
-    }
-}
-
-char *get_binop(binop op)
-{
-    switch (op)
-    {
-    case BO_add:
-        return "+";
-    case BO_sub:
-        return "-";
-    case BO_mul:
-        return "*";
-    case BO_div:
-        return "/";
-    case BO_mod:
-        return "%%";
-    case BO_lt:
-        return "<";
-    case BO_le:
-        return "<=";
-    case BO_gt:
-        return ">";
-    case BO_ge:
-        return ">=";
-    case BO_eq:
-        return "==";
-    case BO_ne:
-        return "!=";
-    case BO_or:
-        return "||";
-    case BO_and:
-        return "&&";
-    case BO_unknown:
-        return "unknown";
-    }
-    return NULL;
-}
-
-char *get_monop(monop op)
-{
-    switch (op)
-    {
-    case MO_not:
-        return "!";
-    case MO_neg:
-        return "-";
-    case MO_unknown:
-        return "unknown";
-    default:
-        return NULL;
-    }
 }

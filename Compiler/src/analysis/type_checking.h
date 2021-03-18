@@ -23,10 +23,4 @@ node *TCprogram(node *arg_node, info *arg_info);
 
 extern node *TCdoTypeChecking(node *syntaxtree);
 
-bool isBooleanOperator(binop operator);
-
-char *get_type(type type);
-char *get_binop(binop op);
-char *get_monop(monop op);
-
 #endif
