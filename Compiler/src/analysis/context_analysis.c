@@ -169,7 +169,7 @@ node *CAvar(node *arg_node, info *arg_info)
 
     if (!entry)
     {      
-        CTIerrorLine(NODE_LINE(arg_node), "Undefined var: %s\n", VAR_NAME(arg_node));
+        CTIerrorLine(NODE_LINE(arg_node), "Undeclared var: %s\n", VAR_NAME(arg_node));
     }
 
     DBUG_RETURN(arg_node);
