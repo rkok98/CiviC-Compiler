@@ -55,8 +55,6 @@ node *STfindInParents(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfindInParents");
 
-    printf("AAA");
-
     node *entry = STfind(symbol_table, name);
 
     if (entry)
