@@ -25,95 +25,97 @@
 
 %}
 
-%p 6000 /* set positions to 6000 */
-%e 2000 /* set nodes to 1100 */
+%p 6000
+%e 2000
 %option noyywrap
 %option nounput
 
 
 %%
 
-"("                        { FILTER( PARENTHESIS_L); }
-")"                        { FILTER( PARENTHESIS_R); }
-"{"                        { FILTER( CURLY_L); }
-"}"                        { FILTER( CURLY_R); }
-"["                        { FILTER( BRACKET_L); }
-"]"                        { FILTER( BRACKET_R); }
-","                        { FILTER( COMMA); }
-";"                        { FILTER( SEMICOLON); }
+"("                       { FILTER( PARENTHESIS_L); }
+")"                       { FILTER( PARENTHESIS_R); }
+"{"                       { FILTER( CURLY_L); }
+"}"                       { FILTER( CURLY_R); }
+"["                       { FILTER( BRACKET_L); }
+"]"                       { FILTER( BRACKET_R); }
+","                       { FILTER( COMMA); }
+";"                       { FILTER( SEMICOLON); }
 
-"-"                        { FILTER( MINUS); }
-"+"                        { FILTER( PLUS);  }
-"*"                        { FILTER( STAR);  } 
-"/"                        { FILTER( SLASH);  } 
-"%"                        { FILTER( PERCENT);  } 
+"-"                       { FILTER( MINUS); }
+"+"                       { FILTER( PLUS);  }
+"*"                       { FILTER( STAR);  } 
+"/"                       { FILTER( SLASH);  } 
+"%"                       { FILTER( PERCENT);  } 
 
-"<="                       { FILTER( LE);    }
-"<"                        { FILTER( LT);    } 
-">="                       { FILTER( GE);    }
-">"                        { FILTER( GT);    }
-"=="                       { FILTER( EQ);    }
-"!="                       { FILTER( NE);    }
-"&&"                       { FILTER( AND);   }
-"||"                       { FILTER( OR);    }
+"<="                      { FILTER( LE);    }
+"<"                       { FILTER( LT);    } 
+">="                      { FILTER( GE);    }
+">"                       { FILTER( GT);    }
+"=="                      { FILTER( EQ);    }
+"!="                      { FILTER( NE);    }
+"&&"                      { FILTER( AND);   }
+"||"                      { FILTER( OR);    }
 
-"="                        { FILTER( LET);   }
+"="                       { FILTER( LET);   }
 
-"!"                        { FILTER( NOT);   }
+"!"                       { FILTER( NOT);   }
 
-"void"                     { FILTER( VOID); }
+"void"                    { FILTER( VOID); }
 
-"true"                     { yylval.cbool = TRUE;
-                             FILTER(BOOLVAL);
-                           }
+"int"                     { FILTER( INT); }
+"float"                   { FILTER( FLOAT); }
+"bool"                    { FILTER( BOOL); }
+
+"true"                    { 
+                            yylval.cbool = TRUE;
+                            FILTER(BOOLVAL);
+                          }
                            
-"false"                    { yylval.cbool = FALSE;
-                             FILTER(BOOLVAL);
-                           }
+"false"                   { 
+                            yylval.cbool = FALSE;
+                            FILTER(BOOLVAL);
+                          }
 
-"int"                      { FILTER( INT); }
-"float"                    { FILTER( FLOAT); }
-"bool"                     { FILTER( BOOL); }
+"extern"                  { FILTER( EXTERN); }
+"export"                  { FILTER( EXPORT); }
+"return"                  { FILTER( RETURN); }
 
-"extern"                   { FILTER( EXTERN); }
-"export"                   { FILTER( EXPORT); }
-"return"                   { FILTER( RETURN); }
-
-"if"                       { FILTER( IF); }
-"else"                     { FILTER( ELSE); }
-"do"                       { FILTER( DO);}
-"while"                    { FILTER( WHILE); }
-"for"                      { FILTER( FOR); }
+"if"                      { FILTER( IF); }
+"else"                    { FILTER( ELSE); }
+"do"                      { FILTER( DO);}
+"while"                   { FILTER( WHILE); }
+"for"                     { FILTER( FOR); }
 
 
-[A-Za-z][A-Za-z0-9_]*      { yylval.id = STRcpy(yytext);
+[A-Za-z][A-Za-z0-9_]*     { 
+                             yylval.id = STRcpy(yytext);
                              FILTER( ID);
-                           }
+                          }
 
-[0-9]+                     { long integer = strtol(yytext, NULL, 10);
-                             if (integer > INT_MAX || integer < INT_MIN) {
-                                CTIerror("Integer %s out of range", yytext);
-                             }
-                             else
-                             {
-                                yylval.cint=atoi(yytext);
-                                FILTER( INTVAL);
-                             }
-                           }
+[0-9]+                    { 
+                            long integer = strtol(yytext, NULL, 10);
+                            if (integer < INT_MIN || integer > INT_MAX) {
+                              CTIerror("Integer %s out of range", yytext);
+                            }
+                            yylval.cint=atoi(yytext);
+                            FILTER( INTVAL);
+                          }
 
-[0-9]*[.][0-9]+            { yylval.cflt = atof(yytext);  
-                              FILTER( FLOATVAL);
-                              printf( "A float: %s (%g)\n", yytext,
-                              atof( yytext ) );
-                           }                           
+[0-9]*[.][0-9]+           { 
+                            yylval.cflt = atof(yytext);  
+                            FILTER( FLOATVAL);
+                          }                                    
 
-\n.*                       { global.line += 1;
-                             global.col = 0;
-                             yyless(1);
-                           }
+\n.*                      { 
+                            global.line += 1;
+                            global.col = 0;
+                            yyless(1);
+                          }
 
-[ \t]                      { global.col += yyleng;
-                           } 
+[ \t]                     { 
+                            global.col += yyleng;
+                          } 
 
 [ \t\n]+                                  // White space
 "//".*                                    // Comments
