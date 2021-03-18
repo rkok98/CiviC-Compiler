@@ -13,12 +13,12 @@
 - [x] ./test/basic/check_success/params_funcall.cvc
 - [x] ./test/basic/check_success/parse_assign.cvc
 - [x] ./test/basic/check_success/parse_funbody.cvc
-- [ ] ./test/basic/check_success/parse_globaldef.cvc
+- [x] ./test/basic/check_success/parse_globaldef.cvc
 - [ ] ./test/basic/check_success/parse_operators.cvc
 - [x] ./test/basic/check_success/vardec_init.cvc
 
 ## Combined extern var
-- [ ] ./test/basic/combined_extern_var/defs.cvc 
+- [x] ./test/basic/combined_extern_var/defs.cvc 
 
 # Milestones
 ## Milestone 7

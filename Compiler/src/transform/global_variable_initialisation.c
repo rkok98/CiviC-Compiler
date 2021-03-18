@@ -51,11 +51,12 @@ node *GVIprogram(node *arg_node, info *arg_info)
 
     node *init_body = TBmakeFunbody(NULL, NULL, NULL);
     node *init_function = TBmakeFundef(T_void, STRcpy("__init"), init_body, NULL);
-
+    node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
+    
     INFO_INIT_FUNCTION(arg_info) = init_function;
+    FUNDEF_SYMBOLTABLE(init_function) = init_symbol_table;
 
     node *declarations = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
-
 
     if (INFO_LAST_STATEMENT(arg_info))
     {
