@@ -13,9 +13,7 @@ node *STinsert(node *symbol_table, node *entry)
 {
     DBUG_ENTER("STinsert");
 
-    node *first_entry = SYMBOLTABLE_ENTRIES(symbol_table);
-
-    if (STfind(first_entry, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
+    if (STfind(symbol_table, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
     {
         CTIerror("Variable/Function '%s' at line %d is already defined.", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry) + 1);
         return NULL;
@@ -35,22 +33,40 @@ node *STinsert(node *symbol_table, node *entry)
     DBUG_RETURN(entry);
 }
 
-node *STfind(node *entry, char *name)
+node *STfind(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfind");
+    node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
 
-    if (entry == NULL)
+    while (entry)
     {
-        DBUG_RETURN(NULL);
+        if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
+        {
+            DBUG_RETURN(entry);
+        }
+
+        entry = SYMBOLTABLEENTRY_NEXT(entry);
     }
 
-    if (STReq(SYMBOLTABLEENTRY_NAME(entry), name))
+    DBUG_RETURN(NULL);
+}
+
+node *STfindInParents(node *symbol_table, char *name)
+{
+    DBUG_ENTER("STfindInParents");
+
+    printf("AAA");
+
+    node *entry = STfind(symbol_table, name);
+
+    if (entry)
     {
         DBUG_RETURN(entry);
     }
 
-    if (SYMBOLTABLEENTRY_NEXT(entry) != NULL) {
-        DBUG_RETURN(STfind(SYMBOLTABLEENTRY_NEXT(entry), name));
+    if (SYMBOLTABLE_PARENT(symbol_table))
+    {       
+        DBUG_RETURN(STfindInParents(SYMBOLTABLE_PARENT(symbol_table), name));
     }
 
     DBUG_RETURN(NULL);
@@ -73,56 +89,4 @@ node *STlast(node *symbol_table)
     }
 
     DBUG_RETURN(entry);
-}
-
-void STprint(node *symbol_table)
-{
-    printf("\n");
-    STprintindentation(SYMBOLTABLE_NESTINGLEVEL(symbol_table));
-    printf("%-10s %-10s %-10s\n", "Symbol:", "Type:", "Scope Level:");
-    STprintentry(SYMBOLTABLE_ENTRIES(symbol_table), SYMBOLTABLE_NESTINGLEVEL(symbol_table));
-}
-
-void STprintentry(node *entry, size_t nesting_level)
-{
-    if (entry == NULL)
-    {
-        return;
-    }
-
-    STprintindentation(nesting_level);
-    printf("%-10s %-10s %-10zu\n", SYMBOLTABLEENTRY_NAME(entry), STentrytype(SYMBOLTABLEENTRY_TYPE(entry)), nesting_level);
-
-    if (SYMBOLTABLEENTRY_NEXTTABLE(entry))
-    {
-        STprint(SYMBOLTABLEENTRY_NEXTTABLE(entry));
-    }
-
-    STprintentry(SYMBOLTABLEENTRY_NEXT(entry), nesting_level);
-}
-
-void STprintindentation(size_t n)
-{
-    for (size_t i = 0; i < n; i++)
-    {
-        printf("\t");
-    }
-}
-
-const char *STentrytype(type type)
-{
-    switch (type)
-    {
-    case T_void:
-        return "void";
-    case T_bool:
-        return "bool";
-    case T_int:
-        return "int";
-    case T_float:
-        return "float";
-    case T_unknown:
-        DBUG_ASSERT(0, "unknown type detected!");
-        return "Unknown";
-    }
 }

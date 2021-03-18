@@ -12,6 +12,22 @@
         "iosfwd": "c",
         "__node_handle": "c",
         "types.h": "c",
-        "variable_initialisation.h": "c"
+        "variable_initialisation.h": "c",
+        "functional": "c",
+        "ios": "c",
+        "__functional_base": "c",
+        "__functional_base_03": "c",
+        "__hash_table": "c",
+        "__tuple": "c",
+        "algorithm": "c",
+        "array": "c",
+        "chrono": "c",
+        "type_traits": "c",
+        "limits": "c",
+        "memory": "c",
+        "ratio": "c",
+        "tuple": "c",
+        "utility": "c",
+        "free.h": "c"
     }
 }

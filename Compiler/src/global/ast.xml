@@ -41,6 +41,24 @@
                 </travuser>
             </traversal>
 
+            <traversal id="TC" name="Type Checking" default="sons" include="type_checking.h">
+                <travuser>
+                    <node name="Num" />
+                    <node name="Float" />
+                    <node name="Bool" />
+                    <node name="Program" />
+                    <node name="FunDef" />
+                    <node name="VarDecl" />
+                    <node name="VarLet" />
+                    <node name="Assign" />
+                    <node name="Return" />
+
+                    <!-- <node name="FunCall" /> -->
+                    <node name="Cast" />
+                    <node name="BinOp" />
+                </travuser>
+            </traversal>
+
             <traversal id="GVI" name="Global Variable Initialisation" default="sons" include="global_variable_initialisation.h">
                 <travuser>
                     <node name="Program" />
@@ -54,7 +72,6 @@
                     <node name="VarDecl" />
                 </travuser>
             </traversal>
-
         </general>
     </phases>
     <nodesets>
@@ -982,6 +999,17 @@
                                 <any/>
                                 <phases>
                                     <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Symboltable">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
                                 </phases>
                             </target>
                         </targets>
