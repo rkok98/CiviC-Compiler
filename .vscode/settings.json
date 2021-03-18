@@ -27,6 +27,7 @@
         "memory": "c",
         "ratio": "c",
         "tuple": "c",
-        "utility": "c"
+        "utility": "c",
+        "free.h": "c"
     }
 }

@@ -2,16 +2,14 @@
 #include "symbol_table.h"
 #include "helpers.h"
 
+#include "dbug.h"
+#include "ctinfo.h"
+#include "free.h"
+#include "memory.h"
+#include "str.h"
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
-#include "dbug.h"
-
-#include "free.h"
-#include "str.h"
-
-#include "memory.h"
-#include "ctinfo.h"
 
 struct INFO
 {
@@ -82,12 +80,12 @@ node *TCfundef(node *arg_node, info *arg_info)
 
     node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
     type return_type = INFO_RETURN_TYPE(arg_info);
-    
+
     INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node);
     INFO_RETURN_TYPE(arg_info) = FUNDEF_TYPE(arg_node);
 
     FUNDEF_FUNBODY(arg_node) = TRAVdo(FUNDEF_FUNBODY(arg_node), arg_info);
-    
+
     INFO_SYMBOL_TABLE(arg_info) = symbol_table;
     INFO_RETURN_TYPE(arg_info) = return_type;
 
