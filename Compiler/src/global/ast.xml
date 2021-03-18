@@ -49,12 +49,11 @@
                     <node name="Bool" />
                     <node name="Program" />
                     <node name="FunDef" />
+                    <node name="FunCall" />
                     <node name="VarDecl" />
                     <node name="VarLet" />
                     <node name="Assign" />
                     <node name="Return" />
-
-                    <!-- <node name="FunCall" /> -->
                     <node name="Cast" />
                     <node name="BinOp" />
                 </travuser>

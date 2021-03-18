@@ -163,51 +163,18 @@ node *TCreturn(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-/**
 node *TCfuncall(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCfuncall");
 
-    char *name = FUNCALL_NAME(arg_node);
-    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), name);
+    node *funcall_entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
 
-    node *current_param = SYMBOLTABLEENTRY_PARAMS(entry);
-    char *expected = STRcat(name, "(");
-    while (current_param)
-    {
-        expected = STRcat(expected, get_type(PARAM_TYPE(current_param)));
-        if (PARAM_NEXT(current_param))
-        {
-            expected = STRcat(expected, ", ");
-        }
-        current_param = PARAM_NEXT(current_param);
-    }
-    expected = STRcat(expected, ")");
-
-    node *current_exprs = FUNCALL_PARAMS(arg_node);
-    char *actual = STRcat(name, "(");
-    while (current_exprs)
-    {
-        EXPRS_EXPR(current_exprs) = TRAVdo(EXPRS_EXPR(current_exprs), arg_info);
-        actual = STRcat(actual, get_type(INFO_TYPE(arg_info)));
-        if (EXPRS_NEXT(current_exprs))
-        {
-            actual = STRcat(actual, ", ");
-        }
-        current_exprs = EXPRS_NEXT(current_exprs);
-    }
-    actual = STRcat(actual, ")");
-
-    if (!STReq(actual, expected))
-    {
-        funcalltype_error(expected, actual, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
+    FUNCALL_ARGS(arg_node) = TRAVopt(FUNCALL_ARGS(arg_node), arg_info);
+    
+    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(funcall_entry);
 
     DBUG_RETURN(arg_node);
 }
-*/
 
 node *TCcast(node *arg_node, info *arg_info)
 {
@@ -239,12 +206,12 @@ node *TCbinop(node *arg_node, info *arg_info)
 
     if (binop_left_type != binop_right_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
     if (binop_op == BO_mod && binop_right_type != T_int)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
     if (HisBooleanOperator(BINOP_OP(arg_node)))

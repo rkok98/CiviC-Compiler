@@ -10,7 +10,7 @@
 ## Check Success
 - [x] ./test/basic/check_success/do_while.cvc
 - [x] ./test/basic/check_success/early_return.cvc
-- [ ] ./test/basic/check_success/params_funcall.cvc
+- [x] ./test/basic/check_success/params_funcall.cvc
 - [x] ./test/basic/check_success/parse_assign.cvc
 - [x] ./test/basic/check_success/parse_funbody.cvc
 - [ ] ./test/basic/check_success/parse_globaldef.cvc
@@ -22,4 +22,4 @@
 
 # Milestones
 ## Milestone 7
-- [ ] Funcall
+- [x] Funcall
