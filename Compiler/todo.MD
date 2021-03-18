@@ -5,7 +5,7 @@
 
 # Tests
 ## Check Error
-- [ ] ./test/basic/check_error/undefined_var.cvc
+- [x] ./test/basic/check_error/undefined_var.cvc
 
 ## Check Success
 - [ ] ./test/basic/check_success/do_while.cvc
