@@ -1,0 +1,108 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% LATEX-TEMPLATE TECHNISCH RAPPORT
+%-------------------------------------------------------------------------------
+% This template is derived from the AVI PT report template.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%-------------------------------------------------------------------------------
+%	PACKAGES EN DOCUMENT CONFIGURATIE
+%-------------------------------------------------------------------------------
+
+\documentclass{uva-inf-article}
+%\usepackage[dutch]{babel}
+%\usepackage{csquotes}
+
+\usepackage[style=numeric-comp]{biblatex}
+\addbibresource{PT-essay.bib}
+
+%-------------------------------------------------------------------------------
+%	GEGEVENS VOOR IN DE TITEL
+%-------------------------------------------------------------------------------
+
+% Vul de naam van de opdracht in.
+\assignment{Individual Written Assessment}
+% Vul het soort opdracht in.
+\assignmenttype{Essay}
+% Vul de titel van de eindopdracht in.
+\title{Designing \texttt{legalease}, a Smart Contracts programming language}
+
+% Vul de volledige namen van alle auteurs in.
+\author{Name}
+% Vul de corresponderende UvAnetID's in.
+\uvanetid{UvAnetID}
+
+% Vul eventueel ook de naam van de docent of vakcoordinator toe.
+\docent{}
+\course{Programmeertalen}
+% Te vinden op onder andere Datanose.
+\courseid{}
+
+% Dit is de datum die op het document komt te staan. Standaard is dat vandaag.
+\date{\today}
+
+%-------------------------------------------------------------------------------
+%	VOORPAGINA
+%-------------------------------------------------------------------------------
+
+\begin{document}
+\maketitle
+
+%-------------------------------------------------------------------------------
+%	INHOUDSOPGAVE EN ABSTRACT
+%-------------------------------------------------------------------------------
+
+% Niet doen bij korte verslagen en rapporten
+%\tableofcontents
+%\begin{abstract}
+%\lipsum[13]
+%\end{abstract}
+
+%-------------------------------------------------------------------------------
+%	INTRODUCTIE
+%-------------------------------------------------------------------------------
+
+\section{Introduction}
+Smart Contracts \cite{relevant-citation-1} are key to ...
+%\lipsum[1]
+
+\subsection{Relevant characteristics of application domain}
+%\lipsum[2]
+
+\subsection{Use case description}
+%\lipsum[3]
+
+%-------------------------------------------------------------------------------
+%	METHODE
+%-------------------------------------------------------------------------------
+
+\section{Analysis}
+%\lipsum[3]
+\subsection{The type system}
+\subsection{State management}
+\subsection{Compilation/interpretation strategy}
+\subsection{Evaluation strategy (lazy/eager)}
+\subsection{Parameter evaluation strategy (call by value/reference)}
+\subsection{Communication semantics (synchronous/asynchronous)}
+\subsection{Higher-order functions}
+\subsection{Anonymous functions}
+
+\section{Discussion}
+%\lipsum[5]
+
+\section{Conclusions}
+%\lipsum[7]
+
+%-------------------------------------------------------------------------------
+%	REFERENTIES
+%-------------------------------------------------------------------------------
+
+\printbibliography
+
+%-------------------------------------------------------------------------------
+%	BIJLAGEN EN EINDE
+%-------------------------------------------------------------------------------
+
+%\section{Bijlage A}
+%\section{Bijlage B}
+%\section{Bijlage C}
+\end{document}
