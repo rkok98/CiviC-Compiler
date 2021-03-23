@@ -105,7 +105,7 @@ node *TCvardecl(node *arg_node, info *arg_info)
 
         if (vardecl_actual_type != vardecl_expected_type)
         {
-            CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", HprintType(vardecl_expected_type), HprintType(vardecl_actual_type));
+            CTIerrorLine(NODE_LINE(arg_node) + 1, "Expected type '%s' but actual '%s'", HprintType(vardecl_expected_type), HprintType(vardecl_actual_type));
         }
     }
 
@@ -136,7 +136,7 @@ node *TCassign(node *arg_node, info *arg_info)
 
     if (assign_actual_type != assign_expected_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual type: %s", HprintType(assign_expected_type), HprintType(assign_actual_type));
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Expected type '%s' but actual type '%s'", HprintType(assign_expected_type), HprintType(assign_actual_type));
     }
 
     DBUG_RETURN(arg_node);
@@ -157,57 +157,24 @@ node *TCreturn(node *arg_node, info *arg_info)
 
     if (return_actual_type != return_expected_type)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Expected type: %s but actual: %s at %d:%d", HprintType(return_expected_type), HprintType(return_actual_type));
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Expected type '%s' but actual '%s'", HprintType(return_expected_type), HprintType(return_actual_type));
     }
 
     DBUG_RETURN(arg_node);
 }
 
-/**
 node *TCfuncall(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCfuncall");
 
-    char *name = FUNCALL_NAME(arg_node);
-    node *entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), name);
+    node *funcall_entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
 
-    node *current_param = SYMBOLTABLEENTRY_PARAMS(entry);
-    char *expected = STRcat(name, "(");
-    while (current_param)
-    {
-        expected = STRcat(expected, get_type(PARAM_TYPE(current_param)));
-        if (PARAM_NEXT(current_param))
-        {
-            expected = STRcat(expected, ", ");
-        }
-        current_param = PARAM_NEXT(current_param);
-    }
-    expected = STRcat(expected, ")");
-
-    node *current_exprs = FUNCALL_PARAMS(arg_node);
-    char *actual = STRcat(name, "(");
-    while (current_exprs)
-    {
-        EXPRS_EXPR(current_exprs) = TRAVdo(EXPRS_EXPR(current_exprs), arg_info);
-        actual = STRcat(actual, get_type(INFO_TYPE(arg_info)));
-        if (EXPRS_NEXT(current_exprs))
-        {
-            actual = STRcat(actual, ", ");
-        }
-        current_exprs = EXPRS_NEXT(current_exprs);
-    }
-    actual = STRcat(actual, ")");
-
-    if (!STReq(actual, expected))
-    {
-        funcalltype_error(expected, actual, NODE_LINE(arg_node), NODE_COL(arg_node));
-    }
-
-    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
+    FUNCALL_ARGS(arg_node) = TRAVopt(FUNCALL_ARGS(arg_node), arg_info);
+    
+    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(funcall_entry);
 
     DBUG_RETURN(arg_node);
 }
-*/
 
 node *TCcast(node *arg_node, info *arg_info)
 {
@@ -217,7 +184,7 @@ node *TCcast(node *arg_node, info *arg_info)
 
     if (INFO_TYPE(arg_info) == T_void)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot cast %s to %s.", HprintType(INFO_TYPE(arg_info)), HprintType(CAST_TYPE(arg_node)));
+        CTIerrorLine(NODE_LINE(arg_node), "Cannot cast '%s' to '%s'", HprintType(INFO_TYPE(arg_info)), HprintType(CAST_TYPE(arg_node)));
     }
 
     INFO_TYPE(arg_info) = CAST_TYPE(arg_node);
@@ -237,14 +204,20 @@ node *TCbinop(node *arg_node, info *arg_info)
     BINOP_RIGHT(arg_node) = TRAVdo(BINOP_RIGHT(arg_node), arg_info);
     type binop_right_type = INFO_TYPE(arg_info);
 
-    if (binop_left_type != binop_right_type)
+    // Validate if the left and right operand types are the same type.
+    // There's an exception for boolean and integer, a binary operator is compatible
+    // with a mix of both types.
+    if (binop_left_type != binop_right_type && 
+       (binop_left_type != T_bool && binop_left_type != T_int) && 
+       (binop_right_type != T_bool && binop_right_type != T_int))
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Cannot apply operator '%s' to type '%s' and type '%s'", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
     if (binop_op == BO_mod && binop_right_type != T_int)
     {
-        CTIerrorLine(NODE_LINE(arg_node), "Cannot apply %s to type %s and type %s at %d:%d", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
+
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Cannot apply operator '%s' to type '%s' and type '%s'", HprintBinOp(binop_op), HprintType(binop_left_type), HprintType(binop_right_type));
     }
 
     if (HisBooleanOperator(BINOP_OP(arg_node)))
