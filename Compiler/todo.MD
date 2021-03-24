@@ -2,6 +2,7 @@
 - [ ] Comments
 - [ ] Remove Commented Code
 - [ ] Print AST
+- [ ] For loop a sahbi
 
 # Tests
 ## Check Error
