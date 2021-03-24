@@ -161,7 +161,7 @@ node *PRTbinop(node *arg_node, info *arg_info)
 
   BINOP_RIGHT(arg_node) = TRAVdo(BINOP_RIGHT(arg_node), arg_info);
 
-  printf(")");
+  printf(" )");
 
   DBUG_RETURN(arg_node);
 }
@@ -320,6 +320,21 @@ node *PRTifelse(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
+node *PRTternary(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTternary");
+
+  printf("( ");
+  TERNARY_COND(arg_node) = TRAVdo(TERNARY_COND(arg_node), arg_info);
+  printf(" ? ");
+  TERNARY_THEN(arg_node) = TRAVdo(TERNARY_THEN(arg_node), arg_info);
+  printf(" : ");
+  TERNARY_ELSE(arg_node) = TRAVdo(TERNARY_ELSE(arg_node), arg_info);
+  printf(" )");
+
+  DBUG_RETURN(arg_node);
+}
+
 node *PRTdecls(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTdecls");
@@ -347,13 +362,6 @@ node *PRTglobdef(node *arg_node, info *arg_info)
   if (GLOBDEF_ISEXPORT(arg_node))
   {
     printf("%s", "export ");
-  }
-
-  int isExtern = GLOBDEF_ISEXTERN(arg_node);
-
-  if (isExtern)
-  {
-    printf("%s", "extern ");
   }
 
   printf("%s %s", HprintType(GLOBDEF_TYPE(arg_node)), GLOBDEF_NAME(arg_node));
@@ -393,11 +401,13 @@ node *PRTfor(node *arg_node, info *arg_info)
 
   print(arg_info, "{\n");
 
-  INFO_INDENTATION_LEVEL(arg_info)++;
+  INFO_INDENTATION_LEVEL(arg_info)
+  ++;
 
   FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
 
-  INFO_INDENTATION_LEVEL(arg_info)--;
+  INFO_INDENTATION_LEVEL(arg_info)
+  --;
 
   print(arg_info, "}\n");
 

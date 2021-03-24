@@ -56,6 +56,12 @@ SUBPHASE(  tc,
            ALWAYS,
            ac)
 
+SUBPHASE(  bdc,
+          "Boolean Disjunction and Conjunction",
+           BDCdoBoolDisjunction, 
+           ALWAYS,
+           ac)
+
 ENDPHASE(ac)
 
 /******************************************************************************/

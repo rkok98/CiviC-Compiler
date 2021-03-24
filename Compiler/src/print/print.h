@@ -29,6 +29,7 @@ extern node *PRTfundefs(node *arg_node, info *arg_info);
 extern node *PRTfundef(node *arg_node, info *arg_info);
 extern node *PRTfunbody(node *arg_node, info *arg_info);
 extern node *PRTifelse(node *arg_node, info *arg_info);
+extern node *PRTternary(node *arg_node, info *arg_info);
 
 extern node *PRTdecls(node *arg_node, info *arg_info);
 extern node *PRTglobdecl(node *arg_node, info *arg_info);

@@ -72,6 +72,13 @@
                     <node name="VarDecl" />
                 </travuser>
             </traversal>
+
+            <traversal id="BDC" name="Boolean Disjunction and Conjunction" default="sons" include="bool_disjunction.h">
+                <travuser>
+                    <node name="BinOp" />
+                </travuser>
+            </traversal>
+
         </general>
     </phases>
     <nodesets>
@@ -86,6 +93,7 @@
                 <node name="Float"/>
                 <node name="Bool"/>
                 <node name="ArrExpr"/>
+                <node name="Ternary" />
             </target>
         </nodeset>
         <nodeset name="Stmt">
@@ -528,6 +536,40 @@
             </attributes>
             <flags>
             </flags>
+        </node>
+        <node name="Ternary">
+            <sons>
+                <son name="Cond">
+                    <targets>
+                        <target mandatory="yes">
+                            <set name="Expr"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Then">
+                    <targets>
+                        <target mandatory="yes">
+                            <set name="Expr"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Else">
+                    <targets>
+                        <target mandatory="yes">
+                            <set name="Expr"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
         </node>
         <node name="While">
             <sons>
