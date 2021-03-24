@@ -79,7 +79,7 @@
                 </travuser>
             </traversal>
 
-            <traversal id="TBC" name="Compiling Boolean Cast Expressions" default="sons" include="bool_cast.h">
+            <traversal id="TBC" name="Compiling Boolean Cast Expressions" default="sons" include="transform_boolean_cast.h">
                 <travuser>
                     <node name="Num" />
                     <node name="Float" />
