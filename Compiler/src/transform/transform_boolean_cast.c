@@ -13,8 +13,6 @@
 #include "symbol_table.h"
 #include "helpers.h"
 
-#include "print.h"
-
 struct INFO
 {
   type type;
