@@ -74,12 +74,12 @@ char *HprintMonOp(monop op)
 bool HisBooleanOperator(binop operator)
 {
     return
-    operator== BO_lt ||
-    operator== BO_le ||
-    operator== BO_gt ||
-    operator== BO_ge ||
-    operator== BO_eq ||
-    operator== BO_ne ||
-    operator== BO_or ||
-    operator== BO_and;
+    operator== BO_lt  ||
+    operator== BO_le  ||
+    operator== BO_gt  ||
+    operator== BO_ge  ||
+    operator== BO_eq  ||
+    operator== BO_ne  ||
+    operator== BO_and ||
+    operator== BO_or;
 }
