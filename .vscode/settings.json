@@ -2,6 +2,7 @@
     "files.associations": {
         "ios": "c",
         "types.h": "c",
-        "mytypes.h": "c"
+        "mytypes.h": "c",
+        "ctinfo.h": "c"
     }
 }

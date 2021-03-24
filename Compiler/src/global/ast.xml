@@ -79,6 +79,16 @@
                 </travuser>
             </traversal>
 
+            <traversal id="TBC" name="Compiling Boolean Cast Expressions" default="sons" include="bool_cast.h">
+                <travuser>
+                    <node name="Num" />
+                    <node name="Float" />
+                    <node name="Bool" />
+                    <node name="Var"/>
+                    <node name="Cast" />
+                    <node name="BinOp" />
+                </travuser>
+            </traversal>
         </general>
     </phases>
     <nodesets>

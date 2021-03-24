@@ -62,6 +62,12 @@ SUBPHASE(  bdc,
            ALWAYS,
            ac)
 
+SUBPHASE(  tbc,
+          "Transform Boolean Cast Expressions",
+           TBCtransformBooleanCast, 
+           ALWAYS,
+           ac)
+
 ENDPHASE(ac)
 
 /******************************************************************************/
