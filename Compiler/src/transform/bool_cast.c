@@ -13,6 +13,8 @@
 #include "symbol_table.h"
 #include "helpers.h"
 
+#include "print.h"
+
 struct INFO
 {
   type type;
@@ -81,8 +83,11 @@ node *TBCbinop(node *arg_node, info *arg_info)
 node *TBCvar(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("TBCvar");
-  // node *node = STfindInParents(INFO_SYMBOL_TABLE(arg_info), VAR_NAME(arg_node));
-  // INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(node);
+
+  node *node = STfindInParents(VAR_SYMBOLTABLE(arg_node), VAR_NAME(arg_node));
+
+  INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(node);
+
   DBUG_RETURN(arg_node);
 }
 
@@ -91,32 +96,34 @@ node *TBCcast(node *arg_node, info *arg_info)
   DBUG_ENTER("TBCcast");
 
   CAST_EXPR(arg_node) = TRAVdo(CAST_EXPR(arg_node), arg_info);
-
+  
   if (CAST_TYPE(arg_node) == T_bool)
   {
+    node *cast_expression = COPYdoCopy ( CAST_EXPR ( arg_node));
     FREEdoFreeTree(arg_node);
 
     if (INFO_TYPE(arg_info) == T_int)
     {
-      DBUG_RETURN(TBmakeBinop(BO_ne, COPYdoCopy(CAST_EXPR(arg_node)), TBmakeNum(FALSE)));
+      DBUG_RETURN(TBmakeBinop(BO_ne, cast_expression, TBmakeNum(FALSE)));
     }
     else if (INFO_TYPE(arg_info) == T_float)
     {
-      DBUG_RETURN(TBmakeBinop(BO_ne, COPYdoCopy(CAST_EXPR(arg_node)), TBmakeFloat(0.0)));
+      DBUG_RETURN(TBmakeBinop(BO_ne, cast_expression, TBmakeFloat(0.0)));
     }
   }
 
   if (INFO_TYPE(arg_info) == T_bool)
   {
+    node *cast_expression = COPYdoCopy ( CAST_EXPR ( arg_node));
     FREEdoFreeTree(arg_node);
 
     if (CAST_TYPE(arg_node) == T_int)
     {
-      DBUG_RETURN(TBmakeTernary(COPYdoCopy(CAST_EXPR(arg_node)), TBmakeNum(TRUE), TBmakeNum(FALSE)));
+      DBUG_RETURN(TBmakeTernary(cast_expression, TBmakeNum(TRUE), TBmakeNum(FALSE)));
     }
     else if (CAST_TYPE(arg_node) == T_float)
     {
-      DBUG_RETURN(TBmakeTernary(COPYdoCopy(CAST_EXPR(arg_node)), TBmakeFloat(1.0), TBmakeFloat(0.0)));
+      DBUG_RETURN(TBmakeTernary(cast_expression, TBmakeFloat(1.0), TBmakeFloat(0.0)));
     }
   }
 

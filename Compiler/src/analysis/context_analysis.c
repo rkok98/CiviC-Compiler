@@ -154,7 +154,7 @@ node *CAvarlet(node *arg_node, info *arg_info)
     {
         CTIerrorLine(NODE_LINE(arg_node) + 1, "Undeclared var: %s\n", VAR_NAME(arg_node));
     }
-
+    
     DBUG_RETURN(arg_node);
 }
 
@@ -168,6 +168,8 @@ node *CAvar(node *arg_node, info *arg_info)
     {
         CTIerrorLine(NODE_LINE(arg_node) + 1, "Undeclared var: %s\n", VAR_NAME(arg_node));
     }
+
+    VAR_SYMBOLTABLE(arg_node) = INFO_SYMBOL_TABLE(arg_info);
 
     DBUG_RETURN(arg_node);
 }

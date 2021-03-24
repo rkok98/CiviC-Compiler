@@ -1056,7 +1056,7 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="Symboltable">
+                <attribute name="SymbolTable">
                     <type name="Link">
                         <targets>
                             <target mandatory="no">
@@ -1102,6 +1102,17 @@
                                 <any/>
                                 <phases>
                                     <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="SymbolTable">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
                                 </phases>
                             </target>
                         </targets>
