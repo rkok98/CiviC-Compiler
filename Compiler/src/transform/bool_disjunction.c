@@ -17,14 +17,14 @@ extern node *BDCbinop(node *arg_node, info *arg_info)
 
     if (BINOP_OP(arg_node) == BO_or)
     {
-        node *right = COPYdoCopy(BINOP_RIGHT(arg_node));
-        DBUG_RETURN(TBmakeTernary(COPYdoCopy(BINOP_LEFT(arg_node)), TBmakeBool(TRUE), right));
+        node *binop_right = COPYdoCopy(BINOP_RIGHT(arg_node));
+        DBUG_RETURN(TBmakeTernary(COPYdoCopy(BINOP_LEFT(arg_node)), TBmakeBool(TRUE), binop_right));
     }
 
     if (BINOP_OP(arg_node) == BO_and)
     {
-        node *right = COPYdoCopy(BINOP_RIGHT(arg_node));
-        DBUG_RETURN(TBmakeTernary(COPYdoCopy(BINOP_LEFT(arg_node)), right, TBmakeBool(FALSE)));
+        node *binop_right = COPYdoCopy(BINOP_RIGHT(arg_node));
+        DBUG_RETURN(TBmakeTernary(COPYdoCopy(BINOP_LEFT(arg_node)), binop_right, TBmakeBool(FALSE)));
     }
 
     DBUG_RETURN(arg_node);
