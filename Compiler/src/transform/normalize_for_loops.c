@@ -1,16 +1,3 @@
-/*****************************************************************************
- *
- * Module: normalize for loops
- *
- * Prefix: NFL
- *
- * Description:
- *
- * @todo
- *
- *****************************************************************************/
-
-
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
@@ -32,23 +19,15 @@
 
 #include "print.h"
 
-/*
- * INFO structure
- */
-
 struct INFO {
   node *vardecls;
   node *stmts;
   kvlistnode *names;
 };
 
-/*
- * INFO macros
- */
 #define INFO_VARDECLS(n)  ((n)->vardecls)
 #define INFO_STMTS(n)  ((n)->stmts)
 #define INFO_NAMES(n)  ((n)->names)
-
 
 void append(node *front, node *new)
 {
@@ -153,7 +132,6 @@ node *NFLstmts(node * arg_node, info * arg_info)
         STMTS_NEXT ( arg_node) = TRAVopt ( STMTS_NEXT ( arg_node), arg_info);
     }
 
-    // done
     DBUG_RETURN( arg_node);
 }
 node *NFLfor(node * arg_node, info * arg_info)
