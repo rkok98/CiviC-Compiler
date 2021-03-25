@@ -31,6 +31,12 @@ PHASE( ac,
        "Analyzing Code",
        ALWAYS)
 
+SUBPHASE( cftw,
+          "Converting for to while loops",
+          CFTWconvertForToWhile,
+          ALWAYS,
+          ac) 
+
 SUBPHASE(  ca,
           "Running Context Analysis",
            CAdoContextAnalysis, 

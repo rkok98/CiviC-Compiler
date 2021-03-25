@@ -42,6 +42,13 @@
                 </travuser>
             </traversal>
 
+            <traversal id="CFTW" name="Convert For-loop to While-loop" default="sons" include="convert_for_to_while_loop.h">
+                <travuser>
+                    <node name="For" />
+                    <node name="Statements" />
+                </travuser>
+            </traversal>
+
             <traversal id="TC" name="Type Checking" default="sons" include="type_checking.h">
                 <travuser>
                     <node name="Num" />
