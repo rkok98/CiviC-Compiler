@@ -3,6 +3,7 @@
 - [ ] Remove Commented Code
 - [ ] Print AST
 - [ ] For loop a sahbi
+- [ ] var symboltable
 
 # Tests
 ## Check Error
@@ -17,6 +18,9 @@
 - [x] ./test/basic/check_success/parse_globaldef.cvc
 - [x] ./test/basic/check_success/parse_operators.cvc
 - [x] ./test/basic/check_success/vardec_init.cvc
+
+# Functional
+- [ ] All
 
 ## Combined extern var
 - [x] ./test/basic/combined_extern_var/defs.cvc 

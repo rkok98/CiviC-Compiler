@@ -79,6 +79,16 @@
                 </travuser>
             </traversal>
 
+            <traversal id="TBC" name="Compiling Boolean Cast Expressions" default="sons" include="transform_boolean_cast.h">
+                <travuser>
+                    <node name="Num" />
+                    <node name="Float" />
+                    <node name="Bool" />
+                    <node name="Var"/>
+                    <node name="Cast" />
+                    <node name="BinOp" />
+                </travuser>
+            </traversal>
         </general>
     </phases>
     <nodesets>
@@ -1046,7 +1056,7 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="Symboltable">
+                <attribute name="SymbolTable">
                     <type name="Link">
                         <targets>
                             <target mandatory="no">
@@ -1092,6 +1102,17 @@
                                 <any/>
                                 <phases>
                                     <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="SymbolTable">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
                                 </phases>
                             </target>
                         </targets>
