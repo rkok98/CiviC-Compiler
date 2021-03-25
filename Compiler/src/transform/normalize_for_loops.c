@@ -233,7 +233,7 @@ node *NFLvarlet(node *arg_node, info *arg_info)
 node *NFLvar(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvar");
-    
+
     kvlistnode *node = KVLLsearch(INFO_NAMES(arg_info), VAR_NAME(arg_node));
 
     if (node)
@@ -247,7 +247,6 @@ node *NFLvar(node *arg_node, info *arg_info)
 node *NFLdoNormalizeForLoops(node *syntaxtree)
 {
     DBUG_ENTER("NFLdoNormalizeForLoops");
-    DBUG_PRINT("NFL", ("NFLdoNormalizeForLoops"));
 
     srand(time(NULL));
 
@@ -257,8 +256,7 @@ node *NFLdoNormalizeForLoops(node *syntaxtree)
     syntaxtree = TRAVdo(syntaxtree, info);
     TRAVpop();
 
-    // free the pointer
-    FreeInfo(info);
+    info = FreeInfo(info);
 
     DBUG_RETURN(syntaxtree);
 }
