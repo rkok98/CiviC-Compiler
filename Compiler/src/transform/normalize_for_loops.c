@@ -146,29 +146,20 @@ node *NFLstmts(node *arg_node, info *arg_info)
 node *NFLfor(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLfor");
-    DBUG_PRINT("NFL", ("NFLfor"));
-
-    // remember the var name
-    const char *varname = FOR_LOOPVAR(arg_node);
-
-    // generate random number
-    int index = rand();
-
-    char *cindex = STRitoa(index);
 
     // set the new name
-    char *name = STRcatn(4, "__for_", cindex, "_", varname);
-
-    // free the string
-    free(cindex);
+    char *name = STRcatn(4, "__for_", STRitoa(rand()), "_", FOR_LOOPVAR(arg_node));
 
     // add the name to the list
-    if (INFO_NAMES(arg_info) == NULL)
-        INFO_NAMES(arg_info) = KVLLcreate(varname, name, NULL);
-
+    if (!INFO_NAMES(arg_info))
+    {
+        INFO_NAMES(arg_info) = KVLLcreate(FOR_LOOPVAR(arg_node), name, NULL);
+    }
     // prepend the the new head
     else
-        INFO_NAMES(arg_info) = KVLLprepend(INFO_NAMES(arg_info), varname, name);
+    {
+        INFO_NAMES(arg_info) = KVLLprepend(INFO_NAMES(arg_info), FOR_LOOPVAR(arg_node), name);
+    }
 
     // traverse over the nodes
     FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
@@ -183,9 +174,13 @@ node *NFLfor(node *arg_node, info *arg_info)
 
     // do we already have a front set?
     if (INFO_VARDECLS(arg_info) == NULL)
+    {
         INFO_VARDECLS(arg_info) = start;
+    }
     else
+    {
         append(INFO_VARDECLS(arg_info), start);
+    }
 
     // step expression
     node *stepexpr = FOR_STEP(arg_node) ? COPYdoCopy(FOR_STEP(arg_node)) : TBmakeNum(1);
@@ -204,9 +199,7 @@ node *NFLfor(node *arg_node, info *arg_info)
     node *block = COPYdoCopy(FOR_BLOCK(arg_node));
 
     // create the assignemnt statement
-    node *assign = TBmakeAssign(
-        TBmakeVarlet(STRcpy(VARDECL_NAME(start)), start, NULL),
-        TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(start)), start, NULL), TBmakeVar(STRcpy(VARDECL_NAME(step)), step, NULL)));
+    node *assign = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(start)), start, NULL), TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(start)), start, NULL), TBmakeVar(STRcpy(VARDECL_NAME(step)), step, NULL)));
 
     //append the statement to the end
     if (block == NULL)
@@ -220,61 +213,43 @@ node *NFLfor(node *arg_node, info *arg_info)
 
     // create the conditions
     node *while_expr = TBmakeBinop(BO_lt, TBmakeVar(STRcpy(VARDECL_NAME(start)), NULL, NULL), TBmakeVar(STRcpy(VARDECL_NAME(stop)), NULL, NULL));
-
-    //add the while loop
-    arg_node = TBmakeWhile(while_expr, block);
-
-    // done
-    DBUG_RETURN(arg_node);
+    DBUG_RETURN(TBmakeWhile(while_expr, block));
 }
 
 node *NFLvarlet(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvarlet");
-    DBUG_PRINT("NFL", ("NFLvarlet"));
 
-    // search the list
     kvlistnode *node = KVLLsearch(INFO_NAMES(arg_info), VARLET_NAME(arg_node));
 
-    // do we need to replace the name of the varlet?
-    if (node == NULL)
-        DBUG_RETURN(arg_node);
+    if (node)
+    {
+        VARLET_NAME(arg_node) = STRcpy(node->value);
+    }
 
-    // set the new name
-    VARLET_NAME(arg_node) = STRcpy(node->value);
-
-    // done
     DBUG_RETURN(arg_node);
 }
 
 node *NFLvar(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvar");
-    DBUG_PRINT("NFL", ("NFLvar"));
-
-    // search the list
+    
     kvlistnode *node = KVLLsearch(INFO_NAMES(arg_info), VAR_NAME(arg_node));
 
-    // do we need to replace the name of the varlet?
-    if (node == NULL)
-        DBUG_RETURN(arg_node);
+    if (node)
+    {
+        VAR_NAME(arg_node) = STRcpy(node->value);
+    }
 
-    // set the new name
-    VAR_NAME(arg_node) = STRcpy(node->value);
-
-    // done
     DBUG_RETURN(arg_node);
 }
 
-/*
- * Traversal start function
- */
 node *NFLdoNormalizeForLoops(node *syntaxtree)
 {
     DBUG_ENTER("NFLdoNormalizeForLoops");
     DBUG_PRINT("NFL", ("NFLdoNormalizeForLoops"));
 
-    srand(time(NULL)); // Initialization, should only be called once.
+    srand(time(NULL));
 
     info *info = MakeInfo();
 
