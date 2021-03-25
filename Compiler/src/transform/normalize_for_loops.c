@@ -1,8 +1,3 @@
-#include <time.h>
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-
 #include "normalize_for_loops.h"
 #include "key_value_linked_list.h"
 
@@ -24,11 +19,14 @@ struct INFO
     node *vardecls;
     node *stmts;
     kvlistnode *names;
+
+    unsigned int fun_counter;
 };
 
 #define INFO_VARDECLS(n) ((n)->vardecls)
 #define INFO_STMTS(n) ((n)->stmts)
 #define INFO_NAMES(n) ((n)->names)
+#define INFO_FUN_counter(n) ((n)->fun_counter)
 
 void append(node *front, node *new)
 {
@@ -58,9 +56,6 @@ void append(node *front, node *new)
             append(VARDECL_NEXT(front), new);
     }
 }
-/*
- * INFO functions
- */
 
 static info *MakeInfo()
 {
@@ -73,6 +68,7 @@ static info *MakeInfo()
     INFO_VARDECLS(result) = NULL;
     INFO_STMTS(result) = NULL;
     INFO_NAMES(result) = NULL;
+    INFO_FUN_counter(result) = 0;
 
     DBUG_RETURN(result);
 }
@@ -81,7 +77,6 @@ static info *FreeInfo(info *info)
 {
     DBUG_ENTER("FreeInfo");
 
-    // free the list
     KVLLdispose(INFO_NAMES(info));
 
     info = MEMfree(info);
@@ -149,7 +144,8 @@ node *NFLfor(node *arg_node, info *arg_info)
     DBUG_ENTER("NFLfor");
 
     // set the new name
-    char *name = STRcatn(4, "__for_", STRitoa(rand()), "_", FOR_LOOPVAR(arg_node));
+    char *name = STRcatn(4, "_for_", STRitoa(INFO_FUN_counter(arg_info)), "_", FOR_LOOPVAR(arg_node));
+    INFO_FUN_counter(arg_info)++;
 
     // add the name to the list
     if (!INFO_NAMES(arg_info))
@@ -248,8 +244,6 @@ node *NFLvar(node *arg_node, info *arg_info)
 node *NFLdoNormalizeForLoops(node *syntaxtree)
 {
     DBUG_ENTER("NFLdoNormalizeForLoops");
-
-    srand(time(NULL));
 
     info *info = MakeInfo();
 
