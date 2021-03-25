@@ -94,7 +94,7 @@ node *NFLfunbody(node *arg_node, info *arg_info)
 
     if (INFO_VARDECLS(funbody_info))
     {
-        if (FUNBODY_VARDECLS(arg_node) == NULL)
+        if (!FUNBODY_VARDECLS(arg_node))
         {
             FUNBODY_VARDECLS(arg_node) = INFO_VARDECLS(funbody_info);
         }
@@ -111,10 +111,13 @@ node *NFLfunbody(node *arg_node, info *arg_info)
 node *NFLstmts(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLstmts");
+    DBUG_PRINT("NFL", ("NFLstmts"));
+
+    nodetype type = NODE_TYPE(STMTS_STMT(arg_node));
 
     STMTS_STMT(arg_node) = TRAVdo(STMTS_STMT(arg_node), arg_info);
 
-    if (NODE_TYPE(STMTS_STMT(arg_node)) == N_for)
+    if (type == N_for)
     {
         node *oldnode = arg_node;
         append(INFO_STATEMENTS(arg_info), arg_node);
