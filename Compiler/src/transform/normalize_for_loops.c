@@ -1,5 +1,5 @@
 #include "normalize_for_loops.h"
-#include "key_value_linked_list.h"
+#include "induction_var_list.h"
 
 #include "types.h"
 #include "tree_basic.h"
@@ -17,7 +17,7 @@
 struct INFO
 {
     unsigned int for_loop_counter;
-    kvlistnode *induction_variables;
+    list_node *induction_variables;
     
     node *variable_declarations;
     node *statements;
@@ -78,7 +78,7 @@ static info *FreeInfo(info *info)
 {
     DBUG_ENTER("FreeInfo");
 
-    KVLLdispose(INFO_INDUCTION_VARIABLES(info));
+    IVLdispose(INFO_INDUCTION_VARIABLES(info));
 
     info = MEMfree(info);
 
@@ -142,22 +142,13 @@ node *NFLfor(node *arg_node, info *arg_info)
     char *name = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
     INFO_FOR_LOOP_COUNTER(arg_info)++;
 
-    // add the name to the list
-    if (!INFO_INDUCTION_VARIABLES(arg_info))
-    {
-        INFO_INDUCTION_VARIABLES(arg_info) = KVLLcreate(FOR_LOOPVAR(arg_node), name, NULL);
-    }
-    // prepend the the new head
-    else
-    {
-        INFO_INDUCTION_VARIABLES(arg_info) = KVLLprepend(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node), name);
-    }
+    INFO_INDUCTION_VARIABLES(arg_info) = IVLadd(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node), name);
 
     // traverse over the nodes
     FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
 
     // remove the node from the list
-    INFO_INDUCTION_VARIABLES(arg_info) = KVLLremove_front(INFO_INDUCTION_VARIABLES(arg_info));
+    INFO_INDUCTION_VARIABLES(arg_info) = IVLremove(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node));
 
     // create a new vardecl node
     node *step = TBmakeVardecl(STRcat(name, "_step"), T_int, NULL, NULL, NULL);
@@ -212,11 +203,11 @@ node *NFLvarlet(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvarlet");
 
-    kvlistnode *node = KVLLsearch(INFO_INDUCTION_VARIABLES(arg_info), VARLET_NAME(arg_node));
+    list_node *node = IVLfind(INFO_INDUCTION_VARIABLES(arg_info), VARLET_NAME(arg_node));
 
     if (node)
     {
-        VARLET_NAME(arg_node) = STRcpy(node->value);
+        VARLET_NAME(arg_node) = STRcpy(node->new_name);
     }
 
     DBUG_RETURN(arg_node);
@@ -226,11 +217,11 @@ node *NFLvar(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvar");
 
-    kvlistnode *node = KVLLsearch(INFO_INDUCTION_VARIABLES(arg_info), VAR_NAME(arg_node));
+    list_node *node = IVLfind(INFO_INDUCTION_VARIABLES(arg_info), VAR_NAME(arg_node));
 
     if (node)
     {
-        VAR_NAME(arg_node) = STRcpy(node->value);
+        VAR_NAME(arg_node) = STRcpy(node->new_name);
     }
 
     DBUG_RETURN(arg_node);
