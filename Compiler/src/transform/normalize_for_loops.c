@@ -252,8 +252,6 @@ node *NFLfor(node *arg_node, info *arg_info)
 
     FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
 
-    INFO_INDUCTION_VARIABLES(arg_info) = IVLremove(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node));
-
     node *vardecl_step = TBmakeVardecl(STRcat(name, "_step"), T_int, NULL, NULL, NULL);
     node *vardecl_stop = TBmakeVardecl(STRcat(name, "_stop"), T_int, NULL, NULL, vardecl_step);
     node *vardecl_start = TBmakeVardecl(STRcpy(name), T_int, NULL, NULL, vardecl_stop);
