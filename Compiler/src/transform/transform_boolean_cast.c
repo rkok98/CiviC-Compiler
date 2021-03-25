@@ -42,27 +42,6 @@ static info *FreeInfo(info *info)
   DBUG_RETURN(info);
 }
 
-node *TBCnum(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("TBCint");
-  INFO_TYPE(arg_info) = T_int;
-  DBUG_RETURN(arg_node);
-}
-
-node *TBCfloat(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("TBCfloat");
-  INFO_TYPE(arg_info) = T_float;
-  DBUG_RETURN(arg_node);
-}
-
-node *TBCbool(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("TBCbool");
-  INFO_TYPE(arg_info) = T_bool;
-  DBUG_RETURN(arg_node);
-}
-
 node *TBCbinop(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("TBCbinop");
@@ -74,17 +53,6 @@ node *TBCbinop(node *arg_node, info *arg_info)
   {
     INFO_TYPE(arg_info) = T_bool;
   }
-
-  DBUG_RETURN(arg_node);
-}
-
-node *TBCvar(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("TBCvar");
-
-  node *node = STfindInParents(VAR_SYMBOLTABLE(arg_node), VAR_NAME(arg_node));
-
-  INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(node);
 
   DBUG_RETURN(arg_node);
 }
@@ -125,6 +93,38 @@ node *TBCcast(node *arg_node, info *arg_info)
     }
   }
 
+  DBUG_RETURN(arg_node);
+}
+
+node *TBCvar(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("TBCvar");
+
+  node *node = STfindInParents(VAR_SYMBOLTABLE(arg_node), VAR_NAME(arg_node));
+
+  INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(node);
+
+  DBUG_RETURN(arg_node);
+}
+
+node *TBCnum(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("TBCint");
+  INFO_TYPE(arg_info) = T_int;
+  DBUG_RETURN(arg_node);
+}
+
+node *TBCfloat(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("TBCfloat");
+  INFO_TYPE(arg_info) = T_float;
+  DBUG_RETURN(arg_node);
+}
+
+node *TBCbool(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("TBCbool");
+  INFO_TYPE(arg_info) = T_bool;
   DBUG_RETURN(arg_node);
 }
 
