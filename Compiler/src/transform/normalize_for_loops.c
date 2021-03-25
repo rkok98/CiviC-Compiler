@@ -267,40 +267,30 @@ node *NFLfor(node *arg_node, info *arg_info)
         append(INFO_VARDECLS(arg_info), vardecl_start);
     }
 
-    node *induction_step = TBmakeNum(1);
-    if (FOR_STEP(arg_node))
-    {
-        induction_step = FOR_STEP(arg_node);
-    }
+    node *stepexpr = FOR_STEP(arg_node) ? COPYdoCopy(FOR_STEP(arg_node)) : TBmakeNum(1);
+    node *assignstep = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL), stepexpr);
+    node *assignstop = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_stop)), vardecl_stop, NULL), COPYdoCopy(FOR_STOP(arg_node)));
+    node *assignstart = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), COPYdoCopy(FOR_START(arg_node)));
 
-    node *assign_step = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL), induction_step);
-    node *assign_stop = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_stop)), vardecl_stop, NULL), COPYdoCopy(FOR_STOP(arg_node)));
-    node *assign_start = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), COPYdoCopy(FOR_START(arg_node)));
-
-    node *statement_step = TBmakeStmts(assign_step, NULL);
-    node *statement_stop = TBmakeStmts(assign_stop, statement_step);
-    node *statement_start = TBmakeStmts(assign_start, statement_stop);
+    node *stmtsstep = TBmakeStmts(assignstep, NULL);
+    node *stmtsstop = TBmakeStmts(assignstop, stmtsstep);
+    node *stmtsstart = TBmakeStmts(assignstart, stmtsstop);
 
     // remember the statments
-    INFO_STATEMENTS(arg_info) = statement_start;
+    INFO_STATEMENTS(arg_info) = stmtsstart;
 
     // copy the blocks
     node *block = COPYdoCopy(FOR_BLOCK(arg_node));
 
     // create the assignemnt statement
-    node *assign = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), 
-                                TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), 
-                                TBmakeVar(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL)));
+    node *assign = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), TBmakeVar(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL)));
 
     //append the statement to the end
     if (block == NULL)
-    {
         block = TBmakeStmts(assign, NULL);
-    }
+
     else
-    {
         append(block, TBmakeStmts(assign, NULL));
-    }
 
     // remove the node
     FREEdoFreeTree(arg_node);
