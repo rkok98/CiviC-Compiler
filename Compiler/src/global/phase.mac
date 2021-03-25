@@ -31,11 +31,11 @@ PHASE( ac,
        "Analyzing Code",
        ALWAYS)
 
-SUBPHASE( cftw,
-          "Converting for to while loops",
-          CFTWconvertForToWhile,
+SUBPHASE( nfl,
+          "Normalizing For Loops",
+          NFLdoNormalizeForLoops,
           ALWAYS,
-          ac) 
+          ac)
 
 SUBPHASE(  ca,
           "Running Context Analysis",

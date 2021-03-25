@@ -42,10 +42,14 @@
                 </travuser>
             </traversal>
 
-            <traversal id="CFTW" name="Convert For-loop to While-loop" default="sons" include="convert_for_to_while_loop.h">
+            <!-- TODO -->
+            <traversal id="NFL" name="Normalize For Loops" default="sons" include="normalize_for_loops.h">
                 <travuser>
+                    <node name="FunBody" />
+                    <node name="Stmts" />
                     <node name="For" />
-                    <node name="Statements" />
+                    <node name="VarLet" />
+                    <node name="Var" />
                 </travuser>
             </traversal>
 
