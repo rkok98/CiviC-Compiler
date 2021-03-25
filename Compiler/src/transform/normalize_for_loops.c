@@ -90,27 +90,21 @@ node *NFLfunbody(node *arg_node, info *arg_info)
 
     info *funbody_info = MakeInfo();
 
-    // traverse over the sons
     FUNBODY_STMTS(arg_node) = TRAVopt(FUNBODY_STMTS(arg_node), funbody_info);
 
-    // do we need to add vardecls?
-    node *vardecls = INFO_VARDECLS(funbody_info);
+    if (INFO_VARDECLS(funbody_info))
+    {
+        if (FUNBODY_VARDECLS(arg_node) == NULL)
+        {
+            FUNBODY_VARDECLS(arg_node) = INFO_VARDECLS(funbody_info);
+        }
+        else
+        {
+            append(FUNBODY_VARDECLS(arg_node), INFO_VARDECLS(funbody_info));
+        }
+    }
 
-    if (vardecls == NULL)
-        DBUG_RETURN(arg_node);
-
-    // append the var decls
-    if (FUNBODY_VARDECLS(arg_node) == NULL)
-        FUNBODY_VARDECLS(arg_node) = vardecls;
-
-    // add the decls
-    else
-        append(FUNBODY_VARDECLS(arg_node), vardecls);
-
-    // reset the variable
-    INFO_VARDECLS(funbody_info) = NULL;
-
-    // done
+    funbody_info = FreeInfo(funbody_info);
     DBUG_RETURN(arg_node);
 }
 
@@ -146,7 +140,8 @@ node *NFLfor(node *arg_node, info *arg_info)
 
     // set the new name
     char *name = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
-    INFO_FOR_LOOP_COUNTER(arg_info)++;
+    INFO_FOR_LOOP_COUNTER(arg_info)
+    ++;
 
     // add the name to the list
     if (!INFO_INDUCTION_VARIABLES(arg_info))
