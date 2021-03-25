@@ -16,17 +16,18 @@
 
 struct INFO
 {
+    unsigned int for_loop_counter;
+    kvlistnode *induction_variables;
+    
     node *variable_declarations;
     node *statements;
-    kvlistnode *induction_variables;
-
-    unsigned int for_loop_counter;
 };
+
+#define INFO_FOR_LOOP_COUNTER(n) ((n)->for_loop_counter)
+#define INFO_INDUCTION_VARIABLES(n) ((n)->induction_variables)
 
 #define INFO_VARDECLS(n) ((n)->variable_declarations)
 #define INFO_STATEMENTS(n) ((n)->statements)
-#define INFO_INDUCTION_VARIABLES(n) ((n)->induction_variables)
-#define INFO_FOR_LOOP_COUNTER(n) ((n)->for_loop_counter)
 
 void append(node *front, node *new)
 {
@@ -111,7 +112,6 @@ node *NFLfunbody(node *arg_node, info *arg_info)
 node *NFLstmts(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLstmts");
-    DBUG_PRINT("NFL", ("NFLstmts"));
 
     nodetype type = NODE_TYPE(STMTS_STMT(arg_node));
 
@@ -140,8 +140,7 @@ node *NFLfor(node *arg_node, info *arg_info)
 
     // set the new name
     char *name = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
-    INFO_FOR_LOOP_COUNTER(arg_info)
-    ++;
+    INFO_FOR_LOOP_COUNTER(arg_info)++;
 
     // add the name to the list
     if (!INFO_INDUCTION_VARIABLES(arg_info))
