@@ -143,6 +143,7 @@ node *NFLstmts(node *arg_node, info *arg_info)
 
     DBUG_RETURN(arg_node);
 }
+
 node *NFLfor(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLfor");
