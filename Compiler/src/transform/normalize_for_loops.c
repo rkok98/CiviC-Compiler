@@ -111,13 +111,10 @@ node *NFLfunbody(node *arg_node, info *arg_info)
 node *NFLstmts(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLstmts");
-    DBUG_PRINT("NFL", ("NFLstmts"));
-
-    nodetype type = NODE_TYPE(STMTS_STMT(arg_node));
 
     STMTS_STMT(arg_node) = TRAVdo(STMTS_STMT(arg_node), arg_info);
 
-    if (type == N_for)
+    if (NODE_TYPE(STMTS_STMT(arg_node)) == N_for)
     {
         node *oldnode = arg_node;
         append(INFO_STATEMENTS(arg_info), arg_node);
