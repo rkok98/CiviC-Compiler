@@ -16,17 +16,17 @@
 
 struct INFO
 {
-    node *vardecls;
-    node *stmts;
-    kvlistnode *names;
+    node *variable_declarations;
+    node *statements;
+    kvlistnode *induction_variables;
 
-    unsigned int fun_counter;
+    unsigned int for_loop_counter;
 };
 
-#define INFO_VARDECLS(n) ((n)->vardecls)
-#define INFO_STMTS(n) ((n)->stmts)
-#define INFO_NAMES(n) ((n)->names)
-#define INFO_FUN_counter(n) ((n)->fun_counter)
+#define INFO_VARDECLS(n) ((n)->variable_declarations)
+#define INFO_STATEMENTS(n) ((n)->statements)
+#define INFO_INDUCTION_VARIABLES(n) ((n)->induction_variables)
+#define INFO_FOR_LOOP_COUNTER(n) ((n)->for_loop_counter)
 
 void append(node *front, node *new)
 {
@@ -66,9 +66,9 @@ static info *MakeInfo()
     result = (info *)MEMmalloc(sizeof(info));
 
     INFO_VARDECLS(result) = NULL;
-    INFO_STMTS(result) = NULL;
-    INFO_NAMES(result) = NULL;
-    INFO_FUN_counter(result) = 0;
+    INFO_STATEMENTS(result) = NULL;
+    INFO_INDUCTION_VARIABLES(result) = NULL;
+    INFO_FOR_LOOP_COUNTER(result) = 0;
 
     DBUG_RETURN(result);
 }
@@ -77,7 +77,7 @@ static info *FreeInfo(info *info)
 {
     DBUG_ENTER("FreeInfo");
 
-    KVLLdispose(INFO_NAMES(info));
+    KVLLdispose(INFO_INDUCTION_VARIABLES(info));
 
     info = MEMfree(info);
 
@@ -87,13 +87,14 @@ static info *FreeInfo(info *info)
 node *NFLfunbody(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLfunbody");
-    DBUG_PRINT("NFL", ("NFLfunbody"));
+
+    info *funbody_info = MakeInfo();
 
     // traverse over the sons
-    FUNBODY_STMTS(arg_node) = TRAVopt(FUNBODY_STMTS(arg_node), arg_info);
+    FUNBODY_STMTS(arg_node) = TRAVopt(FUNBODY_STMTS(arg_node), funbody_info);
 
     // do we need to add vardecls?
-    node *vardecls = INFO_VARDECLS(arg_info);
+    node *vardecls = INFO_VARDECLS(funbody_info);
 
     if (vardecls == NULL)
         DBUG_RETURN(arg_node);
@@ -107,7 +108,7 @@ node *NFLfunbody(node *arg_node, info *arg_info)
         append(FUNBODY_VARDECLS(arg_node), vardecls);
 
     // reset the variable
-    INFO_VARDECLS(arg_info) = NULL;
+    INFO_VARDECLS(funbody_info) = NULL;
 
     // done
     DBUG_RETURN(arg_node);
@@ -125,9 +126,9 @@ node *NFLstmts(node *arg_node, info *arg_info)
     if (type == N_for)
     {
         node *oldnode = arg_node;
-        append(INFO_STMTS(arg_info), arg_node);
-        arg_node = INFO_STMTS(arg_info);
-        INFO_STMTS(arg_info) = NULL;
+        append(INFO_STATEMENTS(arg_info), arg_node);
+        arg_node = INFO_STATEMENTS(arg_info);
+        INFO_STATEMENTS(arg_info) = NULL;
 
         STMTS_NEXT(oldnode) = TRAVopt(STMTS_NEXT(oldnode), arg_info);
     }
@@ -144,25 +145,25 @@ node *NFLfor(node *arg_node, info *arg_info)
     DBUG_ENTER("NFLfor");
 
     // set the new name
-    char *name = STRcatn(4, "_for_", STRitoa(INFO_FUN_counter(arg_info)), "_", FOR_LOOPVAR(arg_node));
-    INFO_FUN_counter(arg_info)++;
+    char *name = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
+    INFO_FOR_LOOP_COUNTER(arg_info)++;
 
     // add the name to the list
-    if (!INFO_NAMES(arg_info))
+    if (!INFO_INDUCTION_VARIABLES(arg_info))
     {
-        INFO_NAMES(arg_info) = KVLLcreate(FOR_LOOPVAR(arg_node), name, NULL);
+        INFO_INDUCTION_VARIABLES(arg_info) = KVLLcreate(FOR_LOOPVAR(arg_node), name, NULL);
     }
     // prepend the the new head
     else
     {
-        INFO_NAMES(arg_info) = KVLLprepend(INFO_NAMES(arg_info), FOR_LOOPVAR(arg_node), name);
+        INFO_INDUCTION_VARIABLES(arg_info) = KVLLprepend(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node), name);
     }
 
     // traverse over the nodes
     FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
 
     // remove the node from the list
-    INFO_NAMES(arg_info) = KVLLremove_front(INFO_NAMES(arg_info));
+    INFO_INDUCTION_VARIABLES(arg_info) = KVLLremove_front(INFO_INDUCTION_VARIABLES(arg_info));
 
     // create a new vardecl node
     node *step = TBmakeVardecl(STRcat(name, "_step"), T_int, NULL, NULL, NULL);
@@ -190,7 +191,7 @@ node *NFLfor(node *arg_node, info *arg_info)
     node *stmtsstart = TBmakeStmts(assignstart, stmtsstop);
 
     // remember the statments
-    INFO_STMTS(arg_info) = stmtsstart;
+    INFO_STATEMENTS(arg_info) = stmtsstart;
 
     // copy the blocks
     node *block = COPYdoCopy(FOR_BLOCK(arg_node));
@@ -217,7 +218,7 @@ node *NFLvarlet(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvarlet");
 
-    kvlistnode *node = KVLLsearch(INFO_NAMES(arg_info), VARLET_NAME(arg_node));
+    kvlistnode *node = KVLLsearch(INFO_INDUCTION_VARIABLES(arg_info), VARLET_NAME(arg_node));
 
     if (node)
     {
@@ -231,7 +232,7 @@ node *NFLvar(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvar");
 
-    kvlistnode *node = KVLLsearch(INFO_NAMES(arg_info), VAR_NAME(arg_node));
+    kvlistnode *node = KVLLsearch(INFO_INDUCTION_VARIABLES(arg_info), VAR_NAME(arg_node));
 
     if (node)
     {
