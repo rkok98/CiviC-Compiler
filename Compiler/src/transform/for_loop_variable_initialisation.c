@@ -82,14 +82,14 @@ list_node *IVLfind(list_node *list, const char *old_name)
     return NULL;
 }
 
-void IVLdispose(list_node *head)
+void IVLdispose(list_node *list)
 {
     list_node *cursor, *tmp;
 
-    if (head != NULL)
+    if (list != NULL)
     {
-        cursor = head->next;
-        head->next = NULL;
+        cursor = list->next;
+        list->next = NULL;
         while (cursor != NULL)
         {
             tmp = cursor->next;
