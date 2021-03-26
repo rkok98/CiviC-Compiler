@@ -11,7 +11,6 @@
 #include "copy.h"
 #include "ctinfo.h"
 
-#include <stdlib.h>
 #include <string.h>
 
 typedef struct list_node
@@ -256,6 +255,7 @@ node *FLVIfor(node *arg_node, info *arg_info)
 
     FREEdoFreeTree(arg_node);
 
+    // Create a new while loop and return it to replace the for-loop
     node *while_expr = TBmakeBinop(BO_lt, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), NULL, NULL), TBmakeVar(STRcpy(VARDECL_NAME(vardecl_stop)), NULL, NULL));
     DBUG_RETURN(TBmakeWhile(while_expr, block));
 }
