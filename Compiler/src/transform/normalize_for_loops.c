@@ -22,6 +22,15 @@ typedef struct list_node
     struct list_node *next;
 } list_node;
 
+struct INFO
+{
+    unsigned int for_loop_counter;
+    list_node *induction_variables;
+    
+    node *variable_declarations;
+    node *statements;
+};
+
 list_node *IVLcreate(const char *old_name, const char *new_name, list_node *next)
 {
     list_node *new_list_node = (list_node *)malloc(sizeof(list_node));
@@ -85,15 +94,6 @@ void IVLdispose(list_node *head)
         }
     }
 }
-
-struct INFO
-{
-    unsigned int for_loop_counter;
-    list_node *induction_variables;
-    
-    node *variable_declarations;
-    node *statements;
-};
 
 #define INFO_FOR_LOOP_COUNTER(n) ((n)->for_loop_counter)
 #define INFO_INDUCTION_VARIABLES(n) ((n)->induction_variables)
