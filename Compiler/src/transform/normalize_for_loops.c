@@ -204,16 +204,16 @@ node *NFLfor(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLfor");
 
-    char *name = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
+    // Generate a new induction variable base name
+    char *induction_basename = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
     INFO_FOR_LOOP_COUNTER(arg_info)++;
 
-    INFO_INDUCTION_VARIABLES(arg_info) = IVLadd(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node), name);
+    INFO_INDUCTION_VARIABLES(arg_info) = IVLadd(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node), induction_basename);
 
-    FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
-
-    node *vardecl_step = TBmakeVardecl(STRcat(name, "_step"), T_int, NULL, NULL, NULL);
-    node *vardecl_stop = TBmakeVardecl(STRcat(name, "_stop"), T_int, NULL, NULL, vardecl_step);
-    node *vardecl_start = TBmakeVardecl(STRcpy(name), T_int, NULL, NULL, vardecl_stop);
+    // Create var decls for the for-loop
+    node *vardecl_step = TBmakeVardecl(STRcat(induction_basename, "_step"), T_int, NULL, NULL, NULL);
+    node *vardecl_stop = TBmakeVardecl(STRcat(induction_basename, "_stop"), T_int, NULL, NULL, vardecl_step);
+    node *vardecl_start = TBmakeVardecl(STRcpy(induction_basename), T_int, NULL, NULL, vardecl_stop);
 
     if (INFO_VARDECLS(arg_info) == NULL)
     {
@@ -224,35 +224,38 @@ node *NFLfor(node *arg_node, info *arg_info)
         add_to_vardecls(INFO_VARDECLS(arg_info), vardecl_start);
     }
 
-    node *stepexpr = FOR_STEP(arg_node) ? COPYdoCopy(FOR_STEP(arg_node)) : TBmakeNum(1);
-    node *assignstep = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL), stepexpr);
-    node *assignstop = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_stop)), vardecl_stop, NULL), COPYdoCopy(FOR_STOP(arg_node)));
-    node *assignstart = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), COPYdoCopy(FOR_START(arg_node)));
+    // Create the for-loop's statements
+    FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
 
-    node *stmtsstep = TBmakeStmts(assignstep, NULL);
-    node *stmtsstop = TBmakeStmts(assignstop, stmtsstep);
-    node *stmtsstart = TBmakeStmts(assignstart, stmtsstop);
+    node *induction_step = TBmakeNum(1); 
+    if (FOR_STEP(arg_node))
+    {
+        induction_step = COPYdoCopy(FOR_STEP(arg_node));
+    }
 
-    // remember the statments
-    INFO_STATEMENTS(arg_info) = stmtsstart;
+    node *induction_step_stmt = TBmakeStmts(TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL), induction_step), NULL);
+    node *stop_stmt = TBmakeStmts(TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_stop)), vardecl_stop, NULL), COPYdoCopy(FOR_STOP(arg_node))), induction_step_stmt);
+    node *start_stmt = TBmakeStmts(TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), COPYdoCopy(FOR_START(arg_node))), stop_stmt);
 
-    // copy the blocks
+    INFO_STATEMENTS(arg_info) = start_stmt;
+
     node *block = COPYdoCopy(FOR_BLOCK(arg_node));
 
-    // create the assignemnt statement
-    node *assign = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), TBmakeVar(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL)));
+    node *assign = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), 
+                                TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), 
+                                TBmakeVar(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL)));
 
-    //append the statement to the end
-    if (block == NULL)
+    if (!block)
+    {
         block = TBmakeStmts(assign, NULL);
-
+    }
     else
+    {
         add_to_stmts(block, TBmakeStmts(assign, NULL));
+    }
 
-    // remove the node
     FREEdoFreeTree(arg_node);
 
-    // create the conditions
     node *while_expr = TBmakeBinop(BO_lt, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), NULL, NULL), TBmakeVar(STRcpy(VARDECL_NAME(vardecl_stop)), NULL, NULL));
     DBUG_RETURN(TBmakeWhile(while_expr, block));
 }
