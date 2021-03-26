@@ -43,7 +43,7 @@
             </traversal>
 
             <!-- TODO -->
-            <traversal id="NFL" name="Normalize For Loops" default="sons" include="normalize_for_loops.h">
+            <traversal id="FLVI" name="For-loop Induction Variable Initialisation" default="sons" include="for_loop_variable_initialisation.h">
                 <travuser>
                     <node name="FunBody" />
                     <node name="Stmts" />

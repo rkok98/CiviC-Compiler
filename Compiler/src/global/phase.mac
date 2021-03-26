@@ -31,9 +31,9 @@ PHASE( ac,
        "Analyzing Code",
        ALWAYS)
 
-SUBPHASE( nfl,
-          "Normalizing For Loops",
-          NFLdoNormalizeForLoops,
+SUBPHASE( FLVI,
+          "For-loop Induction Variable Initialisation",
+          FLVIinitializeForLoopsVariables,
           ALWAYS,
           ac)
 

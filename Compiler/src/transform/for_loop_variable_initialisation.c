@@ -1,4 +1,4 @@
-#include "normalize_for_loops.h"
+#include "for_loop_variable_initialisation.h"
 
 #include "types.h"
 #include "tree_basic.h"
@@ -151,9 +151,9 @@ void add_to_stmts(node *stmts, node *new_stmt)
     STMTS_NEXT(current) = new_stmt;
 }
 
-node *NFLfunbody(node *arg_node, info *arg_info)
+node *FLVIfunbody(node *arg_node, info *arg_info)
 {
-    DBUG_ENTER("NFLfunbody");
+    DBUG_ENTER("FLVIfunbody");
 
     info *funbody_info = MakeInfo();
 
@@ -175,7 +175,7 @@ node *NFLfunbody(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *NFLstmts(node *arg_node, info *arg_info)
+node *FLVIstmts(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLstmts");
 
@@ -200,9 +200,9 @@ node *NFLstmts(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *NFLfor(node *arg_node, info *arg_info)
+node *FLVIfor(node *arg_node, info *arg_info)
 {
-    DBUG_ENTER("NFLfor");
+    DBUG_ENTER("FLVIfor");
 
     // Generate a new induction variable base name
     char *induction_basename = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
@@ -260,7 +260,7 @@ node *NFLfor(node *arg_node, info *arg_info)
     DBUG_RETURN(TBmakeWhile(while_expr, block));
 }
 
-node *NFLvarlet(node *arg_node, info *arg_info)
+node *FLVIvarlet(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvarlet");
 
@@ -274,7 +274,7 @@ node *NFLvarlet(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *NFLvar(node *arg_node, info *arg_info)
+node *FLVIvar(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvar");
 
@@ -288,11 +288,11 @@ node *NFLvar(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
-node *NFLdoNormalizeForLoops(node *syntaxtree)
+node *FLVIinitializeForLoopsVariables(node *syntaxtree)
 {
-    DBUG_ENTER("NFLdoNormalizeForLoops");
+    DBUG_ENTER("FLVIinitializeForLoopsVariables");
 
-    TRAVpush(TR_nfl);
+    TRAVpush(TR_flvi);
     syntaxtree = TRAVdo(syntaxtree, NULL);
     TRAVpop();
 
