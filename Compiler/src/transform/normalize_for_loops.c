@@ -69,41 +69,6 @@ list_node *IVLfind(list_node *list, const char *old_name)
     return NULL;
 }
 
-list_node *IVLremove(list_node *list, const char *old_name)
-{
-    if (list == NULL)
-    {
-        return NULL;
-    }
-
-    struct list_node *current = list;
-    struct list_node *previous = NULL;
-
-    while (current->old_name != old_name)
-    {
-        if (current->next == NULL)
-        {
-            return NULL;
-        }
-        else
-        {
-            previous = current;
-            current = current->next;
-        }
-    }
-
-    if (current == list)
-    {
-        list = list->next;
-    }
-    else
-    {
-        previous->next = current->next;
-    }
-
-    return current;
-}
-
 void IVLdispose(list_node *head)
 {
     list_node *cursor, *tmp;
