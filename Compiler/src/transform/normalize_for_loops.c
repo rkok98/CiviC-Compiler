@@ -11,7 +11,6 @@
 #include "copy.h"
 #include "ctinfo.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -30,6 +29,12 @@ struct INFO
     node *variable_declarations;
     node *statements;
 };
+
+#define INFO_FOR_LOOP_COUNTER(n) ((n)->for_loop_counter)
+#define INFO_INDUCTION_VARIABLES(n) ((n)->induction_variables)
+
+#define INFO_VARDECLS(n) ((n)->variable_declarations)
+#define INFO_STATEMENTS(n) ((n)->statements)
 
 list_node *IVLcreate(const char *old_name, const char *new_name, list_node *next)
 {
@@ -94,12 +99,6 @@ void IVLdispose(list_node *head)
         }
     }
 }
-
-#define INFO_FOR_LOOP_COUNTER(n) ((n)->for_loop_counter)
-#define INFO_INDUCTION_VARIABLES(n) ((n)->induction_variables)
-
-#define INFO_VARDECLS(n) ((n)->variable_declarations)
-#define INFO_STATEMENTS(n) ((n)->statements)
 
 static info *MakeInfo()
 {
@@ -290,13 +289,9 @@ node *NFLdoNormalizeForLoops(node *syntaxtree)
 {
     DBUG_ENTER("NFLdoNormalizeForLoops");
 
-    info *info = MakeInfo();
-
     TRAVpush(TR_nfl);
-    syntaxtree = TRAVdo(syntaxtree, info);
+    syntaxtree = TRAVdo(syntaxtree, NULL);
     TRAVpop();
-
-    info = FreeInfo(info);
 
     DBUG_RETURN(syntaxtree);
 }
