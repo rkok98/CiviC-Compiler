@@ -128,33 +128,28 @@ static info *FreeInfo(info *info)
     DBUG_RETURN(info);
 }
 
-void append(node *front, node *new)
+void add_to_vardecls(node *decls, node *new_decl)
 {
-    // no need to continue if the node is empty
-    if (front == NULL)
-        return;
+    node *current = decls;
 
-    if (NODE_TYPE(front) == N_stmts)
+    while (VARDECL_NEXT(current))
     {
-        // did we reach the end?
-        if (STMTS_NEXT(front) == NULL)
-            STMTS_NEXT(front) = new;
-
-        // get the next node
-        else
-            append(STMTS_NEXT(front), new);
+        current = VARDECL_NEXT(current);
     }
 
-    else if (NODE_TYPE(front) == N_vardecl)
-    {
-        // did we reach the end?
-        if (VARDECL_NEXT(front) == NULL)
-            VARDECL_NEXT(front) = new;
+    VARDECL_NEXT(current) = new_decl;
+}
 
-        // get the next node
-        else
-            append(VARDECL_NEXT(front), new);
+void add_to_stmts(node *stmts, node *new_stmt)
+{
+    node *current = stmts;
+
+    while (STMTS_NEXT(current))
+    {
+        current = STMTS_NEXT(current);
     }
+
+    STMTS_NEXT(current) = new_stmt;
 }
 
 node *NFLfunbody(node *arg_node, info *arg_info)
@@ -173,7 +168,7 @@ node *NFLfunbody(node *arg_node, info *arg_info)
         }
         else
         {
-            append(FUNBODY_VARDECLS(arg_node), INFO_VARDECLS(funbody_info));
+            add_to_vardecls(FUNBODY_VARDECLS(arg_node), INFO_VARDECLS(funbody_info));
         }
     }
 
@@ -192,7 +187,7 @@ node *NFLstmts(node *arg_node, info *arg_info)
     if (type == N_for)
     {
         node *oldnode = arg_node;
-        append(INFO_STATEMENTS(arg_info), arg_node);
+        add_to_stmts(INFO_STATEMENTS(arg_info), arg_node);
         arg_node = INFO_STATEMENTS(arg_info);
         INFO_STATEMENTS(arg_info) = NULL;
 
@@ -227,7 +222,7 @@ node *NFLfor(node *arg_node, info *arg_info)
     }
     else
     {
-        append(INFO_VARDECLS(arg_info), vardecl_start);
+        add_to_vardecls(INFO_VARDECLS(arg_info), vardecl_start);
     }
 
     node *stepexpr = FOR_STEP(arg_node) ? COPYdoCopy(FOR_STEP(arg_node)) : TBmakeNum(1);
@@ -253,7 +248,7 @@ node *NFLfor(node *arg_node, info *arg_info)
         block = TBmakeStmts(assign, NULL);
 
     else
-        append(block, TBmakeStmts(assign, NULL));
+        add_to_stmts(block, TBmakeStmts(assign, NULL));
 
     // remove the node
     FREEdoFreeTree(arg_node);
