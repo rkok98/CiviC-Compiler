@@ -14,7 +14,7 @@
 
 \usepackage[style=numeric-comp]{biblatex}
 \addbibresource{PT-essay.bib}
-
+\usepackage{listings}
 %-------------------------------------------------------------------------------
 %	GEGEVENS VOOR IN DE TITEL
 %-------------------------------------------------------------------------------
@@ -77,12 +77,44 @@ EXTENSIONS!?!?
 %-------------------------------------------------------------------------------
 %	METHODE
 %-------------------------------------------------------------------------------
-
+\newpage
 \section{Lexicographic Analysis}
-%\lipsum[3]
+The first step for building a CiviC compiler is to create (or extend in this case) 
+the scanner that reads the CiviC code (stream of characters) that recognizes the 
+symbols and words and outputs a (finite) stream of tokens.
+By recognizing the words and symbols the Scanner can use pattern matching to find see
+what the next action will be for the compiler. For the scanner to know which symbols
+are available in the CiviC language, we need to define these ourselves. We did this 
+by defining all the possible symbols (parenthesis, brackets and binary operators etc.)
+which are supported by the CiviC language. The CiviC language only supports integers,Ò
+floats and booleans so there is no need to define other types in the compiler.
+BY DOING THIS WE COMPLETED MILESTONE 1 (OF DIT ER NIET BIJ DOEN).
 
+In our scanner we added a check to see if an integer is too high or to low by 
+comparing it to max int and min int. If the integer is too high or too low the compiler
+returns an CTIerror telling the integer is out of range.
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Integer range check, captionpos=b]
+    [0-9]+      { long integer = strtol(yytext, NULL, 10);
+                    if (integer > INT_MAX || integer < INT_MIN) {
+                        CTIerror("Integer %s out of range", yytext);
+                    }
+                    else
+                    {
+                        yylval.cint=atoi(yytext);
+                        FILTER( INTVAL);
+                    }
+                }
+\end{lstlisting}
+
+
+NOG IETS OVER MILESTONE 2 EN 3!!
+
+\newpage
 \section{Syntatic Analysis}
-%\lipsum[5]
+After the scanner is done and creates a (finite) stream of tokens, the parser comes
+into play and will start its job. The parser will use the output from the scanner and
+use it to create and output a abstract syntax tree (AST). The parser uses the stream 
+of tokens to do pattern matching with the pre defined casus in the compiler. 
 
 \section{Semantic Analysis}
 %\lipsum[7]
