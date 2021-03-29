@@ -88,7 +88,8 @@ node *PRTassign(node *arg_node, info *arg_info)
 node *PRTvarlet(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTvarlet");
-
+  
+  printIndentations(arg_info);
   printf("%s", VARLET_NAME(arg_node));
 
   DBUG_RETURN(arg_node);

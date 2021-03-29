@@ -81,7 +81,8 @@ codegen     = gen_byte_code.o
 
 analysis    = symbol_table.o context_analysis.o type_checking.o
 
-transform   = global_variable_initialisation.o local_variable_initialisation.o bool_disjunction.o transform_boolean_cast.o
+transform   = global_variable_initialisation.o local_variable_initialisation.o bool_disjunction.o transform_boolean_cast.o \
+              for_loop_variable_initialisation.o
 
 
 
