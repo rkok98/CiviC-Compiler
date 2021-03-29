@@ -1225,7 +1225,6 @@
         </node>
         <!-- Symbol Table-->
         <node name="SymbolTable">
-            <description>Symbol table entry</description>
             <sons>
                 <son name="Entries">
                     <description>ST body</description>
@@ -1280,6 +1279,16 @@
                     </targets>
                 </son>
                 <son name="NextTable">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="SymbolTable"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Table">
                     <targets>
                         <target mandatory="no">
                             <node name="SymbolTable"/>
