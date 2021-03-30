@@ -1416,5 +1416,45 @@
                 </attribute>
             </attributes>
         </node>
+
+        <!-- Linked List -->
+        <node name="LinkedValue">
+            <sons>
+                <son name="Next">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="LinkedValue" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+            <attributes>
+                <attribute name="Key">
+                    <type name="String">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Value">
+                    <type name="String">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+            </attributes>
+        </node>
     </syntaxtree>
 </definition>

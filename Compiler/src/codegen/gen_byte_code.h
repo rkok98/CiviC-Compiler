@@ -37,7 +37,11 @@ extern node *GBCbool (node *arg_node, info *arg_info);
 extern node *GBCerror (node *arg_node, info *arg_info);
 extern node *GBCternary (node *arg_node, info *arg_info);
 
-
 extern node *GBCdoGenByteCode( node *syntaxtree);
+
+/** 
+ * TODO: remove functions below
+ */
+extern node *GBClinkedvalue(node *arg_node, info *arg_info);
 
 #endif

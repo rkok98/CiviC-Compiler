@@ -1134,3 +1134,12 @@ node *GBCdoGenByteCode(node *syntaxtree)
 
   DBUG_RETURN(syntaxtree);
 }
+
+/**
+ * TODO: Remove the functions below
+ */
+node *GBClinkedvalue(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("GBCternary");
+  DBUG_RETURN(arg_node);
+}

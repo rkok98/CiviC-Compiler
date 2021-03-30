@@ -88,7 +88,7 @@ node *PRTassign(node *arg_node, info *arg_info)
 node *PRTvarlet(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTvarlet");
-  
+
   printIndentations(arg_info);
   printf("%s", VARLET_NAME(arg_node));
 
@@ -415,6 +415,15 @@ node *PRTfor(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
+node *PRTids(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTids");
+
+  printf("%s", IDS_NAME(arg_node));
+
+  DBUG_RETURN(arg_node);
+}
+
 node *PRTvar(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTvar");
@@ -610,8 +619,13 @@ node *PRTbool(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
-node *
-PRTdoPrint(node *syntaxtree)
+node *PRTlinkedvalue(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTlinkedvalue");
+  DBUG_RETURN(arg_node);
+}
+
+node *PRTdoPrint(node *syntaxtree)
 {
   info *info;
 
@@ -634,13 +648,4 @@ PRTdoPrint(node *syntaxtree)
   printf("\n------------------------------\n\n");
 
   DBUG_RETURN(syntaxtree);
-}
-
-node *PRTids(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("PRTids");
-
-  printf("%s", IDS_NAME(arg_node));
-
-  DBUG_RETURN(arg_node);
 }
