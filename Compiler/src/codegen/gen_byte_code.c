@@ -377,7 +377,9 @@ node *GBCfundecl(node *arg_node, info *arg_info)
 
   node *table = INFO_SYMBOL_TABLE(arg_info);
 
-  node *entry = STsearchFundef(table, FUNDEF_NAME(arg_node));
+  node *entry = STsearchFundef(table, FUNDECL_NAME(arg_node));
+
+  printf("%d", entry == NULL);
 
   node *fentry = SYMBOLTABLE_ENTRIES(SYMBOLTABLEENTRY_TABLE(entry));
 
@@ -401,8 +403,8 @@ node *GBCfundecl(node *arg_node, info *arg_info)
       NULL,
       0,
       "fun \"%s\" %s %s",
-      FUNDEF_NAME(arg_node),
-      HprintType(FUNDEF_TYPE(arg_node)),
+      FUNDECL_NAME(arg_node),
+      HprintType(FUNDECL_TYPE(arg_node)),
       params == NULL ? "" : params);
 
   char *str = (char *)malloc(length + 1);
@@ -411,8 +413,8 @@ node *GBCfundecl(node *arg_node, info *arg_info)
       str,
       length + 1,
       "fun \"%s\" %s %s",
-      FUNDEF_NAME(arg_node),
-      HprintType(FUNDEF_TYPE(arg_node)),
+      FUNDECL_NAME(arg_node),
+      HprintType(FUNDECL_TYPE(arg_node)),
       params == NULL ? "" : params);
 
   addToExternPool(arg_info, str);

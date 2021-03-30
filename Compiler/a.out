@@ -1,36 +1,90 @@
 __init:
 	iloadc 0
 	istore 0
-	floadc 1
-	fstore 0
-	bloadc 2
-	bstore 0
-	iloadc 0
+	iloadc 1
 	istore 0
-	floadc 1
-	fstore 0
-	bloadc 2
-	bstore 0
 	return
 
-.const int 321
-.const float 1.000000
-.const bool false
-.exportvar "a2" 0
-.exportvar "b2" 0
-.exportvar "c2" 0
-.exportvar "d2" 0
-.exportvar "e2" 0
-.exportvar "f2" 0
+foo:
+	esr 2
+	iloadc 2
+	istore 0
+	iload_0
+	istore 0
+	isrg
+	iload_0
+	jsre 0
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	iload_0
+	jsre 0
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	iloadg 0
+	jsre 0
+	isrg
+	iloadc 0
+	jsre 0
+	return
+
+bar:
+	esr 1
+	iloadg 0
+	iloadc 0
+	iadd
+	istore 0
+	isrg
+	iload_0
+	jsre 0
+	isrg
+	iloadc 0
+	jsre 0
+	return
+
+baz:
+	esr 2
+	iloadg 0
+	istore 0
+	iloadc 3
+	istore 0
+	isrg
+	iload_0
+	jsre 0
+	isrg
+	iloadc 0
+	jsre 0
+	return
+
+main:
+	isrg
+	jsr 0 foo
+	isrg
+	jsr 0 bar
+	isrg
+	iloadg 0
+	jsre 0
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	jsr 0 baz
+	isrg
+	iloadg 0
+	jsre 0
+	isrg
+	iloadc 0
+	jsre 0
+
+.const int 1
+.const int 10
+.const int 3
+.const int 5
+.exportfun "main" int  main
 .global int
-.global float
-.global bool
 .global int
-.global float
-.global bool
-.global int
-.global float
-.global bool
-.global int
-.global float
-.global bool
+.importfun "printInt" void 
+.importfun "printNewlines" void 
