@@ -115,7 +115,7 @@ node *CAfundef(node *arg_node, info *arg_info)
     INFO_SYMBOL_TABLE(fundef_info) = fundef_table;
     FUNDEF_SYMBOLTABLE(arg_node) = fundef_table;
 
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), 1, FUNDEF_ISEXPORT(arg_node), 0, NULL, NULL, INFO_SYMBOL_TABLE(fundef_info));
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), 1, FUNDEF_ISEXPORT(arg_node), 0, NULL, NULL, fundef_table);
 
     STinsert(parent_table, entry);
 
