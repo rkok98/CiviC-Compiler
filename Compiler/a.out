@@ -288,5 +288,5 @@ main:
 .const float 5.000000
 .const float 0.000000
 .exportfun "main" int  main
-.importfun "printInt" void 
-.importfun "printNewlines" void 
+.importfun "printInt" void  int
+.importfun "printNewlines" void  int

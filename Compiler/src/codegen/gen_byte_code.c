@@ -384,7 +384,9 @@ node *GBCfundecl(node *arg_node, info *arg_info)
   {
     // do we have a param entry
     if (!SYMBOLTABLEENTRY_ISPARAMETER(fentry))
+    {
       continue;
+    }
 
     // what is this?
     char *temp = STRcatn(3, params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fentry)));

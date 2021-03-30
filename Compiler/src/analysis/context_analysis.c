@@ -108,6 +108,9 @@ node *CAfundecl(node *arg_node, info *arg_info)
 
     STinsert(parent_table, entry);
 
+    FUNDECL_PARAMS(arg_node) = TRAVopt(FUNDECL_PARAMS(arg_node), fundef_info);
+    fundef_info = FreeInfo(fundef_info);
+
     DBUG_RETURN(arg_node);
 }
 
