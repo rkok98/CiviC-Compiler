@@ -2,8 +2,11 @@
 - [ ] Comments
 - [ ] Remove Commented Code
 - [ ] Print AST
-- [ ] For loop a sahbi
+- [x] For loop a sahbi
 - [ ] var symboltable
+- [ ] Remove print statements
+- [ ] Convert linked list to AST node
+- [ ] remove duplicated symbol table code
 
 # Tests
 ## Check Error
