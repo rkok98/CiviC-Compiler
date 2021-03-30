@@ -634,12 +634,12 @@ node *GBCfor(node *arg_node, info *arg_info)
 node *GBCglobdecl(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCglobdecl");
-  DBUG_PRINT("GBC", ("GBCglobdecl"));
 
-  char *str = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", HprintType(GLOBDEF_TYPE(arg_node)));
+  char *str = STRcatn(4, "var \"", GLOBDECL_NAME(arg_node), "\" ", HprintType(GLOBDECL_TYPE(arg_node)));
+
   addToExternPool(arg_info, str);
 
-  TRAVopt(GLOBDEF_DIMS(arg_node), arg_info);
+  TRAVopt(GLOBDECL_DIMS(arg_node), arg_info);
 
   DBUG_RETURN(arg_node);
 }
