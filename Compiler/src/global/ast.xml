@@ -1274,6 +1274,17 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="ReturnType">
+                    <type name="Type">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
             </attributes>
         </node>
 

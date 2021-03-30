@@ -277,13 +277,12 @@ node *GBCexprstmt(node *arg_node, info *arg_info)
   DBUG_PRINT("GBC", ("GBCexprstmt 3"));
 
   node *entry = STdeepSearchFundef(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(expr));
+  node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
 
-  /**
-     * TODO
-    node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
-
-    if (FUNDEF_ISEXTERN (link)) DBUG_RETURN(arg_node);
-    */
+  if (NODE_TYPE(link) == N_fundecl)
+  {
+    DBUG_RETURN(arg_node);
+  }
 
   DBUG_PRINT("GBC", ("GBCexprstmt 4"));
 
@@ -299,38 +298,33 @@ node *GBCexprstmt(node *arg_node, info *arg_info)
 
 node *GBCreturn(node *arg_node, info *arg_info)
 {
-  /**
-   * TODO
-    DBUG_ENTER("GBCreturn");
-    DBUG_PRINT("GBC", ("GBCreturn"));
+  DBUG_ENTER("GBCreturn");
+  DBUG_PRINT("GBC", ("GBCreturn"));
 
-    node *table = INFO_SYMBOL_TABLE(arg_info);
+  node *table = INFO_SYMBOL_TABLE(arg_info);
 
-    TRAVopt(RETURN_EXPR(arg_node), arg_info);
+  TRAVopt(RETURN_EXPR(arg_node), arg_info);
 
-    switch (SYMBOLTABLE_RETURNTYPE(table))
-    {
-    case T_int:
-        fprintf(INFO_FILE(arg_info), "\t%s\n", "ireturn");
-        break;
-    case T_float:
-        fprintf(INFO_FILE(arg_info), "\t%s\n", "freturn");
-        break;
-    case T_bool:
-        fprintf(INFO_FILE(arg_info), "\t%s\n", "breturn");
-        break;
-    case T_void:
-        fprintf(INFO_FILE(arg_info), "\t%s\n", "return");
-        break;
-    case T_unknown:
-        CTIabort("Unknown type found in file: %s, line: %s", __FILE__, __LINE__);
-        break;
-    }
+  switch (SYMBOLTABLE_RETURNTYPE(table))
+  {
+  case T_int:
+    fprintf(INFO_FILE(arg_info), "\t%s\n", "ireturn");
+    break;
+  case T_float:
+    fprintf(INFO_FILE(arg_info), "\t%s\n", "freturn");
+    break;
+  case T_bool:
+    fprintf(INFO_FILE(arg_info), "\t%s\n", "breturn");
+    break;
+  case T_void:
+    fprintf(INFO_FILE(arg_info), "\t%s\n", "return");
+    break;
+  case T_unknown:
+    CTIabort("Unknown type found in file: %s, line: %s", __FILE__, __LINE__);
+    break;
+  }
 
-    DBUG_RETURN(arg_node);
-    */
-
-  return arg_node;
+  DBUG_RETURN(arg_node);
 }
 
 node *GBCfuncall(node *arg_node, info *arg_info)
@@ -738,7 +732,7 @@ node *GBCassign(node *arg_node, info *arg_info)
     fprintf(INFO_FILE(arg_info), "\t%cstoreg %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
   else
   */
-    fprintf(INFO_FILE(arg_info), "\t%cstore %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
+  fprintf(INFO_FILE(arg_info), "\t%cstore %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
 
   // increment the store
   INFO_SYMBOL_TABLE_ENTRY(arg_info) = NULL;
@@ -906,7 +900,7 @@ node *GBCvar(node *arg_node, info *arg_info)
   DBUG_PRINT("GBC", ("GBCvar 1"));
   node *decl = VAR_DECL(arg_node);
 
-  if (decl == NULL) 
+  if (decl == NULL)
   {
     printf("%s", VAR_NAME(arg_node));
   }
@@ -961,7 +955,7 @@ node *GBCvar(node *arg_node, info *arg_info)
           SYMBOLTABLEENTRY_OFFSET(entry) < 4 ? "\tbload_%d\n" : "\tbload %d\n",
           SYMBOLTABLEENTRY_OFFSET(entry));
   }
-  
+
   DBUG_PRINT("GBC", ("GBCvar 3"));
 
   DBUG_RETURN(arg_node);

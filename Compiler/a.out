@@ -1,136 +1,292 @@
-foo:
+printBool:
+	bload_0
+	branch_f 1_else
 
-fun:
-	esr 7
+	isrg
 	iloadc 0
-	istore 0
+	jsre 0
+	jump 2_end
+
+1_else:
+	isrg
 	iloadc 1
-	istore 0
-	iloadc 2
-	istore 0
-	iloadc 3
-	istore 0
-	floadc 4
-	fstore 0
-	floadc 5
-	fstore 0
-	bloadc 6
-	bstore 0
-	iload_0
-	iload_0
-	ilt
-	branch_f 2_false_expr
-	iload_0
-	iload_0
-	igt
-	jump 3_end
-2_false_expr:
-	bloadc 7
-3_end:
-	branch_f 1_false_expr
-	iloadc 0
-	jump 4_end
-1_false_expr:
-	iloadc 8
-4_end:
-	istore 0
-	isrg
-	iload_0
 	jsre 0
-	isrg
-	iloadc 0
-	jsre 0
-	isrg
-	iload_0
-	iload_0
-	ilt
-	branch_f 5_false_expr
-	iloadc 0
-	jump 6_end
-5_false_expr:
-	iloadc 8
-6_end:
-	fload_0
-	fload_0
-	fadd
-	iload_0
-	iload_0
-	ilt
-	branch_f 7_false_expr
-	iloadc 0
-	jump 8_end
-7_false_expr:
-	iloadc 8
-8_end:
-	jsr 3 foo
-	istore 0
-	isrg
-	iload_0
-	jsre 0
-	isrg
-	iloadc 0
-	jsre 0
-	iload_0
-	iload_0
-	ilt
-	branch_f 9_false_expr
-	bloadc 6
-	jump 10_end
-9_false_expr:
-	iload_0
-	iload_0
-	igt
-10_end:
-	branch_f 11_end
 
-	iloadc 9
-	istore 0
-11_end:
-
-bar:
-	esr 3
-	iloadc 10
-	istore 0
-	floadc 11
-	fstore 0
-	iload_0
-	fload_0
-	f2i
-	iload_0
-	imul
-	iadd
-	istore 0
-	isrg
-	iload_0
-	jsre 0
+2_end:
 	isrg
 	iloadc 0
 	jsre 0
 	return
 
+t:
+	isrg
+	iloadc 0
+	jsre 0
+	bloadc 2
+	breturn
+
+f:
+	isrg
+	iloadc 1
+	jsre 0
+	bloadc 3
+	breturn
+
 main:
 	isrg
-	jsr 0 fun
-	ipop
 	isrg
-	jsr 0 bar
+	jsr 0 t
+	isrg
+	jsr 0 f
+	beq
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 t
+	beq
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 t
+	isrg
+	jsr 0 t
+	beq
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 f
+	beq
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	isrg
+	jsr 0 t
+	isrg
+	jsr 0 f
+	bne
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 t
+	bne
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 t
+	isrg
+	jsr 0 t
+	bne
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 f
+	bne
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	isrg
+	jsr 0 t
+	branch_f 3_false_expr
+	isrg
+	jsr 0 f
+	jump 4_end
+3_false_expr:
+	bloadc 3
+4_end:
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	branch_f 5_false_expr
+	isrg
+	jsr 0 t
+	jump 6_end
+5_false_expr:
+	bloadc 3
+6_end:
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 t
+	branch_f 7_false_expr
+	isrg
+	jsr 0 t
+	jump 8_end
+7_false_expr:
+	bloadc 3
+8_end:
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	branch_f 9_false_expr
+	isrg
+	jsr 0 f
+	jump 10_end
+9_false_expr:
+	bloadc 3
+10_end:
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	isrg
+	jsr 0 t
+	branch_f 11_false_expr
+	bloadc 2
+	jump 12_end
+11_false_expr:
+	isrg
+	jsr 0 f
+12_end:
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	branch_f 13_false_expr
+	bloadc 2
+	jump 14_end
+13_false_expr:
+	isrg
+	jsr 0 t
+14_end:
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 t
+	branch_f 15_false_expr
+	bloadc 2
+	jump 16_end
+15_false_expr:
+	isrg
+	jsr 0 t
+16_end:
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	branch_f 17_false_expr
+	bloadc 2
+	jump 18_end
+17_false_expr:
+	isrg
+	jsr 0 f
+18_end:
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	isrg
+	jsr 0 t
+	isrg
+	jsr 0 f
+	bmul
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 t
+	bmul
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 t
+	isrg
+	jsr 0 t
+	bmul
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 f
+	bmul
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	isrg
+	jsr 0 t
+	isrg
+	jsr 0 f
+	badd
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 t
+	badd
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 t
+	isrg
+	jsr 0 t
+	badd
+	jsr 1 printBool
+	isrg
+	isrg
+	jsr 0 f
+	isrg
+	jsr 0 f
+	badd
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	iloadc 4
+	iloadc 1
+	ine
+	jsr 1 printBool
+	isrg
+	iloadc 1
+	iloadc 1
+	ine
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	isrg
+	floadc 5
+	floadc 6
+	fne
+	jsr 1 printBool
+	isrg
+	floadc 6
+	floadc 6
+	fne
+	jsr 1 printBool
+	isrg
+	iloadc 0
+	jsre 0
+	iloadc 1
+	ireturn
 
 .const int 1
-.const int 2
-.const int 3
-.const int 4
-.const float 1.000000
-.const float 2.000000
+.const int 0
 .const bool true
 .const bool false
-.const int 0
-.const int 7
 .const int 5
-.const float 6.000000
+.const float 5.000000
+.const float 0.000000
 .exportfun "main" int  main
 .importfun "printInt" void 
-.importfun "printFloat" void 
-.importfun "scanInt" int 
-.importfun "scanFloat" float 
-.importfun "printSpaces" void 
 .importfun "printNewlines" void 
