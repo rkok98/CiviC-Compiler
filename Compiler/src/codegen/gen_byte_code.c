@@ -902,6 +902,11 @@ node *GBCvar(node *arg_node, info *arg_info)
   DBUG_PRINT("GBC", ("GBCvar 1"));
   node *decl = VAR_DECL(arg_node);
 
+  if (decl == NULL) 
+  {
+    printf("%s", VAR_NAME(arg_node));
+  }
+
   DBUG_PRINT("GBC", ("GBCvar 1.1"));
 
   node *entry = STdeepSearchByNode(INFO_SYMBOL_TABLE(arg_info), decl);
