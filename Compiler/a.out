@@ -1,1 +1,36 @@
-.importvar "pi" float
+__init:
+	iloadc 0
+	istore 0
+	floadc 1
+	fstore 0
+	bloadc 2
+	bstore 0
+	iloadc 0
+	istore 0
+	floadc 1
+	fstore 0
+	bloadc 2
+	bstore 0
+	return
+
+.const int 321
+.const float 1.000000
+.const bool false
+.exportvar "a2" 0
+.exportvar "b2" 0
+.exportvar "c2" 0
+.exportvar "d2" 0
+.exportvar "e2" 0
+.exportvar "f2" 0
+.global int
+.global float
+.global bool
+.global int
+.global float
+.global bool
+.global int
+.global float
+.global bool
+.global int
+.global float
+.global bool

@@ -481,7 +481,9 @@ node *GBCfundef(node *arg_node, info *arg_info)
   }
 
   // set the symbol table for the upcoming scope
-  INFO_SYMBOL_TABLE(arg_info) = SYMBOLTABLEENTRY_TABLE(entry); // nested symbol table
+  INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node); // nested symbol table
+
+  printf("%s %d", FUNDEF_NAME(arg_node), FUNDEF_ISEXPORT(arg_node));
 
   // number of registers to use
   size_t registers = STVardecls(INFO_SYMBOL_TABLE(arg_info));
