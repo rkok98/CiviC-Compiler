@@ -1,1 +1,18 @@
 __init:
+	iloadc 0
+	istoreg 0
+	return
+
+main:
+	isrg
+	iloadg 0
+	jsre 0
+	iloadc 0
+	ireturn
+
+.const int 10
+.const int 0
+.exportfun "__init" void  __init
+.exportfun "main" int  main
+.global int
+.importfun "printInt" void  int

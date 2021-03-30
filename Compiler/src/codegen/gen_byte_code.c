@@ -1,7 +1,6 @@
 #include "globals.h"
 
 #include "gen_byte_code.h"
-#include "linked_list.h"
 #include "symbol_table.h"
 
 #include "types.h"
@@ -28,10 +27,10 @@ struct INFO
   node *symbol_table;
   node *symbol_table_entry;
 
-  listnode *const_pool;
-  listnode *export_pool;
-  listnode *import_pool;
-  listnode *global_pool;
+  node *const_pool;
+  node *export_pool;
+  node *import_pool;
+  node *global_pool;
 
   int load_counter; // counts amound of loads {0..n}
   int branch_count; // counts amound of stores - function bound {0..n}
@@ -79,11 +78,6 @@ static info *FreeInfo(info *info)
 {
   DBUG_ENTER("FreeInfo");
 
-  LLdispose(INFO_CONST_POOL(info));
-  LLdispose(INFO_EXPORT_POOL(info));
-  LLdispose(INFO_IMPORT_POOL(info));
-  LLdispose(INFO_GLOBAL_POOL(info));
-
   info = MEMfree(info);
 
   DBUG_RETURN(info);
@@ -100,51 +94,43 @@ char *createBranch(const char *name, info *info)
   return branch;
 }
 
-void addToConstPool(info *arg_info, char *value)
+node *SearchPool(node *pool, const char *value)
 {
-  // is the linked list set?
-  if (INFO_CONST_POOL(arg_info) == NULL)
-    INFO_CONST_POOL(arg_info) = LLcreate(value, INFO_LOAD_COUNTER(arg_info), NULL);
+  if (!pool)
+  {
+    return NULL;
+  }
 
-  // append the value
-  else
-    LLappend(INFO_CONST_POOL(arg_info), value, INFO_LOAD_COUNTER(arg_info));
+  if (STReq(LINKEDVALUE_VALUE(pool), value))
+  {
+    return pool;
+  }
 
-  // increment the counter
-  INFO_LOAD_COUNTER(arg_info) += 1;
+  return SearchPool(LINKEDVALUE_NEXT(pool), value);
 }
 
-void addToExportPool(info *arg_info, char *value)
+unsigned int CountPool(node *pool)
 {
-  // is the linked list set?
-  if (INFO_EXPORT_POOL(arg_info) == NULL)
-    INFO_EXPORT_POOL(arg_info) = LLcreate(value, 0, NULL);
+  if (!pool)
+  {
+    return 0;
+  }
 
-  // append the value
-  else
-    LLappend(INFO_EXPORT_POOL(arg_info), value, 0);
+  return 1 + CountPool(LINKEDVALUE_NEXT(pool));
 }
 
-void addToExternPool(info *arg_info, char *value)
+node *addToPool(node *pool, node *value)
 {
-  // is the linked list set?
-  if (INFO_IMPORT_POOL(arg_info) == NULL)
-    INFO_IMPORT_POOL(arg_info) = LLcreate(value, 0, NULL);
-
-  // append the value
+  if (!pool)
+  {
+    pool = value;
+  }
   else
-    LLappend(INFO_IMPORT_POOL(arg_info), value, 0);
-}
+  {
+    LINKEDVALUE_NEXT(pool) = addToPool(LINKEDVALUE_NEXT(pool), value);
+  }
 
-void addToGlobalPool(info *arg_info, char *value)
-{
-  // is the linked list set?
-  if (INFO_GLOBAL_POOL(arg_info) == NULL)
-    INFO_GLOBAL_POOL(arg_info) = LLcreate(value, 0, NULL);
-
-  // append the value
-  else
-    LLappend(INFO_GLOBAL_POOL(arg_info), value, 0);
+  return pool;
 }
 
 /**
@@ -157,38 +143,38 @@ void addToGlobalPool(info *arg_info, char *value)
 void writeGlobals(info *arg_info)
 {
   // the pools
-  listnode *const_pool = INFO_CONST_POOL(arg_info);
-  listnode *export_pool = INFO_EXPORT_POOL(arg_info);
-  listnode *import_pool = INFO_IMPORT_POOL(arg_info);
-  listnode *global_pool = INFO_GLOBAL_POOL(arg_info);
+  node *const_pool = INFO_CONST_POOL(arg_info);
+  node *export_pool = INFO_EXPORT_POOL(arg_info);
+  node *import_pool = INFO_IMPORT_POOL(arg_info);
+  node *global_pool = INFO_GLOBAL_POOL(arg_info);
   FILE *fileptr = INFO_FILE(arg_info);
 
   // Print constant pool values
   while (const_pool != NULL)
   {
-    fprintf(fileptr, ".const %s\n", const_pool->value);
-    const_pool = const_pool->next;
+    fprintf(fileptr, ".const %s\n", LINKEDVALUE_VALUE(const_pool));
+    const_pool = LINKEDVALUE_NEXT(const_pool);
   }
 
   // Print constant pool values
   while (export_pool != NULL)
   {
-    fprintf(fileptr, ".export%s\n", export_pool->value);
-    export_pool = export_pool->next;
+    fprintf(fileptr, ".export%s\n", LINKEDVALUE_VALUE(export_pool));
+    export_pool = LINKEDVALUE_NEXT(export_pool);
   }
 
   // Print constant pool values
   while (global_pool != NULL)
   {
-    fprintf(fileptr, ".global %s\n", global_pool->value);
-    global_pool = global_pool->next;
+    fprintf(fileptr, ".global %s\n", LINKEDVALUE_VALUE(global_pool));
+    global_pool = LINKEDVALUE_NEXT(global_pool);
   }
 
   // Print import pool values
   while (import_pool != NULL)
   {
-    fprintf(fileptr, ".import%s\n", import_pool->value);
-    import_pool = import_pool->next;
+    fprintf(fileptr, ".import%s\n", LINKEDVALUE_VALUE(import_pool));
+    import_pool = LINKEDVALUE_NEXT(import_pool);
   }
 }
 
@@ -413,7 +399,7 @@ node *GBCfundecl(node *arg_node, info *arg_info)
       HprintType(FUNDECL_TYPE(arg_node)),
       params == NULL ? "" : params);
 
-  addToExternPool(arg_info, str);
+  INFO_IMPORT_POOL(arg_info) = addToPool(INFO_IMPORT_POOL(arg_info), TBmakeLinkedvalue(0, str, NULL));
   free(params);
 
   DBUG_RETURN(arg_node);
@@ -475,7 +461,7 @@ node *GBCfundef(node *arg_node, info *arg_info)
         params == NULL ? "" : params,
         FUNDEF_NAME(arg_node));
 
-    addToExportPool(arg_info, str);
+    INFO_EXPORT_POOL(arg_info) = addToPool(INFO_EXPORT_POOL(arg_info), TBmakeLinkedvalue(0, str, NULL));
   }
 
   // set the symbol table for the upcoming scope
@@ -637,7 +623,7 @@ node *GBCglobdecl(node *arg_node, info *arg_info)
 
   char *str = STRcatn(4, "var \"", GLOBDECL_NAME(arg_node), "\" ", HprintType(GLOBDECL_TYPE(arg_node)));
 
-  addToExternPool(arg_info, str);
+  INFO_IMPORT_POOL(arg_info) = addToPool(INFO_IMPORT_POOL(arg_info), TBmakeLinkedvalue(0, str, NULL));
 
   TRAVopt(GLOBDECL_DIMS(arg_node), arg_info);
 
@@ -656,10 +642,10 @@ node *GBCglobdef(node *arg_node, info *arg_info)
     char *offset = STRitoa(SYMBOLTABLEENTRY_OFFSET(entry));
     char *str = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", offset);
     free(offset);
-    addToExportPool(arg_info, str);
+    INFO_EXPORT_POOL(arg_info) = addToPool(INFO_EXPORT_POOL(arg_info), TBmakeLinkedvalue(0, str, NULL));
   }
 
-  addToGlobalPool(arg_info, STRcpy(HprintType(GLOBDEF_TYPE(arg_node))));
+  INFO_GLOBAL_POOL(arg_info) = addToPool(INFO_GLOBAL_POOL(arg_info), TBmakeLinkedvalue(0, STRcpy(HprintType(GLOBDEF_TYPE(arg_node))), NULL));
 
   TRAVopt(GLOBDEF_DIMS(arg_node), arg_info);
 
@@ -972,18 +958,19 @@ node *GBCnum(node *arg_node, info *arg_info)
   char *str = STRcat("int ", STRitoa(NUM_VALUE(arg_node)));
 
   // Search linked list for const value
-  listnode *const_pool = LLsearch(INFO_CONST_POOL(arg_info), str);
+  node *const_pool = SearchPool(INFO_CONST_POOL(arg_info), str);
 
   // Add to const pool if it doesn't exist yet.
   // Else extract values from linked list and print to file.
   if (const_pool == NULL)
   {
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", INFO_LOAD_COUNTER(arg_info));
-    addToConstPool(arg_info, str);
+    INFO_CONST_POOL(arg_info) = INFO_CONST_POOL(arg_info) = addToPool(INFO_CONST_POOL(arg_info), TBmakeLinkedvalue(INFO_LOAD_COUNTER(arg_info), str, NULL));
+    INFO_LOAD_COUNTER(arg_info) += 1;
   }
   else
   {
-    fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", const_pool->counter);
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "iloadc", LINKEDVALUE_KEY(const_pool));
     free(str);
   }
 
@@ -1004,18 +991,19 @@ node *GBCfloat(node *arg_node, info *arg_info)
   snprintf(str, length + 1, "float %f", FLOAT_VALUE(arg_node));
 
   // Search linked list for const value
-  listnode *const_pool = LLsearch(INFO_CONST_POOL(arg_info), str);
+  node *const_pool = SearchPool(INFO_CONST_POOL(arg_info), str);
 
   // Add to const pool if it doesn't exist yet.
   // Else extract values from linked list and print to file.
   if (const_pool == NULL)
   {
-    fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", INFO_LOAD_COUNTER(arg_info));
-    addToConstPool(arg_info, str);
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "floadc", INFO_LOAD_COUNTER(arg_info));
+    INFO_CONST_POOL(arg_info) = INFO_CONST_POOL(arg_info) = addToPool(INFO_CONST_POOL(arg_info), TBmakeLinkedvalue(INFO_LOAD_COUNTER(arg_info), str, NULL));
+    INFO_LOAD_COUNTER(arg_info) += 1;
   }
   else
   {
-    fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", const_pool->counter);
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "floadc", LINKEDVALUE_KEY(const_pool));
     free(str);
   }
 
@@ -1034,18 +1022,19 @@ node *GBCbool(node *arg_node, info *arg_info)
   char *str = STRcat("bool ", BOOL_VALUE(arg_node) ? "true" : "false");
 
   // Search linked list for const value
-  listnode *const_pool = LLsearch(INFO_CONST_POOL(arg_info), str);
+  node *const_pool = SearchPool(INFO_CONST_POOL(arg_info), str);
 
   // Add to const pool if it doesn't exist yet.
   // Else extract values from linked list and print to file.
   if (const_pool == NULL)
   {
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", INFO_LOAD_COUNTER(arg_info));
-    addToConstPool(arg_info, str);
+    INFO_CONST_POOL(arg_info) = addToPool(INFO_CONST_POOL(arg_info), TBmakeLinkedvalue(INFO_LOAD_COUNTER(arg_info), str, NULL));
+    INFO_LOAD_COUNTER(arg_info) += 1;
   }
   else
   {
-    fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", const_pool->counter);
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "bloadc", LINKEDVALUE_KEY(const_pool));
     free(str);
   }
 
