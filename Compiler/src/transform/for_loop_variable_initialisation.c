@@ -172,8 +172,7 @@ node *FLVIfor(node *arg_node, info *arg_info)
 
     // Generate a new induction variable base name
     char *induction_basename = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
-    INFO_FOR_LOOP_COUNTER(arg_info)
-    ++;
+    INFO_FOR_LOOP_COUNTER(arg_info)++;
 
     INFO_INDUCTION_VARIABLES(arg_info) = IVLadd(INFO_INDUCTION_VARIABLES(arg_info), TBmakeLinkedvalue(FOR_LOOPVAR(arg_node), induction_basename, NULL));
 
