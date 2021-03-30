@@ -9,6 +9,44 @@
 #include "ctinfo.h"
 #include "str.h"
 
+size_t STcountGlobdecls(node *table)
+{
+    size_t count = 0;
+    node *entry = SYMBOLTABLE_ENTRIES(table);
+
+    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
+    {
+        node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
+        if (NODE_TYPE(link) != N_globdecl)
+        {
+            continue;
+        }
+
+        count++;
+    }
+
+    return count;
+}
+
+size_t STcountFunDecls(node *table)
+{
+    size_t count = 0;
+    node *entry = SYMBOLTABLE_ENTRIES(table);
+
+    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
+    {
+        node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
+        if (NODE_TYPE(link) != N_fundecl)
+        {
+            continue;
+        }
+
+        count++;
+    }
+
+    return count;
+}
+
 size_t STcount(node *table)
 {
     size_t count = 0;
@@ -40,7 +78,21 @@ node *STinsert(node *symbol_table, node *entry)
         return NULL;
     }
 
-    SYMBOLTABLEENTRY_OFFSET(entry) = STcount(symbol_table);
+    node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
+
+    // set the offset
+    if (NODE_TYPE(link) == N_globdecl)
+    {
+        SYMBOLTABLEENTRY_OFFSET(entry) = STcountGlobdecls(symbol_table);
+    }
+    else if (NODE_TYPE(link) == N_fundecl)
+    {
+        SYMBOLTABLEENTRY_OFFSET(entry) = STcountFunDecls(symbol_table);
+    }
+    else
+    {
+        SYMBOLTABLEENTRY_OFFSET(entry) = STcount(symbol_table);
+    }
 
     node *last = STlast(symbol_table);
 
