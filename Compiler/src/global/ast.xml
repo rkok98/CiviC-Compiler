@@ -1372,7 +1372,7 @@
                 <attribute name="Definition">
                     <type name="Link">
                         <targets>
-                            <target mandatory="no">
+                            <target mandatory="yes">
                                 <phases>
                                     <all />
                                 </phases>

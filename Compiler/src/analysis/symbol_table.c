@@ -169,7 +169,6 @@ size_t STparams(node *table)
             continue;
         }
 
-
         count++;
     }
 
@@ -197,16 +196,20 @@ size_t STVardecls(node *table)
 node *STsearchVariableEntry(node *list, const char *name, type type)
 {
     // do we have a valid entry
-    if ( list == NULL) return NULL;
+    if (list == NULL)
+        return NULL;
 
     // skip fundefs
-    if ( SYMBOLTABLEENTRY_TABLE ( list) != NULL) return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT (list), name, type);
+    if (SYMBOLTABLEENTRY_TABLE(list) != NULL)
+        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(list), name, type);
 
     // check if the name is the same
-    if ( strcmp(SYMBOLTABLEENTRY_NAME ( list), name) != 0) return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT (list), name, type);
+    if (strcmp(SYMBOLTABLEENTRY_NAME(list), name) != 0)
+        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(list), name, type);
 
     // check if the type is the same
-    if ( type != T_unknown && SYMBOLTABLEENTRY_TYPE ( list) != type) return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT (list), name, type);
+    if (type != T_unknown && SYMBOLTABLEENTRY_TYPE(list) != type)
+        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(list), name, type);
 
     // return the result
     return list;
@@ -215,34 +218,36 @@ node *STsearchVariableEntry(node *list, const char *name, type type)
 node *STsearchVariable(node *table, const char *name, type type)
 {
     // the entry
-    node *entry = SYMBOLTABLE_ENTRIES ( table);
+    node *entry = SYMBOLTABLE_ENTRIES(table);
 
     // return the result
-    return STsearchVariableEntry( entry, name, type);
+    return STsearchVariableEntry(entry, name, type);
 }
 
 node *STsearchVariableByName(node *table, const char *name)
 {
     // the entry
-    node *entry = SYMBOLTABLE_ENTRIES ( table);
+    node *entry = SYMBOLTABLE_ENTRIES(table);
 
     // return the result
-    return STsearchVariableEntry( entry, name, T_unknown);
+    return STsearchVariableEntry(entry, name, T_unknown);
 }
 
 node *STdeepSearchVariableByName(node *table, const char *name)
 {
     // search for the node in the current scope
-    node *found = STsearchVariableByName( table, name);
+    node *found = STsearchVariableByName(table, name);
 
     // do we have a node?
-    if (found != NULL) return found;
+    if (found != NULL)
+        return found;
 
     // get the parent table
-    node *parent = SYMBOLTABLE_PARENT ( table);
+    node *parent = SYMBOLTABLE_PARENT(table);
 
     // do we have a parent table?
-    if (parent == NULL) return NULL;
+    if (parent == NULL)
+        return NULL;
 
     // search for the node in the parent table
     return STdeepSearchVariableByName(parent, name);
@@ -251,23 +256,37 @@ node *STdeepSearchVariableByName(node *table, const char *name)
 node *STdeepSearchByNode(node *table, node *link)
 {
     // get the entry
-    node *entry = SYMBOLTABLE_ENTRIES ( table);
+    node *entry = SYMBOLTABLE_ENTRIES(table);
 
     // loop over the entries
-    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT ( entry))
+    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
     {
-        node *n = SYMBOLTABLEENTRY_DEFINITION ( entry);
+        node *n = SYMBOLTABLEENTRY_DEFINITION(entry);
 
-        if (NODE_TYPE (link) != NODE_TYPE (n)) continue;
+        DBUG_PRINT("GBC", ("SEARCH 1.1"));
+        if (NODE_TYPE(link) != NODE_TYPE(n))
+            continue;
 
-        if ( NODE_TYPE (n) == N_globdef && STReq(GLOBDEF_NAME (n), GLOBDEF_NAME (link))) return entry;
-        if ( NODE_TYPE (n) == N_fundef && STReq(FUNDEF_NAME (n), FUNDEF_NAME (link))) return entry;
-        if ( NODE_TYPE (n) == N_vardecl && STReq(VARDECL_NAME (n), VARDECL_NAME (link))) return entry;
-        if ( NODE_TYPE (n) == N_param && STReq(PARAM_NAME (n), PARAM_NAME (link))) return entry;
+        DBUG_PRINT("GBC", ("SEARCH 2.2"));
 
+        if (NODE_TYPE(n) == N_globdef && STReq(GLOBDEF_NAME(n), GLOBDEF_NAME(link)))
+            return entry;
+        if (NODE_TYPE(n) == N_globdecl && STReq(GLOBDECL_NAME(n), GLOBDECL_NAME(link)))
+            return entry;
+        if (NODE_TYPE(n) == N_fundef && STReq(FUNDEF_NAME(n), FUNDEF_NAME(link)))
+            return entry;
+        if (NODE_TYPE(n) == N_fundecl && STReq(FUNDECL_NAME(n), FUNDECL_NAME(link)))
+            return entry;
+        if (NODE_TYPE(n) == N_vardecl && STReq(VARDECL_NAME(n), VARDECL_NAME(link)))
+            return entry;
+        if (NODE_TYPE(n) == N_param && STReq(PARAM_NAME(n), PARAM_NAME(link)))
+            return entry;
+
+        DBUG_PRINT("GBC", ("SEARCH 2.1"));
     }
 
-    if (SYMBOLTABLE_PARENT ( table) == NULL) return NULL;
+    if (SYMBOLTABLE_PARENT(table) == NULL)
+        return NULL;
 
-    return STdeepSearchByNode ( SYMBOLTABLE_PARENT ( table), link);
+    return STdeepSearchByNode(SYMBOLTABLE_PARENT(table), link);
 }

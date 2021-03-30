@@ -1,0 +1,16 @@
+foo:
+	esr 6
+	iloadc 0
+	istore 0
+	iloadc 1
+	iloadc 2
+	iadd
+	istore 0
+	iloadc 3
+	iloadc 4
+	imul
+	istore 0
+	iloadc 5
+	iloadc 6
+	irem
+	istore 0
