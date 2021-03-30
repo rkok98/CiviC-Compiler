@@ -256,7 +256,12 @@ node *FLVIfor(node *arg_node, info *arg_info)
     FREEdoFreeTree(arg_node);
 
     // Create a new while loop and return it to replace the for-loop
-    node *while_expr = TBmakeBinop(BO_lt, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), NULL, NULL), TBmakeVar(STRcpy(VARDECL_NAME(vardecl_stop)), NULL, NULL));
+    node *while_expr = TBmakeTernary(
+        TBmakeBinop(BO_gt, TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_step)), vardecl_step, NULL), TBmakeNum (0)),
+        TBmakeBinop(BO_lt, TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_start)), vardecl_start, NULL), TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_stop)), vardecl_stop, NULL)),
+        TBmakeBinop(BO_gt, TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_start)), vardecl_start, NULL), TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_stop)), vardecl_stop, NULL))
+    );
+
     DBUG_RETURN(TBmakeWhile(while_expr, block));
 }
 

@@ -60,36 +60,36 @@ node *TBCbinop(node *arg_node, info *arg_info)
 node *TBCcast(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("TBCcast");
-
+  
   CAST_EXPR(arg_node) = TRAVdo(CAST_EXPR(arg_node), arg_info);
   
   if (CAST_TYPE(arg_node) == T_bool)
   {
-    node *cast_expression = COPYdoCopy ( CAST_EXPR ( arg_node));
+    node *cast_expression = COPYdoCopy(CAST_EXPR(arg_node));
     FREEdoFreeTree(arg_node);
 
     if (INFO_TYPE(arg_info) == T_int)
     {
-      DBUG_RETURN(TBmakeBinop(BO_ne, cast_expression, TBmakeNum(FALSE)));
+      arg_node = TBmakeBinop(BO_ne, cast_expression, TBmakeNum(FALSE));
     }
     else if (INFO_TYPE(arg_info) == T_float)
     {
-      DBUG_RETURN(TBmakeBinop(BO_ne, cast_expression, TBmakeFloat(0.0)));
+      arg_node = TBmakeBinop(BO_ne, cast_expression, TBmakeFloat(0.0));
     }
   }
-
-  if (INFO_TYPE(arg_info) == T_bool)
+  else if (INFO_TYPE(arg_info) == T_bool)
   {
-    node *cast_expression = COPYdoCopy ( CAST_EXPR ( arg_node));
-    FREEdoFreeTree(arg_node);
-
+    node *cast_expression = COPYdoCopy(CAST_EXPR(arg_node));
+    
     if (CAST_TYPE(arg_node) == T_int)
     {
-      DBUG_RETURN(TBmakeTernary(cast_expression, TBmakeNum(TRUE), TBmakeNum(FALSE)));
+      FREEdoFreeTree(arg_node);
+      arg_node = TBmakeTernary(cast_expression, TBmakeNum(TRUE), TBmakeNum(FALSE));
     }
     else if (CAST_TYPE(arg_node) == T_float)
     {
-      DBUG_RETURN(TBmakeTernary(cast_expression, TBmakeFloat(1.0), TBmakeFloat(0.0)));
+      FREEdoFreeTree(arg_node);
+      arg_node = TBmakeTernary(cast_expression, TBmakeFloat(1.0), TBmakeFloat(0.0));
     }
   }
 

@@ -100,6 +100,8 @@
                     <node name="BinOp" />
                 </travuser>
             </traversal>
+
+            <traversal id="GBC" name="Generate byte code" default="user" include="gen_byte_code.h"/>
         </general>
     </phases>
     <nodesets>
@@ -411,6 +413,17 @@
                                 <any/>
                                 <phases>
                                     <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="SymbolTable">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
                                 </phases>
                             </target>
                         </targets>
@@ -1225,7 +1238,6 @@
         </node>
         <!-- Symbol Table-->
         <node name="SymbolTable">
-            <description>Symbol table entry</description>
             <sons>
                 <son name="Entries">
                     <description>ST body</description>
@@ -1262,6 +1274,17 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="ReturnType">
+                    <type name="Type">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
             </attributes>
         </node>
 
@@ -1280,6 +1303,16 @@
                     </targets>
                 </son>
                 <son name="NextTable">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="SymbolTable"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Table">
                     <targets>
                         <target mandatory="no">
                             <node name="SymbolTable"/>
@@ -1337,6 +1370,41 @@
                 </attribute>
                 <attribute name="IsParameter">
                     <type name="Bool">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Offset">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="yes">
+                                <any/>
+                                <phases>
+                                    <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Depth">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="yes">
+                                <any/>
+                                <phases>
+                                    <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Definition">
+                    <type name="Link">
                         <targets>
                             <target mandatory="yes">
                                 <phases>
