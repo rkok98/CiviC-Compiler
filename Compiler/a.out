@@ -1,292 +1,181 @@
-printBool:
-	bload_0
-	branch_f 1_else
-
-	isrg
-	iloadc 0
-	jsre 0
-	jump 2_end
-
-1_else:
-	isrg
-	iloadc 1
-	jsre 0
-
-2_end:
-	isrg
-	iloadc 0
-	jsre 0
-	return
-
-t:
-	isrg
-	iloadc 0
-	jsre 0
-	bloadc 2
-	breturn
-
-f:
-	isrg
-	iloadc 1
-	jsre 0
-	bloadc 3
-	breturn
-
 main:
-	isrg
-	isrg
-	jsr 0 t
-	isrg
-	jsr 0 f
-	beq
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 t
-	beq
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 t
-	isrg
-	jsr 0 t
-	beq
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 f
-	beq
-	jsr 1 printBool
-	isrg
+	esr 18
 	iloadc 0
+	istore 0
+	iloadc 1
+	istore 1
+	iloadc 2
+	istore 2
+
+1_while:
+	iload_0
+	iload_1
+	ilt
+	branch_f 2_end
+	isrg
+	iload_0
 	jsre 0
 	isrg
+	iloadc 2
+	jsre 0
+	iload_0
+	iload_2
+	iadd
+	istore 0
+	jump 1_while
+2_end:
+
 	isrg
-	jsr 0 t
-	isrg
-	jsr 0 f
-	bne
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 t
-	bne
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 t
-	isrg
-	jsr 0 t
-	bne
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 f
-	bne
-	jsr 1 printBool
-	isrg
+	iloadc 2
+	jsre 0
+	iloadc 1
+	istore 3
 	iloadc 0
+	istore 4
+	iloadc 2
+	ineg
+	istore 5
+
+3_while:
+	iload_3
+	iload 4
+	ilt
+	branch_f 4_end
+	isrg
+	iload_3
 	jsre 0
 	isrg
-	isrg
-	jsr 0 t
-	branch_f 3_false_expr
-	isrg
-	jsr 0 f
-	jump 4_end
-3_false_expr:
-	bloadc 3
+	iloadc 2
+	jsre 0
+	iload_3
+	iload 5
+	iadd
+	istore 3
+	jump 3_while
 4_end:
-	jsr 1 printBool
+
 	isrg
+	iloadc 2
+	jsre 0
+	iloadc 0
+	istore 6
+	iloadc 1
+	istore 7
+	iloadc 3
+	istore 8
+
+5_while:
+	iload 6
+	iload 7
+	ilt
+	branch_f 6_end
 	isrg
-	jsr 0 f
-	branch_f 5_false_expr
+	iload 6
+	jsre 0
 	isrg
-	jsr 0 t
-	jump 6_end
-5_false_expr:
-	bloadc 3
+	iloadc 2
+	jsre 0
+	iload 6
+	iload 8
+	iadd
+	istore 6
+	jump 5_while
 6_end:
-	jsr 1 printBool
+
 	isrg
-	isrg
-	jsr 0 t
-	branch_f 7_false_expr
-	isrg
-	jsr 0 t
-	jump 8_end
-7_false_expr:
-	bloadc 3
-8_end:
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	branch_f 9_false_expr
-	isrg
-	jsr 0 f
-	jump 10_end
-9_false_expr:
-	bloadc 3
-10_end:
-	jsr 1 printBool
-	isrg
-	iloadc 0
+	iloadc 2
 	jsre 0
-	isrg
-	isrg
-	jsr 0 t
-	branch_f 11_false_expr
-	bloadc 2
-	jump 12_end
-11_false_expr:
-	isrg
-	jsr 0 f
-12_end:
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	branch_f 13_false_expr
-	bloadc 2
-	jump 14_end
-13_false_expr:
-	isrg
-	jsr 0 t
-14_end:
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 t
-	branch_f 15_false_expr
-	bloadc 2
-	jump 16_end
-15_false_expr:
-	isrg
-	jsr 0 t
-16_end:
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	branch_f 17_false_expr
-	bloadc 2
-	jump 18_end
-17_false_expr:
-	isrg
-	jsr 0 f
-18_end:
-	jsr 1 printBool
-	isrg
-	iloadc 0
-	jsre 0
-	isrg
-	isrg
-	jsr 0 t
-	isrg
-	jsr 0 f
-	bmul
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 t
-	bmul
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 t
-	isrg
-	jsr 0 t
-	bmul
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 f
-	bmul
-	jsr 1 printBool
-	isrg
-	iloadc 0
-	jsre 0
-	isrg
-	isrg
-	jsr 0 t
-	isrg
-	jsr 0 f
-	badd
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 t
-	badd
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 t
-	isrg
-	jsr 0 t
-	badd
-	jsr 1 printBool
-	isrg
-	isrg
-	jsr 0 f
-	isrg
-	jsr 0 f
-	badd
-	jsr 1 printBool
-	isrg
-	iloadc 0
-	jsre 0
-	isrg
 	iloadc 4
-	iloadc 1
-	ine
-	jsr 1 printBool
-	isrg
-	iloadc 1
-	iloadc 1
-	ine
-	jsr 1 printBool
-	isrg
+	istore 9
 	iloadc 0
+	istore 10
+	iloadc 5
+	ineg
+	istore 11
+
+7_while:
+	iload 9
+	iload 10
+	ilt
+	branch_f 8_end
+	isrg
+	iload 9
 	jsre 0
 	isrg
-	floadc 5
-	floadc 6
-	fne
-	jsr 1 printBool
-	isrg
-	floadc 6
-	floadc 6
-	fne
-	jsr 1 printBool
-	isrg
-	iloadc 0
+	iloadc 2
 	jsre 0
-	iloadc 1
+	iload 9
+	iload 11
+	iadd
+	istore 9
+	jump 7_while
+8_end:
+
+	iloadc 0
+	istore 12
+	iloadc 6
+	istore 13
+	iloadc 2
+	istore 14
+
+9_while:
+	iload 12
+	iload 13
+	ilt
+	branch_f 10_end
+	iloadc 0
+	istore 15
+	iloadc 7
+	istore 16
+	iloadc 2
+	istore 17
+
+11_while:
+	iload 15
+	iload 16
+	ilt
+	branch_f 12_end
+	isrg
+	iload 12
+	jsre 0
+	isrg
+	iloadc 2
+	jsre 0
+	isrg
+	iload 15
+	jsre 0
+	isrg
+	iloadc 2
+	jsre 0
+	iload 15
+	iload 17
+	iadd
+	istore 15
+	jump 11_while
+12_end:
+
+	isrg
+	iloadc 2
+	jsre 0
+	iload 12
+	iload 14
+	iadd
+	istore 12
+	jump 9_while
+10_end:
+
+	iloadc 0
 	ireturn
 
-.const int 1
 .const int 0
-.const bool true
-.const bool false
+.const int 10
+.const int 1
+.const int 2
+.const int 7
+.const int 3
 .const int 5
-.const float 5.000000
-.const float 0.000000
+.const int 4
 .exportfun "main" int  main
 .importfun "printInt" void  int
+.importfun "printSpaces" void  int
 .importfun "printNewlines" void  int

@@ -728,13 +728,13 @@ node *GBCassign(node *arg_node, info *arg_info)
     break;
   }
 
-  /*
-   * TODO
   if (SYMBOLTABLEENTRY_DEPTH(entry) == 0)
+  {
+    printf("_-=");
     fprintf(INFO_FILE(arg_info), "\t%cstoreg %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
+  }
   else
-  */
-  fprintf(INFO_FILE(arg_info), "\t%cstore %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
+    fprintf(INFO_FILE(arg_info), "\t%cstore %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
 
   // increment the store
   INFO_SYMBOL_TABLE_ENTRY(arg_info) = NULL;

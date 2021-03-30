@@ -1391,6 +1391,18 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="Depth">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="yes">
+                                <any/>
+                                <phases>
+                                    <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
                 <attribute name="Definition">
                     <type name="Link">
                         <targets>

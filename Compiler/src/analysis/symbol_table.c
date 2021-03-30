@@ -9,6 +9,27 @@
 #include "ctinfo.h"
 #include "str.h"
 
+size_t STcount(node *table)
+{
+    size_t count = 0;
+    node *entry = SYMBOLTABLE_ENTRIES(table);
+
+    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
+    {
+        node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
+        if (NODE_TYPE(link) == N_fundecl)
+            continue;
+        if (NODE_TYPE(link) == N_fundef && FUNDEF_ISEXPORT(link))
+            continue;
+        if (NODE_TYPE(link) == N_globdecl)
+            continue;
+
+        count++;
+    }
+
+    return count;
+}
+
 node *STinsert(node *symbol_table, node *entry)
 {
     DBUG_ENTER("STinsert");
@@ -18,6 +39,8 @@ node *STinsert(node *symbol_table, node *entry)
         CTIerror("Variable/Function '%s' at line %d is already defined.", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry) + 1);
         return NULL;
     }
+
+    SYMBOLTABLEENTRY_OFFSET(entry) = STcount(symbol_table);
 
     node *last = STlast(symbol_table);
 
