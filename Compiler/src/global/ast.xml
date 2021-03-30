@@ -1435,7 +1435,7 @@
                 <attribute name="Key">
                     <type name="String">
                         <targets>
-                            <target mandatory="no">
+                            <target mandatory="yes">
                                 <phases>
                                     <all />
                                 </phases>
@@ -1446,7 +1446,7 @@
                 <attribute name="Value">
                     <type name="String">
                         <targets>
-                            <target mandatory="no">
+                            <target mandatory="yes">
                                 <phases>
                                     <all />
                                 </phases>
