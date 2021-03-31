@@ -402,7 +402,8 @@ binop:
      | expr AND expr       { $$ = TBmakeBinop(BO_and, $1, $3); }
      ;
 
-type: INT        { $$ = T_int;   }
+type: 
+       INT        { $$ = T_int;   }
      | FLOAT     { $$ = T_float; }
      | BOOL      { $$ = T_bool;  }
      | VOID      { $$ = T_void;  }
