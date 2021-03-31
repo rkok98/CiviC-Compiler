@@ -1423,7 +1423,7 @@
                 <son name="Constants">
                     <targets>
                         <target mandatory="no">
-                            <node name="LinkedValue" />
+                            <node name="CodeGenTableEntry" />
                             <phases>
                                 <all />
                             </phases>
@@ -1433,7 +1433,7 @@
                 <son name="Exports">
                     <targets>
                         <target mandatory="no">
-                            <node name="LinkedValue" />
+                            <node name="CodeGenTableEntry" />
                             <phases>
                                 <all />
                             </phases>
@@ -1443,7 +1443,7 @@
                 <son name="Globals">
                     <targets>
                         <target mandatory="no">
-                            <node name="LinkedValue" />
+                            <node name="CodeGenTableEntry" />
                             <phases>
                                 <all />
                             </phases>
@@ -1453,7 +1453,7 @@
                 <son name="Imports">
                     <targets>
                         <target mandatory="no">
-                            <node name="LinkedValue" />
+                            <node name="CodeGenTableEntry" />
                             <phases>
                                 <all />
                             </phases>
@@ -1468,7 +1468,7 @@
                 <son name="Next">
                     <targets>
                         <target mandatory="no">
-                            <node name="LinkedValue" />
+                            <node name="CodeGenTableEntry" />
                             <phases>
                                 <all />
                             </phases>
@@ -1477,8 +1477,8 @@
                 </son>
             </sons>
             <attributes>
-                <attribute name="Instruction">
-                    <type name="String">
+                <attribute name="Index">
+                    <type name="Int">
                         <targets>
                             <target mandatory="yes">
                                 <phases>
@@ -1488,10 +1488,10 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="Index">
-                    <type name="Int">
+                <attribute name="Instruction">
+                    <type name="String">
                         <targets>
-                            <target mandatory="no">
+                            <target mandatory="yes">
                                 <phases>
                                     <all />
                                 </phases>

@@ -7,7 +7,7 @@ main:
 	isrg
 	iloadg 0
 	jsre 0
-	iloadc 0
+	iloadc 1
 	ireturn
 
 .const int 10
@@ -15,4 +15,3 @@ main:
 .exportfun "__init" void  __init
 .exportfun "main" int  main
 .global int
-.importfun "printInt" void  int
