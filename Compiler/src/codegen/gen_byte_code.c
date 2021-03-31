@@ -259,7 +259,6 @@ node *GBCfuncall(node *arg_node, info *arg_info)
 node *GBCfundefs(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCfundefs");
-  DBUG_PRINT("GBC", ("GBCfundefs"));
 
   TRAVdo(FUNDEFS_FUNDEF(arg_node), arg_info);
   TRAVopt(FUNDEFS_NEXT(arg_node), arg_info);
