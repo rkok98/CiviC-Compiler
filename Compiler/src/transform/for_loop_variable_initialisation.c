@@ -13,18 +13,11 @@
 
 #include <string.h>
 
-typedef struct list_node
-{
-    const char *old_name;
-    const char *new_name;
-    struct list_node *next;
-} list_node;
-
 struct INFO
 {
     unsigned int for_loop_counter;
-    list_node *induction_variables;
-    
+    node *induction_variables;
+
     node *variable_declarations;
     node *statements;
 };
@@ -35,68 +28,40 @@ struct INFO
 #define INFO_VARDECLS(n) ((n)->variable_declarations)
 #define INFO_STATEMENTS(n) ((n)->statements)
 
-list_node *IVLcreate(const char *old_name, const char *new_name, list_node *next)
-{
-    list_node *new_list_node = (list_node *)malloc(sizeof(list_node));
-    new_list_node->old_name = old_name;
-    new_list_node->new_name = new_name;
-    new_list_node->next = next;
-
-    return new_list_node;
-}
-
-list_node *IVLadd(list_node *list, const char *old_name, const char *new_name)
+node *IVLadd(node *list, node *new_link)
 {
     if (list == NULL)
     {
-        list = IVLcreate(old_name, new_name, NULL);
+        list = new_link;
         return list;
     }
 
-    list_node *cursor = list;
-    while (cursor->next != NULL)
+    node *cursor = list;
+    while (LINKEDVALUE_NEXT(cursor))
     {
-        cursor = cursor->next;
+        cursor = LINKEDVALUE_NEXT(cursor);
     }
 
-    list_node *new_kvlistnode = IVLcreate(old_name, new_name, NULL);
-    cursor->next = new_kvlistnode;
+    LINKEDVALUE_NEXT(cursor) = new_link;
 
     return list;
 }
 
-list_node *IVLfind(list_node *list, const char *old_name)
+node *IVLfind(node *list, const char *old_name)
 {
 
-    list_node *cursor = list;
-    while (cursor != NULL)
+    node *cursor = list;
+    while (cursor)
     {
-        if (strcmp(cursor->old_name, old_name) == 0)
+        if (strcmp(LINKEDVALUE_KEY(cursor), old_name) == 0)
         {
             return cursor;
         }
 
-        cursor = cursor->next;
+        cursor = LINKEDVALUE_NEXT(cursor);
     }
 
     return NULL;
-}
-
-void IVLdispose(list_node *list)
-{
-    list_node *cursor, *tmp;
-
-    if (list != NULL)
-    {
-        cursor = list->next;
-        list->next = NULL;
-        while (cursor != NULL)
-        {
-            tmp = cursor->next;
-            free(cursor);
-            cursor = tmp;
-        }
-    }
 }
 
 static info *MakeInfo()
@@ -119,35 +84,37 @@ static info *FreeInfo(info *info)
 {
     DBUG_ENTER("FreeInfo");
 
-    IVLdispose(INFO_INDUCTION_VARIABLES(info));
-
     info = MEMfree(info);
 
     DBUG_RETURN(info);
 }
 
-void add_to_vardecls(node *decls, node *new_decl)
+node *add_to_vardecls(node *decls, node *new_decl)
 {
-    node *current = decls;
-
-    while (VARDECL_NEXT(current))
+    if (!decls)
     {
-        current = VARDECL_NEXT(current);
+        return new_decl;
+    }
+    else
+    {
+        VARDECL_NEXT(decls) = add_to_vardecls(VARDECL_NEXT(decls), new_decl);
     }
 
-    VARDECL_NEXT(current) = new_decl;
+    return decls;
 }
 
-void add_to_stmts(node *stmts, node *new_stmt)
+node *add_to_stmts(node *stmts, node *new_stmt)
 {
-    node *current = stmts;
-
-    while (STMTS_NEXT(current))
+    if (!stmts)
     {
-        current = STMTS_NEXT(current);
+        return new_stmt;
+    }
+    else
+    {
+        STMTS_NEXT(stmts) = add_to_stmts(STMTS_NEXT(stmts), new_stmt);
     }
 
-    STMTS_NEXT(current) = new_stmt;
+    return stmts;
 }
 
 node *FLVIfunbody(node *arg_node, info *arg_info)
@@ -207,7 +174,7 @@ node *FLVIfor(node *arg_node, info *arg_info)
     char *induction_basename = STRcatn(4, "_for_", STRitoa(INFO_FOR_LOOP_COUNTER(arg_info)), "_", FOR_LOOPVAR(arg_node));
     INFO_FOR_LOOP_COUNTER(arg_info)++;
 
-    INFO_INDUCTION_VARIABLES(arg_info) = IVLadd(INFO_INDUCTION_VARIABLES(arg_info), FOR_LOOPVAR(arg_node), induction_basename);
+    INFO_INDUCTION_VARIABLES(arg_info) = IVLadd(INFO_INDUCTION_VARIABLES(arg_info), TBmakeLinkedvalue(FOR_LOOPVAR(arg_node), induction_basename, NULL));
 
     // Create var decls for the for-loop
     node *vardecl_step = TBmakeVardecl(STRcat(induction_basename, "_step"), T_int, NULL, NULL, NULL);
@@ -226,7 +193,7 @@ node *FLVIfor(node *arg_node, info *arg_info)
     // Create the for-loop's statements
     FOR_BLOCK(arg_node) = TRAVopt(FOR_BLOCK(arg_node), arg_info);
 
-    node *induction_step = TBmakeNum(1); 
+    node *induction_step = TBmakeNum(1);
     if (FOR_STEP(arg_node))
     {
         induction_step = COPYdoCopy(FOR_STEP(arg_node));
@@ -240,9 +207,9 @@ node *FLVIfor(node *arg_node, info *arg_info)
 
     node *block = COPYdoCopy(FOR_BLOCK(arg_node));
 
-    node *assign = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), 
-                                TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), 
-                                TBmakeVar(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL)));
+    node *assign = TBmakeAssign(TBmakeVarlet(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL),
+                                TBmakeBinop(BO_add, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL),
+                                            TBmakeVar(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL)));
 
     if (!block)
     {
@@ -257,10 +224,9 @@ node *FLVIfor(node *arg_node, info *arg_info)
 
     // Create a new while loop and return it to replace the for-loop
     node *while_expr = TBmakeTernary(
-        TBmakeBinop(BO_gt, TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_step)), vardecl_step, NULL), TBmakeNum (0)),
-        TBmakeBinop(BO_lt, TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_start)), vardecl_start, NULL), TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_stop)), vardecl_stop, NULL)),
-        TBmakeBinop(BO_gt, TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_start)), vardecl_start, NULL), TBmakeVar (STRcpy( VARDECL_NAME ( vardecl_stop)), vardecl_stop, NULL))
-    );
+        TBmakeBinop(BO_gt, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_step)), vardecl_step, NULL), TBmakeNum(0)),
+        TBmakeBinop(BO_lt, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), TBmakeVar(STRcpy(VARDECL_NAME(vardecl_stop)), vardecl_stop, NULL)),
+        TBmakeBinop(BO_gt, TBmakeVar(STRcpy(VARDECL_NAME(vardecl_start)), vardecl_start, NULL), TBmakeVar(STRcpy(VARDECL_NAME(vardecl_stop)), vardecl_stop, NULL)));
 
     DBUG_RETURN(TBmakeWhile(while_expr, block));
 }
@@ -269,11 +235,11 @@ node *FLVIvarlet(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvarlet");
 
-    list_node *node = IVLfind(INFO_INDUCTION_VARIABLES(arg_info), VARLET_NAME(arg_node));
+    node *node = IVLfind(INFO_INDUCTION_VARIABLES(arg_info), VARLET_NAME(arg_node));
 
     if (node)
     {
-        VARLET_NAME(arg_node) = STRcpy(node->new_name);
+        VARLET_NAME(arg_node) = STRcpy(LINKEDVALUE_VALUE(node));
     }
 
     DBUG_RETURN(arg_node);
@@ -283,11 +249,11 @@ node *FLVIvar(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("NFLvar");
 
-    list_node *node = IVLfind(INFO_INDUCTION_VARIABLES(arg_info), VAR_NAME(arg_node));
+    node *node = IVLfind(INFO_INDUCTION_VARIABLES(arg_info), VAR_NAME(arg_node));
 
     if (node)
     {
-        VAR_NAME(arg_node) = STRcpy(node->new_name);
+        VAR_NAME(arg_node) = STRcpy(LINKEDVALUE_VALUE(node));
     }
 
     DBUG_RETURN(arg_node);
