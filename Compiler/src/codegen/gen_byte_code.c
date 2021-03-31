@@ -381,8 +381,9 @@ node *GBCfundecl(node *arg_node, info *arg_info)
       params == NULL ? "" : params);
 
   node *cgtable_entry = TBmakeCodegentableentry(0, str, NULL);
+  node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
-  CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)), cgtable_entry);
+  CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_imports, cgtable_entry);
   free(params);
 
   DBUG_RETURN(arg_node);
@@ -952,7 +953,8 @@ node *GBCnum(node *arg_node, info *arg_info)
   char *str = STRcat("int ", STRitoa(NUM_VALUE(arg_node)));
 
   // Search linked list for const value
-  node *const_pool = SearchPool(CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)), str);
+  node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
+  node *const_pool = SearchPool(cgtable_constants, str);
 
   // Add to const pool if it doesn't exist yet.
   // Else extract values from linked list and print to file.
@@ -961,7 +963,7 @@ node *GBCnum(node *arg_node, info *arg_info)
     node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), str, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
-    CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)), cgtable_entry);
+    CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
     INFO_LOAD_COUNTER(arg_info) += 1;
   }
   else
@@ -987,7 +989,8 @@ node *GBCfloat(node *arg_node, info *arg_info)
   snprintf(str, length + 1, "float %f", FLOAT_VALUE(arg_node));
 
   // Search linked list for const value
-  node *const_pool = SearchPool(CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)), str);
+  node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
+  node *const_pool = SearchPool(cgtable_constants, str);
 
   // Add to const pool if it doesn't exist yet.
   // Else extract values from linked list and print to file.
@@ -996,7 +999,7 @@ node *GBCfloat(node *arg_node, info *arg_info)
     node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), str, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
-    CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)), cgtable_entry);
+    CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
     INFO_LOAD_COUNTER(arg_info) += 1;
   }
   else
@@ -1020,7 +1023,8 @@ node *GBCbool(node *arg_node, info *arg_info)
   char *str = STRcat("bool ", BOOL_VALUE(arg_node) ? "true" : "false");
 
   // Search linked list for const value
-  node *const_pool = SearchPool(CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)), str);
+  node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
+  node *const_pool = SearchPool(cgtable_constants, str);
 
   // Add to const pool if it doesn't exist yet.
   // Else extract values from linked list and print to file.
@@ -1029,7 +1033,7 @@ node *GBCbool(node *arg_node, info *arg_info)
     node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), str, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
-    CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)), cgtable_entry);
+    CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
     INFO_LOAD_COUNTER(arg_info) += 1;
   }
   else
