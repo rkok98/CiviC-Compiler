@@ -114,51 +114,6 @@ node *addToPool(node *pool, node *value)
   return pool;
 }
 
-/**
- * Print const_pool, export_pool and global_pool values to
- * global.outfile
- * 
- * @param info arg_info
- * @return void
- */
-void writeGlobals(info *arg_info)
-{
-  // the pools
-  node *const_pool = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *export_pool = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *import_pool = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *global_pool = CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info));
-  FILE *fileptr = INFO_FILE(arg_info);
-
-  // Print constant pool values
-  while (const_pool != NULL)
-  {
-    fprintf(fileptr, ".const %s\n", CODEGENTABLEENTRY_VALUE(const_pool));
-    const_pool = CODEGENTABLEENTRY_NEXT(const_pool);
-  }
-
-  // Print constant pool values
-  while (export_pool != NULL)
-  {
-    fprintf(fileptr, ".export%s\n", CODEGENTABLEENTRY_VALUE(export_pool));
-    export_pool = CODEGENTABLEENTRY_NEXT(export_pool);
-  }
-
-  // Print constant pool values
-  while (global_pool != NULL)
-  {
-    fprintf(fileptr, ".global %s\n", CODEGENTABLEENTRY_VALUE(global_pool));
-    global_pool = CODEGENTABLEENTRY_NEXT(global_pool);
-  }
-
-  // Print import pool values
-  while (import_pool != NULL)
-  {
-    fprintf(fileptr, ".import%s\n", CODEGENTABLEENTRY_VALUE(import_pool));
-    import_pool = CODEGENTABLEENTRY_NEXT(import_pool);
-  }
-}
-
 node *GBCprogram(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCprogram");
@@ -380,7 +335,7 @@ node *GBCfundecl(node *arg_node, info *arg_info)
       HprintType(FUNDECL_TYPE(arg_node)),
       params == NULL ? "" : params);
 
-  node *cgtable_entry = TBmakeCodegentableentry(0, "", str, NULL);
+  node *cgtable_entry = TBmakeCodegentableentry(0, ".import", str, NULL);
   node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
   CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_imports, cgtable_entry);
@@ -445,7 +400,7 @@ node *GBCfundef(node *arg_node, info *arg_info)
         params == NULL ? "" : params,
         FUNDEF_NAME(arg_node));
 
-    node *cgtable_entry = TBmakeCodegentableentry(0, ".exportfun", str, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", str, NULL);
     node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
     CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_exports, cgtable_entry);
@@ -633,14 +588,14 @@ node *GBCglobdef(node *arg_node, info *arg_info)
     char *str = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", offset);
     free(offset);
 
-    node *cgtable_entry = TBmakeCodegentableentry(0, ".exportfun", str, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", str, NULL);
     node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
     CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_exports, cgtable_entry);
   }
 
   node * cg_table_globals = CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info));
-  node *cgtable_entry = TBmakeCodegentableentry(0, ".global", STRcpy(HprintType(GLOBDEF_TYPE(arg_node))), NULL);
+  node *cgtable_entry = TBmakeCodegentableentry(0, ".global ", STRcpy(HprintType(GLOBDEF_TYPE(arg_node))), NULL);
 
   CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cg_table_globals, cgtable_entry);
 
@@ -962,7 +917,7 @@ node *GBCnum(node *arg_node, info *arg_info)
   // Else extract values from linked list and print to file.
   if (const_pool == NULL)
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const", str, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
@@ -998,7 +953,7 @@ node *GBCfloat(node *arg_node, info *arg_info)
   // Else extract values from linked list and print to file.
   if (const_pool == NULL)
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const", str, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
@@ -1032,7 +987,7 @@ node *GBCbool(node *arg_node, info *arg_info)
   // Else extract values from linked list and print to file.
   if (const_pool == NULL)
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const", str, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
@@ -1117,9 +1072,8 @@ node *GBCdoGenByteCode(node *syntaxtree)
 
   TRAVpush(TR_gbc);
   syntaxtree = TRAVdo(syntaxtree, info);
+  INFO_CODE_GEN_TABLE(info) = TRAVopt(INFO_CODE_GEN_TABLE(info), info);
   TRAVpop();
-
-  writeGlobals(info);
 
   // close the file
   fclose(INFO_FILE(info));
@@ -1136,12 +1090,25 @@ node *GBCdoGenByteCode(node *syntaxtree)
 node *GBCcodegentable(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCcodegentable");
+
+  CODEGENTABLE_IMPORTS(arg_node) = TRAVopt(CODEGENTABLE_IMPORTS(arg_node), arg_info);
+  CODEGENTABLE_GLOBALS(arg_node) = TRAVopt(CODEGENTABLE_GLOBALS(arg_node), arg_info);
+  CODEGENTABLE_CONSTANTS(arg_node) = TRAVopt(CODEGENTABLE_CONSTANTS(arg_node), arg_info);
+  CODEGENTABLE_EXPORTS(arg_node) = TRAVopt(CODEGENTABLE_EXPORTS(arg_node), arg_info);
+
   DBUG_RETURN(arg_node);
 }
 
 node *GBCcodegentableentry(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCcodegentableentry");
+  
+  FILE *fileptr = INFO_FILE(arg_info);
+  
+  fprintf(fileptr, "%s%s\n", CODEGENTABLEENTRY_INSTRUCTION(arg_node), CODEGENTABLEENTRY_VALUE(arg_node));
+
+  CODEGENTABLEENTRY_NEXT(arg_node) = TRAVopt(CODEGENTABLEENTRY_NEXT(arg_node), arg_info);
+
   DBUG_RETURN(arg_node);
 }
 

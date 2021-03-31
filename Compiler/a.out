@@ -14,4 +14,5 @@ main:
 .const int 0
 .exportfun "__init" void  __init
 .exportfun "main" int  main
+.importfun "printInt" void  int
 .global int
