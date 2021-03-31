@@ -226,24 +226,7 @@ node *GBCreturn(node *arg_node, info *arg_info)
 
   TRAVopt(RETURN_EXPR(arg_node), arg_info);
 
-  switch (INFO_CURRENT_TYPE(arg_info))
-  {
-  case T_int:
-    fprintf(INFO_FILE(arg_info), "\t%s\n", "ireturn");
-    break;
-  case T_float:
-    fprintf(INFO_FILE(arg_info), "\t%s\n", "freturn");
-    break;
-  case T_bool:
-    fprintf(INFO_FILE(arg_info), "\t%s\n", "breturn");
-    break;
-  case T_void:
-    fprintf(INFO_FILE(arg_info), "\t%s\n", "return");
-    break;
-  case T_unknown:
-    CTIabort("Unknown type found in file: %s, line: %s", __FILE__, __LINE__);
-    break;
-  }
+  fprintf(INFO_FILE(arg_info), "\t%sreturn\n", typePrefix(INFO_CURRENT_TYPE(arg_info)));
 
   DBUG_RETURN(arg_node);
 }
