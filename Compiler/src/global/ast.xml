@@ -1499,6 +1499,17 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="Value">
+                    <type name="String">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
             </attributes>
         </node>
 
