@@ -446,9 +446,9 @@ node *GBCfundef(node *arg_node, info *arg_info)
         FUNDEF_NAME(arg_node));
 
     node *cgtable_entry = TBmakeCodegentableentry(0, str, NULL);
-    // node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
+    node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
-    CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)), cgtable_entry);
+    CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_exports, cgtable_entry);
   }
 
   // set the symbol table for the upcoming scope
@@ -634,13 +634,15 @@ node *GBCglobdef(node *arg_node, info *arg_info)
     free(offset);
 
     node *cgtable_entry = TBmakeCodegentableentry(0, str, NULL);
+    node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
-    CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)), cgtable_entry);
+    CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_exports, cgtable_entry);
   }
 
+  node * cg_table_globals = CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info));
   node *cgtable_entry = TBmakeCodegentableentry(0, STRcpy(HprintType(GLOBDEF_TYPE(arg_node))), NULL);
 
-  CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info)), cgtable_entry);
+  CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cg_table_globals, cgtable_entry);
 
   TRAVopt(GLOBDEF_DIMS(arg_node), arg_info);
 
