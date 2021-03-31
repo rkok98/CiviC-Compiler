@@ -1092,8 +1092,8 @@ node *GBCcodegentable(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCcodegentable");
 
   CODEGENTABLE_IMPORTS(arg_node) = TRAVopt(CODEGENTABLE_IMPORTS(arg_node), arg_info);
-  CODEGENTABLE_GLOBALS(arg_node) = TRAVopt(CODEGENTABLE_GLOBALS(arg_node), arg_info);
   CODEGENTABLE_CONSTANTS(arg_node) = TRAVopt(CODEGENTABLE_CONSTANTS(arg_node), arg_info);
+  CODEGENTABLE_GLOBALS(arg_node) = TRAVopt(CODEGENTABLE_GLOBALS(arg_node), arg_info);
   CODEGENTABLE_EXPORTS(arg_node) = TRAVopt(CODEGENTABLE_EXPORTS(arg_node), arg_info);
 
   DBUG_RETURN(arg_node);
