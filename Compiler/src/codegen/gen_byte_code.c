@@ -278,25 +278,20 @@ node *GBCfundecl(node *arg_node, info *arg_info)
 
   while (fundecl_entry)
   {
-    if (!SYMBOLTABLEENTRY_ISPARAMETER(fundecl_entry))
+    if (SYMBOLTABLEENTRY_ISPARAMETER(fundecl_entry))
     {
-      continue;
+      fundecl_params = STRcatn(3, fundecl_params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fundecl_entry)));
+      fundecl_entry = SYMBOLTABLEENTRY_NEXT(fundecl_entry);
     }
-
-    fundecl_params = STRcatn(3, fundecl_params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fundecl_entry)));
-    fundecl_entry = SYMBOLTABLEENTRY_NEXT(fundecl_entry);
   }
 
-  int length = snprintf(NULL, 0, "fun \"%s\" %s %s", FUNDECL_NAME(arg_node), HprintType(FUNDECL_TYPE(arg_node)), fundecl_params ? fundecl_params : "");
+  const char *instruction_value = STRcatn(6, "fun \"", FUNDECL_NAME(arg_node), "\" ", HprintType(FUNDECL_TYPE(arg_node)), " ", fundecl_params ? fundecl_params : "");
 
-  char *str = (char *)malloc(length + 1);
-
-  snprintf( str, length + 1, "fun \"%s\" %s %s", FUNDECL_NAME(arg_node), HprintType(FUNDECL_TYPE(arg_node)), fundecl_params ? fundecl_params : "");
-
-  node *cgtable_entry = TBmakeCodegentableentry(0, ".import", str, NULL);
+  node *cgtable_entry = TBmakeCodegentableentry(0, ".import", STRcpy(instruction_value), NULL);
   node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
   CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_imports, cgtable_entry);
+  
   free(fundecl_params);
 
   DBUG_RETURN(arg_node);
