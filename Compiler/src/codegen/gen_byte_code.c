@@ -281,8 +281,9 @@ node *GBCfundecl(node *arg_node, info *arg_info)
     if (SYMBOLTABLEENTRY_ISPARAMETER(fundecl_entry))
     {
       fundecl_params = STRcatn(3, fundecl_params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fundecl_entry)));
-      fundecl_entry = SYMBOLTABLEENTRY_NEXT(fundecl_entry);
     }
+
+    fundecl_entry = SYMBOLTABLEENTRY_NEXT(fundecl_entry);
   }
 
   const char *instruction_value = STRcatn(6, "fun \"", FUNDECL_NAME(arg_node), "\" ", HprintType(FUNDECL_TYPE(arg_node)), " ", fundecl_params ? fundecl_params : "");
@@ -291,7 +292,7 @@ node *GBCfundecl(node *arg_node, info *arg_info)
   node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
   CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_imports, cgtable_entry);
-  
+
   free(fundecl_params);
 
   DBUG_RETURN(arg_node);
@@ -300,36 +301,26 @@ node *GBCfundecl(node *arg_node, info *arg_info)
 node *GBCfundef(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCfundef");
-  DBUG_PRINT("GBC", ("GBCfundef"));
 
-  // store the symbol table
-  node *table = INFO_SYMBOL_TABLE(arg_info);
-
-  // get the entry from the symbol table
-  node *entry = STsearchFundef(table, FUNDEF_NAME(arg_node));
-
-  // print to the file
   fprintf(INFO_FILE(arg_info), "%s:\n", FUNDEF_NAME(arg_node));
 
-  // is this an exported fundef?
+  node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
+  node *fundef = STsearchFundef(symbol_table, FUNDEF_NAME(arg_node));
+
   if (FUNDEF_ISEXPORT(arg_node))
   {
-    // get the entry
-    node *fentry = SYMBOLTABLE_ENTRIES(SYMBOLTABLEENTRY_TABLE(entry));
+    node *fundef_entries = SYMBOLTABLE_ENTRIES(SYMBOLTABLEENTRY_TABLE(fundef));
 
-    char *params = NULL;
+    char *fundef_params = NULL;
 
-    // loop over the entries
-    for (; fentry != NULL; fentry = SYMBOLTABLEENTRY_NEXT(fentry))
+    while (fundef_entries)
     {
-      // do we have a param entry
-      if (!SYMBOLTABLEENTRY_ISPARAMETER(fentry))
-        continue;
+      if (SYMBOLTABLEENTRY_ISPARAMETER(fundef_entries))
+      {
+        fundef_params = STRcatn(3, fundef_params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fundef_entries)));
+      }
 
-      char *temp = STRcatn(3, params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fentry)));
-      free(params);
-
-      params = temp;
+      fundef_entries = SYMBOLTABLEENTRY_NEXT(fundef_entries);
     }
 
     // Create export pool string
@@ -339,7 +330,7 @@ node *GBCfundef(node *arg_node, info *arg_info)
         "fun \"%s\" %s %s %s",
         FUNDEF_NAME(arg_node),
         HprintType(FUNDEF_TYPE(arg_node)),
-        params == NULL ? "" : params,
+        fundef_params == NULL ? "" : fundef_params,
         FUNDEF_NAME(arg_node));
 
     char *str = (char *)malloc(length + 1);
@@ -350,7 +341,7 @@ node *GBCfundef(node *arg_node, info *arg_info)
         "fun \"%s\" %s %s %s",
         FUNDEF_NAME(arg_node),
         HprintType(FUNDEF_TYPE(arg_node)),
-        params == NULL ? "" : params,
+        fundef_params == NULL ? "" : fundef_params,
         FUNDEF_NAME(arg_node));
 
     node *cgtable_entry = TBmakeCodegentableentry(0, ".export", str, NULL);
@@ -385,7 +376,7 @@ node *GBCfundef(node *arg_node, info *arg_info)
     fprintf(INFO_FILE(arg_info), "\t%s\n", "return");
 
   // reset the symbol table
-  INFO_SYMBOL_TABLE(arg_info) = table;
+  INFO_SYMBOL_TABLE(arg_info) = symbol_table;
 
   // print end of line
   fputc('\n', INFO_FILE(arg_info));
