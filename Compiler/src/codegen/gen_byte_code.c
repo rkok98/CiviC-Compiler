@@ -658,11 +658,11 @@ node *GBCcast(node *arg_node, info *arg_info)
 
     if (CAST_TYPE(arg_node) == T_int)
     {
-      fprintf(INFO_FILE(arg_info), "    f2i\n");
+      fprintf(INFO_FILE(arg_info), "\tf2i\n");
     }
     else if (CAST_TYPE(arg_node) == T_float)
     {
-      fprintf(INFO_FILE(arg_info), "    i2f\n");
+      fprintf(INFO_FILE(arg_info), "\ti2f\n");
     }
   }
 
