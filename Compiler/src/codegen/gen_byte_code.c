@@ -711,7 +711,7 @@ node *GBCnum(node *arg_node, info *arg_info)
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
   node *const_pool = SearchPool(cgtable_constants, str);
 
-  if (const_pool == NULL)
+  if (!const_pool)
   {
     node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
