@@ -361,7 +361,6 @@ node *GBCfunbody(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCfunbody");
   DBUG_PRINT("GBC", ("GBCfunbody"));
 
-  // iterate over the nodes
   TRAVopt(FUNBODY_VARDECLS(arg_node), arg_info);
   TRAVopt(FUNBODY_STMTS(arg_node), arg_info);
 
@@ -375,7 +374,6 @@ node *GBCifelse(node *arg_node, info *arg_info)
 
   TRAVdo(IFELSE_COND(arg_node), arg_info);
 
-  // the end branch
   char *branch = createBranch(IFELSE_ELSE(arg_node) == NULL ? "end" : "else", arg_info);
   char *end = IFELSE_ELSE(arg_node) != NULL ? createBranch("end", arg_info) : branch;
 
