@@ -18,34 +18,30 @@
 
 #include "helpers.h"
 
-/*
- * INFO structure
- */
 struct INFO
 {
   FILE *fptr;
+  node *code_gen_table;
+
   node *symbol_table;
   node *symbol_table_entry;
 
-  node *code_gen_table;
-
-  int load_counter; // counts amound of loads {0..n}
+  int constants_counter; // counts amound of loads {0..n}
   int branch_count; // counts amound of stores - function bound {0..n}
-  int current_type; // Current type of var {int, float, bool}
+
+  type current_type; // Current type of var {int, float, bool}
 };
 
 #define INFO_FILE(n) ((n)->fptr)
+#define INFO_CODE_GEN_TABLE(n) ((n)->code_gen_table)
+
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_SYMBOL_TABLE_ENTRY(n) ((n)->symbol_table_entry)
 
-#define INFO_CODE_GEN_TABLE(n) ((n)->code_gen_table)
-#define INFO_LOAD_COUNTER(n) ((n)->load_counter)
+#define INFO_LOAD_COUNTER(n) ((n)->constants_counter)
 #define INFO_BRANCH_COUNT(n) ((n)->branch_count)
-#define INFO_CURRENT_TYPE(n) ((n)->current_type)
 
-/*
- * INFO functions
- */
+#define INFO_CURRENT_TYPE(n) ((n)->current_type)
 
 static info *MakeInfo()
 {
@@ -54,13 +50,17 @@ static info *MakeInfo()
   DBUG_ENTER("MakeInfo");
 
   result = (info *)MEMmalloc(sizeof(info));
+
   INFO_FILE(result) = NULL;
+  INFO_CODE_GEN_TABLE(result) = TBmakeCodegentable(NULL, NULL, NULL, NULL);
+  
   INFO_SYMBOL_TABLE(result) = NULL;
   INFO_SYMBOL_TABLE_ENTRY(result) = NULL;
-  INFO_CODE_GEN_TABLE(result) = TBmakeCodegentable(NULL, NULL, NULL, NULL);
+  
   INFO_LOAD_COUNTER(result) = 0;
   INFO_BRANCH_COUNT(result) = 0;
-  INFO_CURRENT_TYPE(result) = T_unknown; // current const type
+
+  INFO_CURRENT_TYPE(result) = T_unknown;
 
   DBUG_RETURN(result);
 }
@@ -119,7 +119,6 @@ node *GBCprogram(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCprogram");
   DBUG_PRINT("GBC", ("GBCprogram"));
 
-  // link the symbol table
   INFO_SYMBOL_TABLE(arg_info) = PROGRAM_SYMBOLTABLE(arg_node);
 
   TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
@@ -223,11 +222,9 @@ node *GBCreturn(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCreturn");
   DBUG_PRINT("GBC", ("GBCreturn"));
 
-  node *table = INFO_SYMBOL_TABLE(arg_info);
-
   TRAVopt(RETURN_EXPR(arg_node), arg_info);
 
-  switch (SYMBOLTABLE_RETURNTYPE(table))
+  switch (INFO_CURRENT_TYPE(arg_info))
   {
   case T_int:
     fprintf(INFO_FILE(arg_info), "\t%s\n", "ireturn");
