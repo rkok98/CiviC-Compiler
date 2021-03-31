@@ -21,7 +21,8 @@
         "tuple": "c",
         "type_traits": "c",
         "vector": "c",
-        "induction_var_list.h": "c"
+        "induction_var_list.h": "c",
+        "__locale": "c"
     },
     "cSpell.language": "nl,en,en-GB,en-US"
 }

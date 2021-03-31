@@ -131,7 +131,7 @@ const char *typePrefix(type t)
   }
 
   return NULL;
-} 
+}
 
 node *GBCprogram(node *arg_node, info *arg_info)
 {
@@ -270,55 +270,34 @@ node *GBCfundecl(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCfundecl");
 
-  node *table = INFO_SYMBOL_TABLE(arg_info);
+  node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
+  node *fundecl = STsearchFundef(symbol_table, FUNDECL_NAME(arg_node));
+  node *fundecl_entry = SYMBOLTABLE_ENTRIES(SYMBOLTABLEENTRY_TABLE(fundecl));
 
-  node *entry = STsearchFundef(table, FUNDECL_NAME(arg_node));
+  char *fundecl_params = NULL;
 
-  printf("%d", entry == NULL);
-
-  node *fentry = SYMBOLTABLE_ENTRIES(SYMBOLTABLEENTRY_TABLE(entry));
-
-  char *params = NULL;
-
-  // loop over the entries
-  for (; fentry != NULL; fentry = SYMBOLTABLEENTRY_NEXT(fentry))
+  while (fundecl_entry)
   {
-    // do we have a param entry
-    if (!SYMBOLTABLEENTRY_ISPARAMETER(fentry))
+    if (!SYMBOLTABLEENTRY_ISPARAMETER(fundecl_entry))
     {
       continue;
     }
 
-    // what is this?
-    char *temp = STRcatn(3, params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fentry)));
-
-    params = temp;
+    fundecl_params = STRcatn(3, fundecl_params, " ", HprintType(SYMBOLTABLEENTRY_TYPE(fundecl_entry)));
+    fundecl_entry = SYMBOLTABLEENTRY_NEXT(fundecl_entry);
   }
 
-  // Create import pool string
-  int length = snprintf(
-      NULL,
-      0,
-      "fun \"%s\" %s %s",
-      FUNDECL_NAME(arg_node),
-      HprintType(FUNDECL_TYPE(arg_node)),
-      params == NULL ? "" : params);
+  int length = snprintf(NULL, 0, "fun \"%s\" %s %s", FUNDECL_NAME(arg_node), HprintType(FUNDECL_TYPE(arg_node)), fundecl_params ? fundecl_params : "");
 
   char *str = (char *)malloc(length + 1);
 
-  snprintf(
-      str,
-      length + 1,
-      "fun \"%s\" %s %s",
-      FUNDECL_NAME(arg_node),
-      HprintType(FUNDECL_TYPE(arg_node)),
-      params == NULL ? "" : params);
+  snprintf( str, length + 1, "fun \"%s\" %s %s", FUNDECL_NAME(arg_node), HprintType(FUNDECL_TYPE(arg_node)), fundecl_params ? fundecl_params : "");
 
   node *cgtable_entry = TBmakeCodegentableentry(0, ".import", str, NULL);
   node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
   CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_imports, cgtable_entry);
-  free(params);
+  free(fundecl_params);
 
   DBUG_RETURN(arg_node);
 }
