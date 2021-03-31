@@ -323,62 +323,34 @@ node *GBCfundef(node *arg_node, info *arg_info)
       fundef_entries = SYMBOLTABLEENTRY_NEXT(fundef_entries);
     }
 
-    // Create export pool string
-    int length = snprintf(
-        NULL,
-        0,
-        "fun \"%s\" %s %s %s",
-        FUNDEF_NAME(arg_node),
-        HprintType(FUNDEF_TYPE(arg_node)),
-        fundef_params == NULL ? "" : fundef_params,
-        FUNDEF_NAME(arg_node));
+    const char *instruction_value = STRcatn(8, "fun \"", FUNDEF_NAME(arg_node), "\" ", HprintType(FUNDEF_TYPE(arg_node)), " ", fundef_params ? fundef_params : "", " ", FUNDEF_NAME(arg_node));
 
-    char *str = (char *)malloc(length + 1);
-
-    snprintf(
-        str,
-        length + 1,
-        "fun \"%s\" %s %s %s",
-        FUNDEF_NAME(arg_node),
-        HprintType(FUNDEF_TYPE(arg_node)),
-        fundef_params == NULL ? "" : fundef_params,
-        FUNDEF_NAME(arg_node));
-
-    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", str, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", STRcpy(instruction_value), NULL);
     node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
     CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_exports, cgtable_entry);
   }
 
-  // set the symbol table for the upcoming scope
-  INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node); // nested symbol table
-
   printf("%s %d", FUNDEF_NAME(arg_node), FUNDEF_ISEXPORT(arg_node));
+  INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node);
 
-  // number of registers to use
-  size_t registers = STVardecls(INFO_SYMBOL_TABLE(arg_info));
+  unsigned int registers = STVardecls(INFO_SYMBOL_TABLE(arg_info));
 
-  if (registers > 0)
+  if (registers)
   {
-    // Print amount of function vardecls
-    fprintf(
-        INFO_FILE(arg_info),
-        "\tesr %ld\n",
-        registers);
+    fprintf(INFO_FILE(arg_info), "\tesr %ld\n", registers);
   }
 
-  // traverse over the params and body
   TRAVopt(FUNDEF_PARAMS(arg_node), arg_info);
   TRAVopt(FUNDEF_FUNBODY(arg_node), arg_info);
 
-  // If return type is void, add 'return' as last instruction to function.
   if (FUNDEF_TYPE(arg_node) == T_void)
+  {
     fprintf(INFO_FILE(arg_info), "\t%s\n", "return");
+  }
 
-  // reset the symbol table
   INFO_SYMBOL_TABLE(arg_info) = symbol_table;
 
-  // print end of line
   fputc('\n', INFO_FILE(arg_info));
 
   DBUG_RETURN(arg_node);
