@@ -478,7 +478,7 @@ node *GBCglobdef(node *arg_node, info *arg_info)
 
     char *globdef_offset = STRitoa(SYMBOLTABLEENTRY_OFFSET(globdef));
     char *instructions_value = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", globdef_offset);
-    
+
     node *cgtable_entry = TBmakeCodegentableentry(0, ".export", instructions_value, NULL);
     node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
@@ -611,20 +611,9 @@ node *GBCbinop(node *arg_node, info *arg_info)
     break;
   }
 
-  switch (INFO_CURRENT_TYPE(arg_info))
+  if (typePrefix(INFO_CURRENT_TYPE(arg_info)))
   {
-  case T_int:
-    fprintf(INFO_FILE(arg_info), "\ti%s\n", operation);
-    break;
-  case T_float:
-    fprintf(INFO_FILE(arg_info), "\tf%s\n", operation);
-    break;
-  case T_bool:
-    fprintf(INFO_FILE(arg_info), "\tb%s\n", operation);
-    break;
-  case T_void:
-  case T_unknown:
-    break;
+    fprintf(INFO_FILE(arg_info), "\t%s%s\n", typePrefix(INFO_CURRENT_TYPE(arg_info)), operation);
   }
 
   DBUG_RETURN(arg_node);
@@ -633,7 +622,6 @@ node *GBCbinop(node *arg_node, info *arg_info)
 node *GBCmonop(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCmonop");
-  DBUG_PRINT("GBC", ("GBCmonop"));
 
   TRAVdo(MONOP_OPERAND(arg_node), arg_info);
 
@@ -651,20 +639,9 @@ node *GBCmonop(node *arg_node, info *arg_info)
     break;
   }
 
-  switch (INFO_CURRENT_TYPE(arg_info))
+  if (typePrefix(INFO_CURRENT_TYPE(arg_info)))
   {
-  case T_int:
-    fprintf(INFO_FILE(arg_info), "\ti%s\n", operation);
-    break;
-  case T_float:
-    fprintf(INFO_FILE(arg_info), "\tf%s\n", operation);
-    break;
-  case T_bool:
-    fprintf(INFO_FILE(arg_info), "\tb%s\n", operation);
-    break;
-  case T_void:
-  case T_unknown:
-    break;
+    fprintf(INFO_FILE(arg_info), "\t%s%s\n", typePrefix(INFO_CURRENT_TYPE(arg_info)), operation);
   }
 
   DBUG_RETURN(arg_node);
@@ -673,27 +650,22 @@ node *GBCmonop(node *arg_node, info *arg_info)
 node *GBCcast(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCcast");
-  DBUG_PRINT("GBC", ("GBCcast"));
 
   TRAVdo(CAST_EXPR(arg_node), arg_info);
 
-  switch (CAST_TYPE(arg_node))
+  if (INFO_CURRENT_TYPE(arg_info) != CAST_TYPE(arg_node))
   {
-  case T_int:
-    fprintf(INFO_FILE(arg_info), "\tf2i\n");
-    break;
-  case T_float:
-    fprintf(INFO_FILE(arg_info), "\ti2f\n");
-    break;
-  case T_bool:
-    fprintf(INFO_FILE(arg_info), "\tbi2f\n");
-    break;
-  case T_void:
-  case T_unknown:
-    break;
+
+    if (CAST_TYPE(arg_node) == T_int)
+    {
+      fprintf(INFO_FILE(arg_info), "    f2i\n");
+    }
+    else if (CAST_TYPE(arg_node) == T_float)
+    {
+      fprintf(INFO_FILE(arg_info), "    i2f\n");
+    }
   }
 
-  // Set current type to int
   INFO_CURRENT_TYPE(arg_info) = CAST_TYPE(arg_node);
 
   DBUG_RETURN(arg_node);
@@ -702,9 +674,7 @@ node *GBCcast(node *arg_node, info *arg_info)
 node *GBCvar(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCvar");
-  DBUG_PRINT("GBC", ("GBCvar"));
 
-  DBUG_PRINT("GBC", ("GBCvar 1"));
   node *decl = VAR_DECL(arg_node);
 
   if (decl == NULL)
