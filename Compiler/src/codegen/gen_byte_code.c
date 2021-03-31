@@ -222,7 +222,6 @@ node *GBCexprstmt(node *arg_node, info *arg_info)
 node *GBCreturn(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCreturn");
-  DBUG_PRINT("GBC", ("GBCreturn"));
 
   TRAVopt(RETURN_EXPR(arg_node), arg_info);
 
