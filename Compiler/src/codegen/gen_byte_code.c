@@ -552,11 +552,9 @@ node *GBCassign(node *arg_node, info *arg_info)
 node *GBCvarlet(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCvarlet");
-  DBUG_PRINT("GBC", ("GBCvarlet"));
 
-  // set the current
-  node *table = INFO_SYMBOL_TABLE(arg_info);
-  INFO_SYMBOL_TABLE_ENTRY(arg_info) = STdeepSearchVariableByName(table, VARLET_NAME(arg_node));
+  node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
+  INFO_SYMBOL_TABLE_ENTRY(arg_info) = STdeepSearchVariableByName(symbol_table, VARLET_NAME(arg_node));
 
   DBUG_RETURN(arg_node);
 }
