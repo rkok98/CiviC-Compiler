@@ -397,7 +397,6 @@ node *GBCifelse(node *arg_node, info *arg_info)
     free(ifelse_end);
   }
 
-
   DBUG_RETURN(arg_node);
 }
 
