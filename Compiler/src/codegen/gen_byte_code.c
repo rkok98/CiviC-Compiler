@@ -500,7 +500,6 @@ node *GBCglobdef(node *arg_node, info *arg_info)
 node *GBCparam(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCparam");
-  DBUG_PRINT("GBC", ("GBCparam"));
 
   TRAVopt(PARAM_DIMS(arg_node), arg_info);
   TRAVopt(PARAM_NEXT(arg_node), arg_info);
@@ -511,7 +510,6 @@ node *GBCparam(node *arg_node, info *arg_info)
 node *GBCvardecl(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCvardecl");
-  DBUG_PRINT("GBC", ("GBCvardecl"));
 
   TRAVopt(VARDECL_DIMS(arg_node), arg_info);
   TRAVopt(VARDECL_INIT(arg_node), arg_info);
@@ -523,7 +521,6 @@ node *GBCvardecl(node *arg_node, info *arg_info)
 node *GBCstmts(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCstmts");
-  DBUG_PRINT("GBC", ("GBCstmts"));
 
   TRAVdo(STMTS_STMT(arg_node), arg_info);
   TRAVopt(STMTS_NEXT(arg_node), arg_info);
@@ -534,7 +531,6 @@ node *GBCstmts(node *arg_node, info *arg_info)
 node *GBCassign(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCassign");
-  DBUG_PRINT("GBC", ("GBCassign"));
 
   TRAVdo(ASSIGN_LET(arg_node), arg_info);
   TRAVdo(ASSIGN_EXPR(arg_node), arg_info);
