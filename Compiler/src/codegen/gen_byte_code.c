@@ -26,10 +26,10 @@ struct INFO
   node *symbol_table;
   node *symbol_table_entry;
 
-  int constants_counter; // counts amound of loads {0..n}
-  int branch_count; // counts amound of stores - function bound {0..n}
+  int constants_counter;
+  int branch_count;
 
-  type current_type; // Current type of var {int, float, bool}
+  type current_type;
 };
 
 #define INFO_FILE(n) ((n)->fptr)
@@ -53,10 +53,10 @@ static info *MakeInfo()
 
   INFO_FILE(result) = NULL;
   INFO_CODE_GEN_TABLE(result) = TBmakeCodegentable(NULL, NULL, NULL, NULL);
-  
+
   INFO_SYMBOL_TABLE(result) = NULL;
   INFO_SYMBOL_TABLE_ENTRY(result) = NULL;
-  
+
   INFO_LOAD_COUNTER(result) = 0;
   INFO_BRANCH_COUNT(result) = 0;
 
@@ -114,10 +114,28 @@ node *addToPool(node *pool, node *value)
   return pool;
 }
 
+const char *typePrefix(type t)
+{
+  switch (t)
+  {
+  case T_int:
+    return "i";
+  case T_float:
+    return "f";
+  case T_bool:
+    return "b";
+  case T_void:
+    return NULL;
+  case T_unknown:
+    CTIabort("Unknown type found in file: %s, line: %s", __FILE__, __LINE__);
+  }
+
+  return NULL;
+} 
+
 node *GBCprogram(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCprogram");
-  DBUG_PRINT("GBC", ("GBCprogram"));
 
   INFO_SYMBOL_TABLE(arg_info) = PROGRAM_SYMBOLTABLE(arg_node);
 
@@ -129,23 +147,18 @@ node *GBCprogram(node *arg_node, info *arg_info)
 node *GBCsymboltable(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCsymboltable");
-  DBUG_PRINT("GBC", ("GBCsymboltable"));
-
   DBUG_RETURN(arg_node);
 }
 
 node *GBCsymboltableentry(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCsymboltableentry");
-  DBUG_PRINT("GBC", ("GBCsymboltableentry"));
-
   DBUG_RETURN(arg_node);
 }
 
 node *GBCdecls(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCdecls");
-  DBUG_PRINT("GBC", ("GBCdecls"));
 
   TRAVdo(DECLS_DECL(arg_node), arg_info);
   TRAVopt(DECLS_NEXT(arg_node), arg_info);
@@ -156,7 +169,6 @@ node *GBCdecls(node *arg_node, info *arg_info)
 node *GBCexprs(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCexprs");
-  DBUG_PRINT("GBC", ("GBCexprs"));
 
   TRAVdo(EXPRS_EXPR(arg_node), arg_info);
   TRAVopt(EXPRS_NEXT(arg_node), arg_info);
@@ -167,15 +179,12 @@ node *GBCexprs(node *arg_node, info *arg_info)
 node *GBCarrexpr(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCarrexpr");
-  DBUG_PRINT("GBC", ("GBCarrexpr"));
-
   DBUG_RETURN(arg_node);
 }
 
 node *GBCids(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCids");
-  DBUG_PRINT("GBC", ("GBCids"));
 
   TRAVopt(IDS_NEXT(arg_node), arg_info);
 
@@ -185,17 +194,14 @@ node *GBCids(node *arg_node, info *arg_info)
 node *GBCexprstmt(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCexprstmt");
-  DBUG_PRINT("GBC", ("GBCexprstmt"));
 
   node *expr = EXPRSTMT_EXPR(arg_node);
   TRAVdo(expr, arg_info);
 
-  DBUG_PRINT("GBC", ("GBCexprstmt 2"));
-
   if (NODE_TYPE(expr) != N_funcall)
+  {
     DBUG_RETURN(arg_node);
-
-  DBUG_PRINT("GBC", ("GBCexprstmt 3"));
+  }
 
   node *entry = STdeepSearchFundef(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(expr));
   node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
@@ -205,14 +211,10 @@ node *GBCexprstmt(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
   }
 
-  DBUG_PRINT("GBC", ("GBCexprstmt 4"));
-
-  if (SYMBOLTABLEENTRY_TYPE(entry) == T_int)
-    fprintf(INFO_FILE(arg_info), "\tipop\n");
-  else if (SYMBOLTABLEENTRY_TYPE(entry) == T_float)
-    fprintf(INFO_FILE(arg_info), "\tfpop\n");
-  else if (SYMBOLTABLEENTRY_TYPE(entry) == T_bool)
-    fprintf(INFO_FILE(arg_info), "\tbpop\n");
+  if (typePrefix(SYMBOLTABLEENTRY_TYPE(entry)))
+  {
+    fprintf(INFO_FILE(arg_info), "\t%spop\n", typePrefix(SYMBOLTABLEENTRY_TYPE(entry)));
+  }
 
   DBUG_RETURN(arg_node);
 }
@@ -591,7 +593,7 @@ node *GBCglobdef(node *arg_node, info *arg_info)
     CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_exports, cgtable_entry);
   }
 
-  node * cg_table_globals = CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info));
+  node *cg_table_globals = CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info));
   node *cgtable_entry = TBmakeCodegentableentry(0, ".global ", STRcpy(HprintType(GLOBDEF_TYPE(arg_node))), NULL);
 
   CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cg_table_globals, cgtable_entry);
@@ -1099,9 +1101,9 @@ node *GBCcodegentable(node *arg_node, info *arg_info)
 node *GBCcodegentableentry(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCcodegentableentry");
-  
+
   FILE *fileptr = INFO_FILE(arg_info);
-  
+
   fprintf(fileptr, "%s%s\n", CODEGENTABLEENTRY_INSTRUCTION(arg_node), CODEGENTABLEENTRY_VALUE(arg_node));
 
   CODEGENTABLEENTRY_NEXT(arg_node) = TRAVopt(CODEGENTABLEENTRY_NEXT(arg_node), arg_info);
