@@ -425,31 +425,24 @@ node *GBCwhile(node *arg_node, info *arg_info)
 node *GBCdowhile(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCdowhile");
-  DBUG_PRINT("GBC", ("GBCdowhile"));
 
-  // creat the branch name
-  char *branch = createBranch("dowhile", arg_info);
+  char *dowhile_branch = createBranch("dowhile", arg_info);
 
-  // creat the end branch
-  fprintf(INFO_FILE(arg_info), "\n%s:\n", branch);
+  fprintf(INFO_FILE(arg_info), "\n%s:\n", dowhile_branch);
 
   TRAVopt(DOWHILE_BLOCK(arg_node), arg_info);
   TRAVdo(DOWHILE_COND(arg_node), arg_info);
 
-  // print to the file
-  fprintf(INFO_FILE(arg_info), "\tbranch_t %s\n", branch);
+  fprintf(INFO_FILE(arg_info), "\tbranch_t %s\n", dowhile_branch);
 
-  // free the resources
-  free(branch);
+  free(dowhile_branch);
 
-  // done
   DBUG_RETURN(arg_node);
 }
 
 node *GBCfor(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCfor");
-  DBUG_PRINT("GBC", ("GBCfor"));
 
   TRAVdo(FOR_START(arg_node), arg_info);
   TRAVdo(FOR_STOP(arg_node), arg_info);
@@ -463,9 +456,9 @@ node *GBCglobdecl(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCglobdecl");
 
-  char *str = STRcatn(4, "var \"", GLOBDECL_NAME(arg_node), "\" ", HprintType(GLOBDECL_TYPE(arg_node)));
+  char *instructions_value = STRcatn(4, "var \"", GLOBDECL_NAME(arg_node), "\" ", HprintType(GLOBDECL_TYPE(arg_node)));
 
-  node *cgtable_entry = TBmakeCodegentableentry(0, ".import", str, NULL);
+  node *cgtable_entry = TBmakeCodegentableentry(0, ".import", instructions_value, NULL);
   node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
   cgtable_imports = addToPool(cgtable_imports, cgtable_entry);
