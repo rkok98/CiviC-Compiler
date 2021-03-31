@@ -374,26 +374,29 @@ node *GBCifelse(node *arg_node, info *arg_info)
   TRAVdo(IFELSE_COND(arg_node), arg_info);
 
   char *ifelse_branch = createBranch(IFELSE_ELSE(arg_node) ? "else" : "end", arg_info);
-  char *end = IFELSE_ELSE(arg_node) ? createBranch("end", arg_info) : ifelse_branch;
+  char *ifelse_end = IFELSE_ELSE(arg_node) ? createBranch("end", arg_info) : ifelse_branch;
 
   fprintf(INFO_FILE(arg_info), "\tbranch_f %s\n\n", ifelse_branch);
 
   TRAVopt(IFELSE_THEN(arg_node), arg_info);
 
-  if (IFELSE_ELSE(arg_node) != NULL)
+  if (IFELSE_ELSE(arg_node))
   {
-    fprintf(INFO_FILE(arg_info), "\tjump %s\n\n", end);
+    fprintf(INFO_FILE(arg_info), "\tjump %s\n\n", ifelse_end);
     fprintf(INFO_FILE(arg_info), "%s:\n", ifelse_branch);
     TRAVopt(IFELSE_ELSE(arg_node), arg_info);
     fputc('\n', INFO_FILE(arg_info));
   }
 
-  fprintf(INFO_FILE(arg_info), "%s:\n", end);
+  fprintf(INFO_FILE(arg_info), "%s:\n", ifelse_end);
 
-  // free the string
   free(ifelse_branch);
-  if (IFELSE_ELSE(arg_node) != NULL)
-    free(end);
+
+  if (IFELSE_ELSE(arg_node))
+  {
+    free(ifelse_end);
+  }
+
 
   DBUG_RETURN(arg_node);
 }
