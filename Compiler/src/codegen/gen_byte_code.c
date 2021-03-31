@@ -403,37 +403,22 @@ node *GBCifelse(node *arg_node, info *arg_info)
 node *GBCwhile(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCwhile");
-  DBUG_PRINT("GBC", ("GBCwhile"));
 
-  // creat the branch name
-  char *branch = createBranch("while", arg_info);
+  char *while_branch = createBranch("while", arg_info);
+  char *while_end = createBranch("end", arg_info);
 
-  // creat the end branch
-  fprintf(INFO_FILE(arg_info), "\n%s:\n", branch);
-
-  // traverse over the conditions
+  fprintf(INFO_FILE(arg_info), "\n%s:\n", while_branch);
   TRAVdo(WHILE_COND(arg_node), arg_info);
 
-  // creat brach name
-  char *end = createBranch("end", arg_info);
-
-  // print to the file
-  fprintf(INFO_FILE(arg_info), "\tbranch_f %s\n", end);
-
-  // traverse over the block
+  fprintf(INFO_FILE(arg_info), "\tbranch_f %s\n", while_end);
   TRAVopt(WHILE_BLOCK(arg_node), arg_info);
 
-  // jump back to the beginning of the while loop
-  fprintf(INFO_FILE(arg_info), "\tjump %s\n", branch);
+  fprintf(INFO_FILE(arg_info), "\tjump %s\n", while_branch);
+  fprintf(INFO_FILE(arg_info), "%s:\n\n", while_end);
 
-  // creat the end branch
-  fprintf(INFO_FILE(arg_info), "%s:\n\n", end);
+  free(while_branch);
+  free(while_end);
 
-  // free the resources
-  free(branch);
-  free(end);
-
-  // leap out
   DBUG_RETURN(arg_node);
 }
 
