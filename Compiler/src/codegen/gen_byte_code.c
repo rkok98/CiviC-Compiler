@@ -471,20 +471,20 @@ node *GBCglobdecl(node *arg_node, info *arg_info)
 node *GBCglobdef(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCglobdef");
-  DBUG_PRINT("GBC", ("GBCglobdef"));
 
   if (GLOBDEF_ISEXPORT(arg_node))
   {
-    node *entry = STdeepSearchVariableByName(INFO_SYMBOL_TABLE(arg_info), GLOBDEF_NAME(arg_node));
+    node *globdef = STdeepSearchVariableByName(INFO_SYMBOL_TABLE(arg_info), GLOBDEF_NAME(arg_node));
 
-    char *offset = STRitoa(SYMBOLTABLEENTRY_OFFSET(entry));
-    char *str = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", offset);
-    free(offset);
-
-    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", str, NULL);
+    char *globdef_offset = STRitoa(SYMBOLTABLEENTRY_OFFSET(globdef));
+    char *instructions_value = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", globdef_offset);
+    
+    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", instructions_value, NULL);
     node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
     CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_exports, cgtable_entry);
+
+    free(globdef_offset);
   }
 
   node *cg_table_globals = CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info));
