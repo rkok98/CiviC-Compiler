@@ -1125,10 +1125,25 @@ node *GBCdoGenByteCode(node *syntaxtree)
 }
 
 /**
+ * TODO: Print to out file
+ */
+node *GBCcodegentable(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("GBCcodegentable");
+  DBUG_RETURN(arg_node);
+}
+
+node *GBCcodegentableentry(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("GBCcodegentableentry");
+  DBUG_RETURN(arg_node);
+}
+
+/**
  * TODO: Remove the functions below
  */
 node *GBClinkedvalue(node *arg_node, info *arg_info)
 {
-  DBUG_ENTER("GBCternary");
+  DBUG_ENTER("GBClinkedvalue");
   DBUG_RETURN(arg_node);
 }

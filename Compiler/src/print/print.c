@@ -625,6 +625,18 @@ node *PRTlinkedvalue(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
+node *PRTcodegentable(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTlinkedvalue");
+  DBUG_RETURN(arg_node);
+}
+
+node *PRTcodegentableentry(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("PRTlinkedvalue");
+  DBUG_RETURN(arg_node);
+}
+
 node *PRTdoPrint(node *syntaxtree)
 {
   info *info;

@@ -43,5 +43,8 @@ extern node *GBCdoGenByteCode( node *syntaxtree);
  * TODO: remove functions below
  */
 extern node *GBClinkedvalue(node *arg_node, info *arg_info);
+extern node *GBCcodegentable(node *arg_node, info *arg_info);
+extern node *GBCcodegentableentry(node *arg_node, info *arg_info);
+
 
 #endif

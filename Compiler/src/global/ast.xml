@@ -1417,6 +1417,91 @@
             </attributes>
         </node>
 
+        <!-- Code gen -->
+        <node name="CodeGenTable">
+            <sons>
+                <son name="Constants">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="LinkedValue" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Exports">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="LinkedValue" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Globals">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="LinkedValue" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Imports">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="LinkedValue" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+        </node>
+
+        <node name="CodeGenTableEntry">
+            <sons>
+                <son name="Next">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="LinkedValue" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+            <attributes>
+                <attribute name="Instruction">
+                    <type name="String">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Index">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+            </attributes>
+        </node>
+
         <!-- Linked List -->
         <node name="LinkedValue">
             <sons>

@@ -56,6 +56,9 @@ extern node *PRTerror(node *arg_node, info *arg_info);
 
 extern node *PRTlinkedvalue(node *arg_node, info *arg_info);
 
+extern node *PRTcodegentable(node *arg_node, info *arg_info);
+extern node *PRTcodegentableentry(node *arg_node, info *arg_info);
+
 extern node *PRTdoPrint(node *syntaxtree);
 
 #endif
