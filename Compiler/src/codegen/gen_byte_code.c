@@ -233,26 +233,25 @@ node *GBCreturn(node *arg_node, info *arg_info)
 node *GBCfuncall(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCfuncall");
-  DBUG_PRINT("GBC", ("GBCfuncall"));
-
-  node *entry = STdeepSearchFundef(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
 
   fprintf(INFO_FILE(arg_info), "\tisrg\n");
 
-  TRAVopt(FUNCALL_ARGS(arg_node), arg_info);
+  FUNCALL_ARGS(arg_node) = TRAVopt(FUNCALL_ARGS(arg_node), arg_info);
 
-  INFO_CURRENT_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
+  node *funcall = STdeepSearchFundef(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
+  INFO_CURRENT_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(funcall);
 
-  // print
-  node *table = SYMBOLTABLEENTRY_TABLE(entry);
-  node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
+  node *link = SYMBOLTABLEENTRY_DEFINITION(funcall);
 
   if (NODE_TYPE(link) == N_fundecl)
   {
-    fprintf(INFO_FILE(arg_info), "\tjsre %d\n", SYMBOLTABLEENTRY_OFFSET(entry));
+    fprintf(INFO_FILE(arg_info), "\tjsre %d\n", SYMBOLTABLEENTRY_OFFSET(funcall));
   }
   else
-    fprintf(INFO_FILE(arg_info), "\tjsr %ld %s\n", STparams(table), FUNCALL_NAME(arg_node));
+  {
+    node *symbol_table = SYMBOLTABLEENTRY_TABLE(funcall);
+    fprintf(INFO_FILE(arg_info), "\tjsr %ld %s\n", STparams(symbol_table), FUNCALL_NAME(arg_node));
+  }
 
   DBUG_RETURN(arg_node);
 }
