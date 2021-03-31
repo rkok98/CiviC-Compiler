@@ -535,36 +535,16 @@ node *GBCassign(node *arg_node, info *arg_info)
   TRAVdo(ASSIGN_LET(arg_node), arg_info);
   TRAVdo(ASSIGN_EXPR(arg_node), arg_info);
 
-  node *entry = INFO_SYMBOL_TABLE_ENTRY(arg_info);
+  node *assign_entry = INFO_SYMBOL_TABLE_ENTRY(arg_info);
 
-  // store count
-  char type;
-  switch (SYMBOLTABLEENTRY_TYPE(entry))
+  if (SYMBOLTABLEENTRY_DEPTH(assign_entry) == 0)
   {
-  case T_int:
-    type = 'i';
-    break;
-  case T_float:
-    type = 'f';
-    break;
-  case T_bool:
-    type = 'b';
-    break;
-  case T_void:
-  case T_unknown:
-    break;
-  }
-
-  if (SYMBOLTABLEENTRY_DEPTH(entry) == 0)
-  {
-    printf("_-=");
-    fprintf(INFO_FILE(arg_info), "\t%cstoreg %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
+    fprintf(INFO_FILE(arg_info), "\t%sstoreg %d\n", typePrefix(SYMBOLTABLEENTRY_TYPE(assign_entry)), SYMBOLTABLEENTRY_OFFSET(assign_entry));
   }
   else
-    fprintf(INFO_FILE(arg_info), "\t%cstore %d\n", type, SYMBOLTABLEENTRY_OFFSET(entry));
-
-  // increment the store
-  INFO_SYMBOL_TABLE_ENTRY(arg_info) = NULL;
+  {
+    fprintf(INFO_FILE(arg_info), "\t%sstore %d\n", typePrefix(SYMBOLTABLEENTRY_TYPE(assign_entry)), SYMBOLTABLEENTRY_OFFSET(assign_entry));
+  }
 
   DBUG_RETURN(arg_node);
 }
