@@ -675,65 +675,29 @@ node *GBCvar(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCvar");
 
-  node *decl = VAR_DECL(arg_node);
+  node *var_decl = VAR_DECL(arg_node);
+  node *vardecl_entry = STdeepSearchByNode(INFO_SYMBOL_TABLE(arg_info), var_decl);
 
-  if (decl == NULL)
+  INFO_CURRENT_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(vardecl_entry);
+
+  if (NODE_TYPE(var_decl) == N_globdef)
   {
-    printf("%s", VAR_NAME(arg_node));
+    if (GLOBDEF_TYPE(var_decl) == T_int)
+      fprintf(INFO_FILE(arg_info), "\tiloadg %d\n", SYMBOLTABLEENTRY_OFFSET(vardecl_entry));
+    else if (GLOBDEF_TYPE(var_decl) == T_float)
+      fprintf(INFO_FILE(arg_info), "\tfloadg %d\n", SYMBOLTABLEENTRY_OFFSET(vardecl_entry));
   }
-
-  DBUG_PRINT("GBC", ("GBCvar 1.1"));
-
-  node *entry = STdeepSearchByNode(INFO_SYMBOL_TABLE(arg_info), decl);
-
-  // Set current type to int
-  INFO_CURRENT_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(entry);
-
-  DBUG_PRINT("GBC", ("GBCvar 2"));
-
-  // is this the global scope?
-  if (NODE_TYPE(decl) == N_globdef)
+  else if (NODE_TYPE(var_decl) == N_globdecl)
   {
-    DBUG_PRINT("GBC", ("GBCvar 2a"));
-    // change scope to extern if flag is set.
-    char scope = 'g';
-
-    if (GLOBDEF_TYPE(decl) == T_int)
-      fprintf(INFO_FILE(arg_info), "\tiload%c %d\n", scope, SYMBOLTABLEENTRY_OFFSET(entry));
-    else if (GLOBDEF_TYPE(decl) == T_float)
-      fprintf(INFO_FILE(arg_info), "\tfload%c %d\n", scope, SYMBOLTABLEENTRY_OFFSET(entry));
-  }
-  else if (NODE_TYPE(decl) == N_globdecl)
-  {
-    DBUG_PRINT("GBC", ("GBCvar 2b"));
-    char scope = 'e';
-
-    if (GLOBDECL_TYPE(decl) == T_int)
-      fprintf(INFO_FILE(arg_info), "\tiload%c %d\n", scope, SYMBOLTABLEENTRY_OFFSET(entry));
-    else if (GLOBDECL_TYPE(decl) == T_float)
-      fprintf(INFO_FILE(arg_info), "\tfload%c %d\n", scope, SYMBOLTABLEENTRY_OFFSET(entry));
+    if (GLOBDECL_TYPE(var_decl) == T_int)
+      fprintf(INFO_FILE(arg_info), "\tiloade %d\n", SYMBOLTABLEENTRY_OFFSET(vardecl_entry));
+    else if (GLOBDECL_TYPE(var_decl) == T_float)
+      fprintf(INFO_FILE(arg_info), "\tfloade %d\n", SYMBOLTABLEENTRY_OFFSET(vardecl_entry));
   }
   else
   {
-    DBUG_PRINT("GBC", ("GBCvar 2c"));
-    if (SYMBOLTABLEENTRY_TYPE(entry) == T_int)
-      fprintf(
-          INFO_FILE(arg_info),
-          SYMBOLTABLEENTRY_OFFSET(entry) < 4 ? "\tiload_%d\n" : "\tiload %d\n",
-          SYMBOLTABLEENTRY_OFFSET(entry));
-    else if (SYMBOLTABLEENTRY_TYPE(entry) == T_float)
-      fprintf(
-          INFO_FILE(arg_info),
-          SYMBOLTABLEENTRY_OFFSET(entry) < 4 ? "\tfload_%d\n" : "\tfload %d\n",
-          SYMBOLTABLEENTRY_OFFSET(entry));
-    else if (SYMBOLTABLEENTRY_TYPE(entry) == T_bool)
-      fprintf(
-          INFO_FILE(arg_info),
-          SYMBOLTABLEENTRY_OFFSET(entry) < 4 ? "\tbload_%d\n" : "\tbload %d\n",
-          SYMBOLTABLEENTRY_OFFSET(entry));
+    fprintf(INFO_FILE(arg_info), "\t%sload %d\n", typePrefix(SYMBOLTABLEENTRY_TYPE(vardecl_entry)), SYMBOLTABLEENTRY_OFFSET(vardecl_entry));
   }
-
-  DBUG_PRINT("GBC", ("GBCvar 3"));
 
   DBUG_RETURN(arg_node);
 }
@@ -741,17 +705,12 @@ node *GBCvar(node *arg_node, info *arg_info)
 node *GBCnum(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCnum");
-  DBUG_PRINT("GBC", ("GBCnum"));
 
-  // Create const pool byte code string
   char *str = STRcat("int ", STRitoa(NUM_VALUE(arg_node)));
 
-  // Search linked list for const value
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
   node *const_pool = SearchPool(cgtable_constants, str);
 
-  // Add to const pool if it doesn't exist yet.
-  // Else extract values from linked list and print to file.
   if (const_pool == NULL)
   {
     node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
@@ -766,7 +725,6 @@ node *GBCnum(node *arg_node, info *arg_info)
     free(str);
   }
 
-  // Set current type to int
   INFO_CURRENT_TYPE(arg_info) = T_int;
 
   DBUG_RETURN(arg_node);
@@ -777,12 +735,11 @@ node *GBCfloat(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCfloat");
   DBUG_PRINT("GBC", ("GBCfloat"));
 
-  // Create const pool byte code string
   int length = snprintf(NULL, 0, "float %f", FLOAT_VALUE(arg_node));
   char *str = malloc(length + 1);
   snprintf(str, length + 1, "float %f", FLOAT_VALUE(arg_node));
 
-  // Search linked list for const value
+
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
   node *const_pool = SearchPool(cgtable_constants, str);
 
