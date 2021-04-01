@@ -349,7 +349,6 @@ node *GBCfundef(node *arg_node, info *arg_info)
 node *GBCfunbody(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCfunbody");
-  DBUG_PRINT("GBC", ("GBCfunbody"));
 
   TRAVopt(FUNBODY_VARDECLS(arg_node), arg_info);
   TRAVopt(FUNBODY_STMTS(arg_node), arg_info);
