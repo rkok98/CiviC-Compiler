@@ -112,7 +112,7 @@ returns an CTIerror telling the integer is out of range.
 % TODO: Extra check max float value.
 
 
-% TODO: Milestone 2
+% TODO: Check Milestone 2
 After completing the scanner we needed to refine our intermediate representation (abstract
 syntax tree) for our compiler. We used the AST that was provided by school and added some 
 elements of our own. To make the SymbolTable work properly we added the SymbolTable to the
@@ -123,10 +123,10 @@ The CodeGenTableEntry stores information for a single line of code generation su
 index, instruction and the value of the generated code. Code generation will be further 
 explained in section 6 of this report.
 
-% TODO: (Expand) Milestone 3
+% TODO: (maybe expand) Milestone 3
 To properly illustrate the logical structure of the code we had to expand the print traversals
 to cover the full syntactic range of the CiviC language. Each node in the AST has its own
-print traversal which prints the information of that node.
+print traversal which prints the information of the specific node in the Print AST phase.
 
 
 
@@ -134,10 +134,25 @@ print traversal which prints the information of that node.
 \section{Syntatic Analysis}
 After the scanner is done and creates a (finite) stream of tokens, the parser comes
 into play and will start its job. The parser will use the output from the scanner and
-use it to create and output a abstract syntax tree (AST). The parser uses the stream 
+use it to create and output an abstract syntax tree (AST). The parser uses the stream 
 of tokens to do pattern matching with the pre defined casus in the compiler. 
 
-% TODO: (Example with CiviC code + pattern matching behind it: int X; // Type ID SEMICOLON (vardecl))
+The parser does all the pattern matching for us. For each node in the AST we created 
+a new node with its pattern in civic.y so the parser can match them. 
+Listing 2 is an example of pattern matching of a simple piece of code. In this
+example we added the node with its pattern so the pattern matching visible. 
+
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Pattern matching Example, captionpos=b]
+
+int b;          // globdef: type ID SEMICOLON
+
+void foo() {    // fundef: type ID PARENTHESIS_L PARENTHESIS_R  CURLY_L
+                    // funbody (inside curly brackets)
+    int a = 2;      // vardecl: type ID LET expr SEMICOLON
+    b = 1;          // assign: varlet LET expr SEMICOLON (varlet: ID)
+}               // CURLY_R 
+\end{lstlisting}
+
 
 \section{Semantic Analysis}
 %\lipsum[7]
