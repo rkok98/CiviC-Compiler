@@ -26,7 +26,7 @@ struct INFO
   node *symbol_table;
   node *symbol_table_entry;
 
-  int constants_counter;
+  int load_constants_counter;
   int branch_count;
 
   type current_type;
@@ -38,7 +38,7 @@ struct INFO
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_SYMBOL_TABLE_ENTRY(n) ((n)->symbol_table_entry)
 
-#define INFO_LOAD_COUNTER(n) ((n)->constants_counter)
+#define INFO_LOAD_CONSTS_COUNTER(n) ((n)->load_constants_counter)
 #define INFO_BRANCH_COUNT(n) ((n)->branch_count)
 
 #define INFO_CURRENT_TYPE(n) ((n)->current_type)
@@ -57,7 +57,7 @@ static info *MakeInfo()
   INFO_SYMBOL_TABLE(result) = NULL;
   INFO_SYMBOL_TABLE_ENTRY(result) = NULL;
 
-  INFO_LOAD_COUNTER(result) = 0;
+  INFO_LOAD_CONSTS_COUNTER(result) = 0;
   INFO_BRANCH_COUNT(result) = 0;
 
   INFO_CURRENT_TYPE(result) = T_unknown;
@@ -713,11 +713,11 @@ node *GBCnum(node *arg_node, info *arg_info)
   }
   else
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", instruction_value, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), ".const ", instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
-    INFO_LOAD_COUNTER(arg_info) += 1;
+    INFO_LOAD_CONSTS_COUNTER(arg_info) += 1;
   }
 
   INFO_CURRENT_TYPE(arg_info) = T_int;
@@ -741,11 +741,11 @@ node *GBCfloat(node *arg_node, info *arg_info)
   }
   else
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", instruction_value, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), ".const ", instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
-    INFO_LOAD_COUNTER(arg_info) += 1;
+    INFO_LOAD_CONSTS_COUNTER(arg_info) += 1;
   }
 
   INFO_CURRENT_TYPE(arg_info) = T_float;
@@ -769,11 +769,11 @@ node *GBCbool(node *arg_node, info *arg_info)
   }
   else
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", instruction_value, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), ".const ", instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
-    INFO_LOAD_COUNTER(arg_info) += 1;
+    INFO_LOAD_CONSTS_COUNTER(arg_info) += 1;
   }
 
   INFO_CURRENT_TYPE(arg_info) = T_bool;
