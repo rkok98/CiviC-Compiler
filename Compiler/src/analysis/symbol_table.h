@@ -14,9 +14,9 @@ extern node *STfindInParents(node *symbol_table, char *name);
 extern node *STfindFunc(node *symbol_table, char *name);
 extern node *STfindFuncInParents(node *symbol_table, char *name);
 
-extern node *STlast(node *symbol_table);
+extern node *STfindByDecl(node *symbol_table, node *decl);
+extern node *STfindByDeclInParents(node *symbol_table, node *decl);
 
-// TODO
-extern node *STdeepSearchByNode(node *table, node *link);
+extern node *STlast(node *symbol_table);
 
 #endif

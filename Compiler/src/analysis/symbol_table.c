@@ -154,6 +154,68 @@ node *STfindFuncInParents(node *symbol_table, char *name)
     DBUG_RETURN(NULL);
 }
 
+node *STfindByDecl(node *symbol_table, node *decl)
+{
+    DBUG_ENTER("STfindByDecl");
+    node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
+
+    while (entry)
+    {
+        node *entry_decl = SYMBOLTABLEENTRY_DEFINITION(entry);
+
+        if (NODE_TYPE(entry_decl) == NODE_TYPE(decl))
+        {
+            if (NODE_TYPE(entry_decl) == N_globdef && STReq(GLOBDEF_NAME(entry_decl), GLOBDEF_NAME(decl)))
+            {
+                DBUG_RETURN(entry);
+            }
+            if (NODE_TYPE(entry_decl) == N_globdecl && STReq(GLOBDECL_NAME(entry_decl), GLOBDECL_NAME(decl)))
+            {
+                DBUG_RETURN(entry);
+            }
+            if (NODE_TYPE(entry_decl) == N_fundef && STReq(FUNDEF_NAME(entry_decl), FUNDEF_NAME(decl)))
+            {
+                DBUG_RETURN(entry);
+            }
+            if (NODE_TYPE(entry_decl) == N_fundecl && STReq(FUNDECL_NAME(entry_decl), FUNDECL_NAME(decl)))
+            {
+                DBUG_RETURN(entry);
+            }
+            if (NODE_TYPE(entry_decl) == N_vardecl && STReq(VARDECL_NAME(entry_decl), VARDECL_NAME(decl)))
+            {
+                DBUG_RETURN(entry);
+            }
+            if (NODE_TYPE(entry_decl) == N_param && STReq(PARAM_NAME(entry_decl), PARAM_NAME(decl)))
+            {
+                DBUG_RETURN(entry);
+            }
+        }
+
+        entry = SYMBOLTABLEENTRY_NEXT(entry);
+    }
+
+    DBUG_RETURN(NULL);
+}
+
+node *STfindByDeclInParents(node *symbol_table, node *decl)
+{
+    DBUG_ENTER("STfindByDeclInParents");
+
+    node *entry = STfindByDecl(symbol_table, decl);
+
+    if (entry)
+    {
+        DBUG_RETURN(entry);
+    }
+
+    if (SYMBOLTABLE_PARENT(symbol_table))
+    {
+        DBUG_RETURN(STfindByDeclInParents(SYMBOLTABLE_PARENT(symbol_table), decl));
+    }
+
+    DBUG_RETURN(NULL);
+}
+
 node *STlast(node *symbol_table)
 {
     DBUG_ENTER("STlast");
@@ -171,42 +233,4 @@ node *STlast(node *symbol_table)
     }
 
     DBUG_RETURN(entry);
-}
-
-// TODO
-node *STdeepSearchByNode(node *table, node *link)
-{
-    // get the entry
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    // loop over the entries
-    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
-    {
-        node *n = SYMBOLTABLEENTRY_DEFINITION(entry);
-
-        DBUG_PRINT("GBC", ("SEARCH 1.1"));
-
-        if (NODE_TYPE(link) != NODE_TYPE(n))
-            continue;
-
-        if (NODE_TYPE(n) == N_globdef && STReq(GLOBDEF_NAME(n), GLOBDEF_NAME(link)))
-            return entry;
-        if (NODE_TYPE(n) == N_globdecl && STReq(GLOBDECL_NAME(n), GLOBDECL_NAME(link)))
-            return entry;
-        if (NODE_TYPE(n) == N_fundef && STReq(FUNDEF_NAME(n), FUNDEF_NAME(link)))
-            return entry;
-        if (NODE_TYPE(n) == N_fundecl && STReq(FUNDECL_NAME(n), FUNDECL_NAME(link)))
-            return entry;
-        if (NODE_TYPE(n) == N_vardecl && STReq(VARDECL_NAME(n), VARDECL_NAME(link)))
-            return entry;
-        if (NODE_TYPE(n) == N_param && STReq(PARAM_NAME(n), PARAM_NAME(link)))
-            return entry;
-
-        DBUG_PRINT("GBC", ("SEARCH 2.1"));
-    }
-
-    if (SYMBOLTABLE_PARENT(table) == NULL)
-        return NULL;
-
-    return STdeepSearchByNode(SYMBOLTABLE_PARENT(table), link);
 }

@@ -665,7 +665,7 @@ node *GBCvar(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCvar");
 
   node *var_decl = VAR_DECL(arg_node);
-  node *vardecl_entry = STdeepSearchByNode(INFO_SYMBOL_TABLE(arg_info), var_decl);
+  node *vardecl_entry = STfindByDeclInParents(INFO_SYMBOL_TABLE(arg_info), var_decl);
 
   INFO_CURRENT_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(vardecl_entry);
 
