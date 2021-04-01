@@ -43,6 +43,16 @@ static info *FreeInfo(info *info)
     DBUG_RETURN(info);
 }
 
+unsigned int TCcountArguments(node *arg_node)
+{
+    if (!arg_node)
+    {
+        return 0;
+    }
+
+    return 1 + TCcountArguments(EXPRS_NEXT(arg_node));
+}
+
 node *TCnum(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCnum");
@@ -167,11 +177,17 @@ node *TCfuncall(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCfuncall");
 
-    node *funcall_entry = STfindInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
+    node *fundecl_entry = STfindFuncInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
+
+    if (!fundecl_entry)
+    {
+        CTIerrorLine(NODE_LINE(arg_node) + 1, "Function '%s' called but is not declared", FUNCALL_NAME(arg_node));
+        DBUG_RETURN(arg_node);
+    }
 
     FUNCALL_ARGS(arg_node) = TRAVopt(FUNCALL_ARGS(arg_node), arg_info);
     
-    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(funcall_entry);
+    INFO_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(fundecl_entry);
 
     DBUG_RETURN(arg_node);
 }
