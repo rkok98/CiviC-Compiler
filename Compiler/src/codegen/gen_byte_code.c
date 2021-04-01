@@ -22,8 +22,8 @@ struct INFO
   node *symbol_table;
   node *symbol_table_entry;
 
+  int branch_counter;
   int load_constants_counter;
-  int branch_count;
 
   type current_type;
 };
@@ -34,8 +34,8 @@ struct INFO
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_SYMBOL_TABLE_ENTRY(n) ((n)->symbol_table_entry)
 
+#define INFO_BRANCH_COUNTER(n) ((n)->branch_counter)
 #define INFO_LOAD_CONSTS_COUNTER(n) ((n)->load_constants_counter)
-#define INFO_BRANCH_COUNTER(n) ((n)->branch_count)
 
 #define INFO_CURRENT_TYPE(n) ((n)->current_type)
 
@@ -53,8 +53,8 @@ static info *MakeInfo()
   INFO_SYMBOL_TABLE(result) = NULL;
   INFO_SYMBOL_TABLE_ENTRY(result) = NULL;
 
-  INFO_LOAD_CONSTS_COUNTER(result) = 0;
   INFO_BRANCH_COUNTER(result) = 0;
+  INFO_LOAD_CONSTS_COUNTER(result) = 0;
 
   INFO_CURRENT_TYPE(result) = T_unknown;
 
