@@ -1242,7 +1242,6 @@
         <node name="SymbolTable">
             <sons>
                 <son name="Entries">
-                    <description>ST body</description>
                     <targets>
                         <target mandatory="yes">
                             <node name="SymbolTableEntry" />
@@ -1280,7 +1279,6 @@
         </node>
 
         <node name="SymbolTableEntry">
-            <description>Symbol table entries</description>
             <sons>
                 <son name="Table">
                     <targets>
@@ -1293,7 +1291,6 @@
                     </targets>
                 </son>
                 <son name="Next">
-                    <description>ST body</description>
                     <targets>
                         <target mandatory="no">
                             <node name="SymbolTableEntry" />
