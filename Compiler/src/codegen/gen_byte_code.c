@@ -195,7 +195,7 @@ node *GBCexprstmt(node *arg_node, info *arg_info)
   }
 
   node *entry = STfindFuncInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(expr));
-  node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
+  node *link = SYMBOLTABLEENTRY_DECLARATION(entry);
 
   if (NODE_TYPE(link) == N_fundecl)
   {
@@ -232,7 +232,7 @@ node *GBCfuncall(node *arg_node, info *arg_info)
   node *funcall = STfindFuncInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
   INFO_CURRENT_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(funcall);
 
-  node *link = SYMBOLTABLEENTRY_DEFINITION(funcall);
+  node *link = SYMBOLTABLEENTRY_DECLARATION(funcall);
 
   if (NODE_TYPE(link) == N_fundecl)
   {
