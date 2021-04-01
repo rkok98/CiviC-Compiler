@@ -841,6 +841,12 @@ node *GBCcodegentableentry(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
+node *GBClinkedvalue(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("GBClinkedvalue");
+  DBUG_RETURN(arg_node);
+}
+
 node *GBCdoGenByteCode(node *syntaxtree)
 {
   DBUG_ENTER("GBCdoGenByteCode");
@@ -866,10 +872,4 @@ node *GBCdoGenByteCode(node *syntaxtree)
   FreeInfo(arg_info);
 
   DBUG_RETURN(syntaxtree);
-}
-
-node *GBClinkedvalue(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("GBClinkedvalue");
-  DBUG_RETURN(arg_node);
 }
