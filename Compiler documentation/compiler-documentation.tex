@@ -90,6 +90,7 @@ which are supported by the CiviC language. The CiviC language only supports inte
 floats and booleans so there is no need to define other types in the compiler.
 
 % TODO: vertel dat we #include "limits.h" hebben gebruikt voor de min en max.
+% ^Done, maar niet zeker of t goed is hieronder
 In our scanner we added a validator that validates if an integer is too large or too small by 
 comparing it to the max int and min int. We included the "limits.h" file in our civic.l
 to get the values of min and max. If the integer is too high or too low the compiler
@@ -111,7 +112,23 @@ returns an CTIerror telling the integer is out of range.
 % TODO: Extra check max float value.
 
 
-% TODO: NOG IETS OVER MILESTONE 2 EN 3!!
+% TODO: Milestone 2
+After completing the scanner we needed to refine our intermediate representation (abstract
+syntax tree) for our compiler. We used the AST that was provided by school and added some 
+elements of our own. To make the SymbolTable work properly we added the SymbolTable to the
+AST along with the SymbolTableEntry. A SymbolTableEntry contains all the information about 
+an entry such as in which SymbolTable its stored in, name, type, if its a function/parameter/export,
+its offset, depth and its definition. We did the same for the CodeGenTable and the CodeGenTableEntry.
+The CodeGenTableEntry stores information for a single line of code generation such as the
+index, instruction and the value of the generated code. Code generation will be further 
+explained in section 6 of this report.
+
+% TODO: (Expand) Milestone 3
+To properly illustrate the logical structure of the code we had to expand the print traversals
+to cover the full syntactic range of the CiviC language. Each node in the AST has its own
+print traversal which prints the information of that node.
+
+
 
 \newpage
 \section{Syntatic Analysis}
