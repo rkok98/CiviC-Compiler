@@ -68,11 +68,11 @@
 the course Compiler Construction by dr. C.U. Grelck. The goal of the CiviC compiler 
 is to create a CiviC compiler that transforms CiviC code into CiviC assembly code 
 that a computer can understand. In this report we will focus on different aspects 
-of our compiler and what we did and how we did it. We will do this in logical order
+of our compiler and what we did and how we did it. We will do this by following the order of the milestones,
 from scanning/parsing to code generation and also use the milestones to further 
 explain the compiler.
 
-EXTENSIONS!?!?
+% TODO: Schrijf dat we geen extensies hebben toegevoegd en/of optimalizaties buiten de standaard milestones om.
 
 %-------------------------------------------------------------------------------
 %	METHODE
@@ -86,13 +86,14 @@ By recognizing the words and symbols the Scanner can use pattern matching to fin
 what the next action will be for the compiler. For the scanner to know which symbols
 are available in the CiviC language, we need to define these ourselves. We did this 
 by defining all the possible symbols (parenthesis, brackets and binary operators etc.)
-which are supported by the CiviC language. The CiviC language only supports integers,Ò
+which are supported by the CiviC language. The CiviC language only supports integers,
 floats and booleans so there is no need to define other types in the compiler.
-BY DOING THIS WE COMPLETED MILESTONE 1 (OF DIT ER NIET BIJ DOEN).
 
-In our scanner we added a check to see if an integer is too high or to low by 
-comparing it to max int and min int. If the integer is too high or too low the compiler
+% TODO: vertel dat we #include "limits.h" hebben gebruikt voor de min en max.
+In our scanner we added a validator that validates if an integer is too large or too small by 
+comparing it to the max int and min int. If the integer is too high or too low the compiler
 returns an CTIerror telling the integer is out of range.
+
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Integer range check, captionpos=b]
     [0-9]+      { long integer = strtol(yytext, NULL, 10);
                     if (integer > INT_MAX || integer < INT_MIN) {
@@ -106,8 +107,10 @@ returns an CTIerror telling the integer is out of range.
                 }
 \end{lstlisting}
 
+% TODO: Extra check max float value.
 
-NOG IETS OVER MILESTONE 2 EN 3!!
+
+% TODO: NOG IETS OVER MILESTONE 2 EN 3!!
 
 \newpage
 \section{Syntatic Analysis}
@@ -116,7 +119,7 @@ into play and will start its job. The parser will use the output from the scanne
 use it to create and output a abstract syntax tree (AST). The parser uses the stream 
 of tokens to do pattern matching with the pre defined casus in the compiler. 
 
-(Example with CiviC code + pattern matching behind it: int X; // Type ID SEMICOLON (vardecl))
+% TODO: (Example with CiviC code + pattern matching behind it: int X; // Type ID SEMICOLON (vardecl))
 
 \section{Semantic Analysis}
 %\lipsum[7]
