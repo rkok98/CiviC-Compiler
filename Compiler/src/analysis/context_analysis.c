@@ -100,11 +100,10 @@ node *CAfundecl(node *arg_node, info *arg_info)
     info *fundef_info = MakeInfo();
     node *fundef_table = TBmakeSymboltable(SYMBOLTABLE_NESTINGLEVEL(parent_table) + 1, parent_table, NULL);
 
-    SYMBOLTABLE_RETURNTYPE(fundef_table) = FUNDECL_TYPE(arg_node);
     INFO_SYMBOL_TABLE(fundef_info) = fundef_table;
     FUNDECL_SYMBOLTABLE(arg_node) = fundef_table;
 
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDECL_NAME(arg_node)), FUNDECL_TYPE(arg_node), 0, 0, 0, 0, 0, arg_node, NULL, NULL, fundef_table);
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDECL_NAME(arg_node)), FUNDECL_TYPE(arg_node), TRUE, 0, 0, 0, 0, arg_node, NULL, NULL, fundef_table);
 
     STinsert(parent_table, entry);
 
@@ -123,7 +122,6 @@ node *CAfundef(node *arg_node, info *arg_info)
     info *fundef_info = MakeInfo();
     node *fundef_table = TBmakeSymboltable(SYMBOLTABLE_NESTINGLEVEL(parent_table) + 1, parent_table, NULL);
 
-    SYMBOLTABLE_RETURNTYPE(fundef_table) = FUNDEF_TYPE(arg_node);
     INFO_SYMBOL_TABLE(fundef_info) = fundef_table;
     FUNDEF_SYMBOLTABLE(arg_node) = fundef_table;
 
