@@ -91,7 +91,8 @@ floats and booleans so there is no need to define other types in the compiler.
 
 % TODO: vertel dat we #include "limits.h" hebben gebruikt voor de min en max.
 In our scanner we added a validator that validates if an integer is too large or too small by 
-comparing it to the max int and min int. If the integer is too high or too low the compiler
+comparing it to the max int and min int. We included the "limits.h" file in our civic.l
+to get the values of min and max. If the integer is too high or too low the compiler
 returns an CTIerror telling the integer is out of range.
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Integer range check, captionpos=b]
