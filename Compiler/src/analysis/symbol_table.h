@@ -5,6 +5,9 @@
 
 extern node *STinsert(node *symbol_table, node *entry);
 
+extern unsigned int STcountParams(node *entry);
+extern unsigned int STcountVarDecls(node *entry);
+
 extern node *STfind(node *symbol_table, char *name);
 extern node *STfindInParents(node *symbol_table, char *name);
 
@@ -20,8 +23,8 @@ const char *STentrytype(type type);
 extern node *STsearchFundef(node *table, const char *name);
 extern node *STdeepSearchFundef(node *table, const char *name);
 
-extern size_t STparams();
-extern size_t STVardecls(node *table);
+
+
 
 extern node *STdeepSearchVariableByName(node *table, const char *name);
 

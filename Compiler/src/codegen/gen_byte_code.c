@@ -241,7 +241,7 @@ node *GBCfuncall(node *arg_node, info *arg_info)
   else
   {
     node *symbol_table = SYMBOLTABLEENTRY_TABLE(funcall);
-    fprintf(INFO_FILE(arg_info), "\tjsr %ld %s\n", STparams(symbol_table), FUNCALL_NAME(arg_node));
+    fprintf(INFO_FILE(arg_info), "\tjsr %u %s\n", STcountParams(SYMBOLTABLE_ENTRIES(symbol_table)), FUNCALL_NAME(arg_node));
   }
 
   DBUG_RETURN(arg_node);
@@ -324,11 +324,11 @@ node *GBCfundef(node *arg_node, info *arg_info)
 
   INFO_SYMBOL_TABLE(arg_info) = FUNDEF_SYMBOLTABLE(arg_node);
 
-  unsigned int registers = STVardecls(INFO_SYMBOL_TABLE(arg_info));
+  unsigned int registers = STcountVarDecls(SYMBOLTABLE_ENTRIES(INFO_SYMBOL_TABLE(arg_info)));
 
   if (registers)
   {
-    fprintf(INFO_FILE(arg_info), "\tesr %ld\n", registers);
+    fprintf(INFO_FILE(arg_info), "\tesr %u\n", registers);
   }
 
   TRAVopt(FUNDEF_PARAMS(arg_node), arg_info);

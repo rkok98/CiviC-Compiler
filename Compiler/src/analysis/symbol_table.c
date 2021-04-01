@@ -9,63 +9,49 @@
 #include "ctinfo.h"
 #include "str.h"
 
-size_t STcountGlobdecls(node *table)
+unsigned int STcountByType(node *entry, nodetype node_type)
 {
-    size_t count = 0;
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
+    if (entry == NULL)
     {
-        node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
-        if (NODE_TYPE(link) != N_globdecl)
-        {
-            continue;
-        }
-
-        count++;
+        return 0;
     }
 
-    return count;
+    if (NODE_TYPE(SYMBOLTABLEENTRY_DEFINITION(entry)) == node_type)
+    {
+        return 1 + STcountByType(SYMBOLTABLEENTRY_NEXT(entry), node_type);
+    }
+
+    return 0 + STcountByType(SYMBOLTABLEENTRY_NEXT(entry), node_type);
 }
 
-size_t STcountFunDecls(node *table)
+unsigned int STcountParams(node *entry)
 {
-    size_t count = 0;
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
+    if (!entry)
     {
-        node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
-        if (NODE_TYPE(link) != N_fundecl)
-        {
-            continue;
-        }
-
-        count++;
+        return 0;
     }
 
-    return count;
+    if (SYMBOLTABLEENTRY_ISPARAMETER(entry))
+    {
+        return 1 + STcountParams(SYMBOLTABLEENTRY_NEXT(entry));
+    }
+
+    return 0 + STcountParams(SYMBOLTABLEENTRY_NEXT(entry));
 }
 
-size_t STcount(node *table)
+unsigned int STcountVarDecls(node *entry)
 {
-    size_t count = 0;
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
+    if (!entry)
     {
-        node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
-        if (NODE_TYPE(link) == N_fundecl)
-            continue;
-        if (NODE_TYPE(link) == N_fundef && FUNDEF_ISEXPORT(link))
-            continue;
-        if (NODE_TYPE(link) == N_globdecl)
-            continue;
-
-        count++;
+        return 0;
     }
 
-    return count;
+    if (!SYMBOLTABLEENTRY_ISPARAMETER(entry))
+    {
+        return 1 + STcountVarDecls(SYMBOLTABLEENTRY_NEXT(entry));
+    }
+
+    return 0 + STcountVarDecls(SYMBOLTABLEENTRY_NEXT(entry));
 }
 
 node *STinsert(node *symbol_table, node *entry)
@@ -78,21 +64,7 @@ node *STinsert(node *symbol_table, node *entry)
         return NULL;
     }
 
-    node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
-
-    // set the offset
-    if (NODE_TYPE(link) == N_globdecl)
-    {
-        SYMBOLTABLEENTRY_OFFSET(entry) = STcountGlobdecls(symbol_table);
-    }
-    else if (NODE_TYPE(link) == N_fundecl)
-    {
-        SYMBOLTABLEENTRY_OFFSET(entry) = STcountFunDecls(symbol_table);
-    }
-    else
-    {
-        SYMBOLTABLEENTRY_OFFSET(entry) = STcount(symbol_table);
-    }
+    SYMBOLTABLEENTRY_OFFSET(entry) = STcountByType(SYMBOLTABLE_ENTRIES(symbol_table), NODE_TYPE(SYMBOLTABLEENTRY_DEFINITION(entry)));
 
     node *last = STlast(symbol_table);
 
@@ -230,42 +202,6 @@ node *STdeepSearchFundef(node *table, const char *name)
 
     // search for the node in the parent table
     return STdeepSearchFundef(parent, name);
-}
-
-size_t STparams(node *table)
-{
-    size_t count = 0;
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
-    {
-        if (!SYMBOLTABLEENTRY_ISPARAMETER(entry))
-        {
-            continue;
-        }
-
-        count++;
-    }
-
-    return count;
-}
-
-size_t STVardecls(node *table)
-{
-    size_t count = 0;
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    for (; entry != NULL; entry = SYMBOLTABLEENTRY_NEXT(entry))
-    {
-        if (SYMBOLTABLEENTRY_ISPARAMETER(entry))
-        {
-            continue;
-        }
-
-        count++;
-    }
-
-    return count;
 }
 
 node *STsearchVariableEntry(node *list, const char *name, type type)
