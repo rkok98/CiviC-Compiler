@@ -13,18 +13,9 @@ extern node *STfindInParents(node *symbol_table, char *name);
 
 extern node *STlast(node *symbol_table);
 
-extern void STprint(node *symbol_table);
-void STprintentry(node *symbol_table, size_t tabs);
-void STprintindentation(size_t n);
-const char *STentrytype(type type);
-
-
 // TODO
 extern node *STsearchFundef(node *table, const char *name);
 extern node *STdeepSearchFundef(node *table, const char *name);
-
-
-
 
 extern node *STdeepSearchVariableByName(node *table, const char *name);
 
