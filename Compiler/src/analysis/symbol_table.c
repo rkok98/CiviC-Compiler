@@ -117,6 +117,43 @@ node *STfindInParents(node *symbol_table, char *name)
     DBUG_RETURN(NULL);
 }
 
+node *STfindFunc(node *symbol_table, char *name)
+{
+    DBUG_ENTER("STfindFunc");
+    node *entry = SYMBOLTABLE_ENTRIES(symbol_table);
+
+    while (entry)
+    {
+        if (SYMBOLTABLEENTRY_ISFUNCTION(entry) && STReq(SYMBOLTABLEENTRY_NAME(entry), name))
+        {
+            DBUG_RETURN(entry);
+        }
+
+        entry = SYMBOLTABLEENTRY_NEXT(entry);
+    }
+
+    DBUG_RETURN(NULL);
+}
+
+node *STfindFuncInParents(node *symbol_table, char *name)
+{
+    DBUG_ENTER("STfindFuncInParents");
+
+    node *entry = STfindFunc(symbol_table, name);
+
+    if (entry)
+    {
+        DBUG_RETURN(entry);
+    }
+
+    if (SYMBOLTABLE_PARENT(symbol_table))
+    {
+        DBUG_RETURN(STfindFuncInParents(SYMBOLTABLE_PARENT(symbol_table), name));
+    }
+
+    DBUG_RETURN(NULL);
+}
+
 node *STlast(node *symbol_table)
 {
     DBUG_ENTER("STlast");
@@ -137,133 +174,6 @@ node *STlast(node *symbol_table)
 }
 
 // TODO
-/**
- *  Find an entry in a linked list of Symbol Table Entry nodes
- *  @param  list        the symbol table entry node
- *  @param  name        the name of the node
- *  @param  type        the type of node
- *  @return node|NULL
- */
-node *STsearchFundefEntry(node *list, const char *name)
-{
-    // do we have a valid entry
-    if (list == NULL)
-        return NULL;
-
-    // skip fundefs
-    if (SYMBOLTABLEENTRY_TABLE(list) == NULL)
-        return STsearchFundefEntry(SYMBOLTABLEENTRY_NEXT(list), name);
-
-    // check if the name is the same
-    if (strcmp(SYMBOLTABLEENTRY_NAME(list), name) != 0)
-        return STsearchFundefEntry(SYMBOLTABLEENTRY_NEXT(list), name);
-
-    // return the result
-    return list;
-}
-
-/**
- *  Find an entry in a linked list of Symbol Table Entry nodes
- *  @param  table       the symbol table
- *  @param  name        the name of the node
- *  @param  type        the type of node
- *  @return node|NULL
- */
-node *STsearchFundef(node *table, const char *name)
-{
-    // the entry
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    // return the result
-    return STsearchFundefEntry(entry, name);
-}
-
-/**
- *  Find an entry  by its name in a linked list of Symbol Table Entry nodes
- *  @param  table       the symbol table
- *  @param  name        the name of the node
- *  @return node|NULL
- */
-node *STdeepSearchFundef(node *table, const char *name)
-{
-    // search for the node in the current scope
-    node *found = STsearchFundef(table, name);
-
-    // do we have a node?
-    if (found != NULL)
-        return found;
-
-    // get the parent table
-    node *parent = SYMBOLTABLE_PARENT(table);
-
-    // do we have a parent table?
-    if (parent == NULL)
-        return NULL;
-
-    // search for the node in the parent table
-    return STdeepSearchFundef(parent, name);
-}
-
-node *STsearchVariableEntry(node *list, const char *name, type type)
-{
-    // do we have a valid entry
-    if (list == NULL)
-        return NULL;
-
-    // skip fundefs
-    if (SYMBOLTABLEENTRY_TABLE(list) != NULL)
-        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(list), name, type);
-
-    // check if the name is the same
-    if (strcmp(SYMBOLTABLEENTRY_NAME(list), name) != 0)
-        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(list), name, type);
-
-    // check if the type is the same
-    if (type != T_unknown && SYMBOLTABLEENTRY_TYPE(list) != type)
-        return STsearchVariableEntry(SYMBOLTABLEENTRY_NEXT(list), name, type);
-
-    // return the result
-    return list;
-}
-
-node *STsearchVariable(node *table, const char *name, type type)
-{
-    // the entry
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    // return the result
-    return STsearchVariableEntry(entry, name, type);
-}
-
-node *STsearchVariableByName(node *table, const char *name)
-{
-    // the entry
-    node *entry = SYMBOLTABLE_ENTRIES(table);
-
-    // return the result
-    return STsearchVariableEntry(entry, name, T_unknown);
-}
-
-node *STdeepSearchVariableByName(node *table, const char *name)
-{
-    // search for the node in the current scope
-    node *found = STsearchVariableByName(table, name);
-
-    // do we have a node?
-    if (found != NULL)
-        return found;
-
-    // get the parent table
-    node *parent = SYMBOLTABLE_PARENT(table);
-
-    // do we have a parent table?
-    if (parent == NULL)
-        return NULL;
-
-    // search for the node in the parent table
-    return STdeepSearchVariableByName(parent, name);
-}
-
 node *STdeepSearchByNode(node *table, node *link)
 {
     // get the entry

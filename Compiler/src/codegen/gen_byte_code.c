@@ -194,7 +194,7 @@ node *GBCexprstmt(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
   }
 
-  node *entry = STdeepSearchFundef(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(expr));
+  node *entry = STfindFuncInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(expr));
   node *link = SYMBOLTABLEENTRY_DEFINITION(entry);
 
   if (NODE_TYPE(link) == N_fundecl)
@@ -229,7 +229,7 @@ node *GBCfuncall(node *arg_node, info *arg_info)
 
   FUNCALL_ARGS(arg_node) = TRAVopt(FUNCALL_ARGS(arg_node), arg_info);
 
-  node *funcall = STdeepSearchFundef(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
+  node *funcall = STfindFuncInParents(INFO_SYMBOL_TABLE(arg_info), FUNCALL_NAME(arg_node));
   INFO_CURRENT_TYPE(arg_info) = SYMBOLTABLEENTRY_TYPE(funcall);
 
   node *link = SYMBOLTABLEENTRY_DEFINITION(funcall);
@@ -262,7 +262,7 @@ node *GBCfundecl(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCfundecl");
 
   node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
-  node *fundecl = STsearchFundef(symbol_table, FUNDECL_NAME(arg_node));
+  node *fundecl = STfindFunc(symbol_table, FUNDECL_NAME(arg_node));
   node *fundecl_entry = SYMBOLTABLE_ENTRIES(SYMBOLTABLEENTRY_TABLE(fundecl));
 
   char *fundecl_params = NULL;
@@ -296,7 +296,7 @@ node *GBCfundef(node *arg_node, info *arg_info)
   fprintf(INFO_FILE(arg_info), "%s:\n", FUNDEF_NAME(arg_node));
 
   node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
-  node *fundef = STsearchFundef(symbol_table, FUNDEF_NAME(arg_node));
+  node *fundef = STfindFunc(symbol_table, FUNDEF_NAME(arg_node));
 
   if (FUNDEF_ISEXPORT(arg_node))
   {
@@ -464,7 +464,7 @@ node *GBCglobdef(node *arg_node, info *arg_info)
 
   if (GLOBDEF_ISEXPORT(arg_node))
   {
-    node *globdef = STdeepSearchVariableByName(INFO_SYMBOL_TABLE(arg_info), GLOBDEF_NAME(arg_node));
+    node *globdef = STfindInParents(INFO_SYMBOL_TABLE(arg_info), GLOBDEF_NAME(arg_node));
 
     char *globdef_offset = STRitoa(SYMBOLTABLEENTRY_OFFSET(globdef));
     char *instructions_value = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", globdef_offset);
@@ -544,7 +544,7 @@ node *GBCvarlet(node *arg_node, info *arg_info)
   DBUG_ENTER("GBCvarlet");
 
   node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
-  INFO_SYMBOL_TABLE_ENTRY(arg_info) = STdeepSearchVariableByName(symbol_table, VARLET_NAME(arg_node));
+  INFO_SYMBOL_TABLE_ENTRY(arg_info) = STfindInParents(symbol_table, VARLET_NAME(arg_node));
 
   DBUG_RETURN(arg_node);
 }
@@ -552,7 +552,6 @@ node *GBCvarlet(node *arg_node, info *arg_info)
 node *GBCbinop(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCbinop");
-  DBUG_PRINT("GBC", ("GBCbinop"));
 
   TRAVdo(BINOP_LEFT(arg_node), arg_info);
   TRAVdo(BINOP_RIGHT(arg_node), arg_info);
