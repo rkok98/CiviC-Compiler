@@ -51,11 +51,15 @@ node *GVIprogram(node *arg_node, info *arg_info)
 
     node *init_body = TBmakeFunbody(NULL, NULL, NULL);
     node *init_function = TBmakeFundef(T_void, STRcpy("__init"), init_body, NULL);
-
+    node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
+    
     INFO_INIT_FUNCTION(arg_info) = init_function;
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(init_function)), FUNDEF_TYPE(init_function), 1, FUNDEF_ISEXPORT(init_function), 0, 0, 0, arg_node, NULL, NULL, init_symbol_table);
+
+    FUNDEF_SYMBOLTABLE(init_function) = init_symbol_table;
+    FUNDEF_ISEXPORT(init_function) = TRUE;
 
     node *declarations = TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
-
 
     if (INFO_LAST_STATEMENT(arg_info))
     {
@@ -65,6 +69,8 @@ node *GVIprogram(node *arg_node, info *arg_info)
     {
         FREEdoFreeTree(init_function);
     }
+
+    STinsert(PROGRAM_SYMBOLTABLE(arg_node), entry);
 
     DBUG_RETURN(arg_node);
 }

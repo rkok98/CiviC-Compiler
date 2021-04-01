@@ -40,3 +40,6 @@ Temporary Items
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/vscode,macos
+Compiler/bin/civas
+Compiler/bin/civvm
+Compiler/bin/civrun

@@ -38,6 +38,18 @@
                     <node name="Param" />
                     <node name="VarDecl" />
                     <node name="VarLet" />
+                    <node name="Var" />
+                </travuser>
+            </traversal>
+
+            <!-- TODO -->
+            <traversal id="FLVI" name="For-loop Induction Variable Initialisation" default="sons" include="for_loop_variable_initialisation.h">
+                <travuser>
+                    <node name="FunBody" />
+                    <node name="Stmts" />
+                    <node name="For" />
+                    <node name="VarLet" />
+                    <node name="Var" />
                 </travuser>
             </traversal>
 
@@ -48,12 +60,11 @@
                     <node name="Bool" />
                     <node name="Program" />
                     <node name="FunDef" />
+                    <node name="FunCall" />
                     <node name="VarDecl" />
                     <node name="VarLet" />
                     <node name="Assign" />
                     <node name="Return" />
-
-                    <!-- <node name="FunCall" /> -->
                     <node name="Cast" />
                     <node name="BinOp" />
                 </travuser>
@@ -72,6 +83,25 @@
                     <node name="VarDecl" />
                 </travuser>
             </traversal>
+
+            <traversal id="BDC" name="Boolean Disjunction and Conjunction" default="sons" include="bool_disjunction.h">
+                <travuser>
+                    <node name="BinOp" />
+                </travuser>
+            </traversal>
+
+            <traversal id="TBC" name="Compiling Boolean Cast Expressions" default="sons" include="transform_boolean_cast.h">
+                <travuser>
+                    <node name="Num" />
+                    <node name="Float" />
+                    <node name="Bool" />
+                    <node name="Var"/>
+                    <node name="Cast" />
+                    <node name="BinOp" />
+                </travuser>
+            </traversal>
+
+            <traversal id="GBC" name="Generate byte code" default="user" include="gen_byte_code.h"/>
         </general>
     </phases>
     <nodesets>
@@ -86,6 +116,7 @@
                 <node name="Float"/>
                 <node name="Bool"/>
                 <node name="ArrExpr"/>
+                <node name="Ternary" />
             </target>
         </nodeset>
         <nodeset name="Stmt">
@@ -387,6 +418,17 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="SymbolTable">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
             </attributes>
             <flags>
                 <flag name="IsExport" />
@@ -528,6 +570,40 @@
             </attributes>
             <flags>
             </flags>
+        </node>
+        <node name="Ternary">
+            <sons>
+                <son name="Cond">
+                    <targets>
+                        <target mandatory="yes">
+                            <set name="Expr"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Then">
+                    <targets>
+                        <target mandatory="yes">
+                            <set name="Expr"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Else">
+                    <targets>
+                        <target mandatory="yes">
+                            <set name="Expr"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
         </node>
         <node name="While">
             <sons>
@@ -1004,7 +1080,7 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="Symboltable">
+                <attribute name="SymbolTable">
                     <type name="Link">
                         <targets>
                             <target mandatory="no">
@@ -1050,6 +1126,17 @@
                                 <any/>
                                 <phases>
                                     <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="SymbolTable">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
                                 </phases>
                             </target>
                         </targets>
@@ -1151,7 +1238,6 @@
         </node>
         <!-- Symbol Table-->
         <node name="SymbolTable">
-            <description>Symbol table entry</description>
             <sons>
                 <son name="Entries">
                     <description>ST body</description>
@@ -1188,6 +1274,17 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="ReturnType">
+                    <type name="Type">
+                        <targets>
+                            <target mandatory="no">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
             </attributes>
         </node>
 
@@ -1206,6 +1303,16 @@
                     </targets>
                 </son>
                 <son name="NextTable">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="SymbolTable"/>
+                            <phases>
+                                <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Table">
                     <targets>
                         <target mandatory="no">
                             <node name="SymbolTable"/>
@@ -1263,6 +1370,41 @@
                 </attribute>
                 <attribute name="IsParameter">
                     <type name="Bool">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Offset">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="yes">
+                                <any/>
+                                <phases>
+                                    <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Depth">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="yes">
+                                <any/>
+                                <phases>
+                                    <all/>
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Definition">
+                    <type name="Link">
                         <targets>
                             <target mandatory="yes">
                                 <phases>

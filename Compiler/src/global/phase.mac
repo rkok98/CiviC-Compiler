@@ -31,6 +31,12 @@ PHASE( ac,
        "Analyzing Code",
        ALWAYS)
 
+SUBPHASE( FLVI,
+          "For-loop Induction Variable Initialisation",
+          FLVIinitializeForLoopsVariables,
+          ALWAYS,
+          ac)
+
 SUBPHASE(  ca,
           "Running Context Analysis",
            CAdoContextAnalysis, 
@@ -53,6 +59,18 @@ SUBPHASE(  lvi,
 SUBPHASE(  tc,
           "Type checking",
            TCdoTypeChecking, 
+           ALWAYS,
+           ac)
+
+SUBPHASE(  bdc,
+          "Boolean Disjunction and Conjunction",
+           BDCdoBoolDisjunction, 
+           ALWAYS,
+           ac)
+
+SUBPHASE(  tbc,
+          "Transform Boolean Cast Expressions",
+           TBCtransformBooleanCast, 
            ALWAYS,
            ac)
 
