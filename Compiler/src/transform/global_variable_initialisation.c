@@ -54,7 +54,7 @@ node *GVIprogram(node *arg_node, info *arg_info)
     node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
     
     INFO_INIT_FUNCTION(arg_info) = init_function;
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(init_function)), FUNDEF_TYPE(init_function), 0, 0, arg_node, NULL, NULL, init_symbol_table);
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(init_function)), FUNDEF_TYPE(init_function), arg_node, NULL, NULL, init_symbol_table);
 
     SYMBOLTABLEENTRY_ISFUNCTION(entry) = TRUE;
     SYMBOLTABLEENTRY_ISEXPORT(entry) = FUNDEF_ISEXPORT(init_function);

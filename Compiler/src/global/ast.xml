@@ -1237,7 +1237,7 @@
             </attributes>
             <flags/>
         </node>
-        
+
         <!-- Symbol Table-->
         <node name="SymbolTable">
             <sons>
@@ -1337,10 +1337,21 @@
                         </targets>
                     </type>
                 </attribute>
+                <attribute name="Declaration">
+                    <type name="Link">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
                 <attribute name="Offset">
                     <type name="Int">
                         <targets>
-                            <target mandatory="yes">
+                            <target mandatory="no">
                                 <any/>
                                 <phases>
                                     <all/>
@@ -1352,21 +1363,10 @@
                 <attribute name="Depth">
                     <type name="Int">
                         <targets>
-                            <target mandatory="yes">
+                            <target mandatory="no">
                                 <any/>
                                 <phases>
                                     <all/>
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
-                <attribute name="Definition">
-                    <type name="Link">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
                                 </phases>
                             </target>
                         </targets>
