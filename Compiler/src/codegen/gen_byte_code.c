@@ -83,7 +83,7 @@ node *SearchInCGTableEntries(node *entries, const char *value)
     return NULL;
   }
 
-  if (STReq(CODEGENTABLEENTRY_INSTRUCTION(entries), value))
+  if (STReq(CODEGENTABLEENTRY_VALUE(entries), value))
   {
     return entries;
   }
@@ -279,7 +279,7 @@ node *GBCfundecl(node *arg_node, info *arg_info)
 
   const char *instruction_value = STRcatn(6, "fun \"", FUNDECL_NAME(arg_node), "\" ", HprintType(FUNDECL_TYPE(arg_node)), " ", fundecl_params ? fundecl_params : "");
 
-  node *cgtable_entry = TBmakeCodegentableentry(0, ".import", STRcpy(instruction_value), NULL);
+  node *cgtable_entry = TBmakeCodegentableentry(0, I_import, STRcpy(instruction_value), NULL);
   node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
   CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_imports, cgtable_entry);
@@ -316,7 +316,7 @@ node *GBCfundef(node *arg_node, info *arg_info)
 
     const char *instruction_value = STRcatn(8, "fun \"", FUNDEF_NAME(arg_node), "\" ", HprintType(FUNDEF_TYPE(arg_node)), " ", fundef_params ? fundef_params : "", " ", FUNDEF_NAME(arg_node));
 
-    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", STRcpy(instruction_value), NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(0, I_export, STRcpy(instruction_value), NULL);
     node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
     CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_exports, cgtable_entry);
@@ -449,7 +449,7 @@ node *GBCglobdecl(node *arg_node, info *arg_info)
 
   char *instructions_value = STRcatn(4, "var \"", GLOBDECL_NAME(arg_node), "\" ", HprintType(GLOBDECL_TYPE(arg_node)));
 
-  node *cgtable_entry = TBmakeCodegentableentry(0, ".import", instructions_value, NULL);
+  node *cgtable_entry = TBmakeCodegentableentry(0, I_import, instructions_value, NULL);
   node *cgtable_imports = CODEGENTABLE_IMPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
   cgtable_imports = addToCGTableEntries(cgtable_imports, cgtable_entry);
@@ -470,7 +470,7 @@ node *GBCglobdef(node *arg_node, info *arg_info)
     char *globdef_offset = STRitoa(SYMBOLTABLEENTRY_OFFSET(globdef));
     char *instructions_value = STRcatn(4, "var \"", GLOBDEF_NAME(arg_node), "\" ", globdef_offset);
 
-    node *cgtable_entry = TBmakeCodegentableentry(0, ".export", instructions_value, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(0, I_export, instructions_value, NULL);
     node *cgtable_exports = CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info));
 
     CODEGENTABLE_EXPORTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_exports, cgtable_entry);
@@ -479,7 +479,7 @@ node *GBCglobdef(node *arg_node, info *arg_info)
   }
 
   node *cg_table_globals = CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info));
-  node *cgtable_entry = TBmakeCodegentableentry(0, ".global ", STRcpy(HprintType(GLOBDEF_TYPE(arg_node))), NULL);
+  node *cgtable_entry = TBmakeCodegentableentry(0, I_global, STRcpy(HprintType(GLOBDEF_TYPE(arg_node))), NULL);
 
   CODEGENTABLE_GLOBALS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cg_table_globals, cgtable_entry);
 
@@ -709,7 +709,7 @@ node *GBCnum(node *arg_node, info *arg_info)
   }
   else
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), ".const ", instruction_value, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), I_constant, instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
@@ -737,7 +737,7 @@ node *GBCfloat(node *arg_node, info *arg_info)
   }
   else
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), ".const ", instruction_value, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), I_constant, instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
@@ -765,7 +765,7 @@ node *GBCbool(node *arg_node, info *arg_info)
   }
   else
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), ".const ", instruction_value, NULL);
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), I_constant, instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
@@ -835,18 +835,23 @@ node *GBCcodegentableentry(node *arg_node, info *arg_info)
   switch (CODEGENTABLEENTRY_INSTRUCTION(arg_node))
   {
   case I_constant:
+    pseudo_instruction = ".const ";
     break;
   case I_export:
+    pseudo_instruction = ".export";
     break;
   case I_global:
+    pseudo_instruction = ".global ";
     break;
   case I_import:
+    pseudo_instruction = ".import";
     break;
+  case I_unknown:
   default:
     DBUG_RETURN(arg_node);
   }
 
-  fprintf(fileptr, "%s%s\n", CODEGENTABLEENTRY_INSTRUCTION(arg_node), CODEGENTABLEENTRY_VALUE(arg_node));
+  fprintf(fileptr, "%s%s\n", pseudo_instruction, CODEGENTABLEENTRY_VALUE(arg_node));
 
   CODEGENTABLEENTRY_NEXT(arg_node) = TRAVopt(CODEGENTABLEENTRY_NEXT(arg_node), arg_info);
 
