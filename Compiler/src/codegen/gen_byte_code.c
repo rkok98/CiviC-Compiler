@@ -706,23 +706,23 @@ node *GBCnum(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCnum");
 
-  char *str = STRcat("int ", STRitoa(NUM_VALUE(arg_node)));
+  char *instruction_value = STRcat("int ", STRitoa(NUM_VALUE(arg_node)));
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *const_pool = SearchPool(cgtable_constants, str);
+  node *const_pool = SearchPool(cgtable_constants, instruction_value);
 
-  if (!const_pool)
+  if (const_pool)
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "iloadc", CODEGENTABLEENTRY_INDEX(const_pool));
+    free(instruction_value);
+  }
+  else
+  {
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
     INFO_LOAD_COUNTER(arg_info) += 1;
-  }
-  else
-  {
-    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "iloadc", CODEGENTABLEENTRY_INDEX(const_pool));
-    free(str);
   }
 
   INFO_CURRENT_TYPE(arg_info) = T_int;
@@ -738,7 +738,6 @@ node *GBCfloat(node *arg_node, info *arg_info)
   int length = snprintf(NULL, 0, "float %f", FLOAT_VALUE(arg_node));
   char *str = malloc(length + 1);
   snprintf(str, length + 1, "float %f", FLOAT_VALUE(arg_node));
-
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
   node *const_pool = SearchPool(cgtable_constants, str);
