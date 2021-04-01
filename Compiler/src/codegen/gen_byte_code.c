@@ -1,22 +1,18 @@
-#include "globals.h"
-
 #include "gen_byte_code.h"
-#include "symbol_table.h"
-
-#include "types.h"
-#include "tree_basic.h"
-#include "traverse.h"
-#include "dbug.h"
-
-#include "ctinfo.h"
-#include <stdio.h>
-#include "memory.h"
-#include "free.h"
-#include "str.h"
-#include "print.h"
-#include <unistd.h>
 
 #include "helpers.h"
+#include "symbol_table.h"
+
+#include "dbug.h"
+#include "globals.h"
+#include "traverse.h"
+#include "tree_basic.h"
+#include "types.h"
+
+#include "ctinfo.h"
+#include "free.h"
+#include "memory.h"
+#include "str.h"
 
 struct INFO
 {
@@ -39,7 +35,7 @@ struct INFO
 #define INFO_SYMBOL_TABLE_ENTRY(n) ((n)->symbol_table_entry)
 
 #define INFO_LOAD_CONSTS_COUNTER(n) ((n)->load_constants_counter)
-#define INFO_BRANCH_COUNT(n) ((n)->branch_count)
+#define INFO_BRANCH_COUNTER(n) ((n)->branch_count)
 
 #define INFO_CURRENT_TYPE(n) ((n)->current_type)
 
@@ -58,7 +54,7 @@ static info *MakeInfo()
   INFO_SYMBOL_TABLE_ENTRY(result) = NULL;
 
   INFO_LOAD_CONSTS_COUNTER(result) = 0;
-  INFO_BRANCH_COUNT(result) = 0;
+  INFO_BRANCH_COUNTER(result) = 0;
 
   INFO_CURRENT_TYPE(result) = T_unknown;
 
@@ -76,8 +72,8 @@ static info *FreeInfo(info *info)
 
 char *createBranch(const char *name, info *info)
 {
-  INFO_BRANCH_COUNT(info) += 1;
-  return STRcatn(3, STRitoa(INFO_BRANCH_COUNT(info)), "_", name);
+  INFO_BRANCH_COUNTER(info) += 1;
+  return STRcatn(3, STRitoa(INFO_BRANCH_COUNTER(info)), "_", name);
 }
 
 node *SearchInCGTableEntries(node *entries, const char *value)
@@ -704,11 +700,11 @@ node *GBCnum(node *arg_node, info *arg_info)
   char *instruction_value = STRcat("int ", STRitoa(NUM_VALUE(arg_node)));
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *const_pool = SearchInCGTableEntries(cgtable_constants, instruction_value);
+  node *constant_entry = SearchInCGTableEntries(cgtable_constants, instruction_value);
 
-  if (const_pool)
+  if (constant_entry)
   {
-    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "iloadc", CODEGENTABLEENTRY_INDEX(const_pool));
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "iloadc", CODEGENTABLEENTRY_INDEX(constant_entry));
     free(instruction_value);
   }
   else
@@ -732,11 +728,11 @@ node *GBCfloat(node *arg_node, info *arg_info)
   char *instruction_value = STRcat("float ", STRitoa(FLOAT_VALUE(arg_node)));
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *const_entry = SearchInCGTableEntries(cgtable_constants, instruction_value);
+  node *constant_entry = SearchInCGTableEntries(cgtable_constants, instruction_value);
 
-  if (const_entry)
+  if (constant_entry)
   {
-    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "floadc", CODEGENTABLEENTRY_INDEX(const_entry));
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "floadc", CODEGENTABLEENTRY_INDEX(constant_entry));
     free(instruction_value);
   }
   else
@@ -760,11 +756,11 @@ node *GBCbool(node *arg_node, info *arg_info)
   char *instruction_value = STRcat("bool ", BOOL_VALUE(arg_node) ? "true" : "false");
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *const_pool = SearchInCGTableEntries(cgtable_constants, instruction_value);
+  node *constant_entry = SearchInCGTableEntries(cgtable_constants, instruction_value);
 
-  if (const_pool)
+  if (constant_entry)
   {
-    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "bloadc", CODEGENTABLEENTRY_INDEX(const_pool));
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "bloadc", CODEGENTABLEENTRY_INDEX(constant_entry));
     free(instruction_value);
   }
   else
