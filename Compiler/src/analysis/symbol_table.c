@@ -60,7 +60,7 @@ node *STinsert(node *symbol_table, node *entry)
 
     if (STfind(symbol_table, SYMBOLTABLEENTRY_NAME(entry)) != NULL)
     {
-        CTIerror("Variable/Function '%s' at line %d is already defined.", SYMBOLTABLEENTRY_NAME(entry), NODE_LINE(entry) + 1);
+        CTIerrorLine(NODE_LINE(entry) + 1, "Variable/Function '%s' is already defined.", SYMBOLTABLEENTRY_NAME(entry));
         return NULL;
     }
 
