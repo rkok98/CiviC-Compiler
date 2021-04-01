@@ -76,15 +76,15 @@ char *createBranch(const char *name, info *info)
   return STRcatn(3, STRitoa(INFO_BRANCH_COUNTER(info)), "_", name);
 }
 
-node *addToCGTableEntries(node *entries, node *value)
+node *addToCGTableEntries(node *entries, node *new_entry)
 {
   if (!entries)
   {
-    entries = value;
+    entries = new_entry;
   }
   else
   {
-    CODEGENTABLEENTRY_NEXT(entries) = addToCGTableEntries(CODEGENTABLEENTRY_NEXT(entries), value);
+    CODEGENTABLEENTRY_NEXT(entries) = addToCGTableEntries(CODEGENTABLEENTRY_NEXT(entries), new_entry);
   }
 
   return entries;
@@ -685,8 +685,8 @@ node *GBCnum(node *arg_node, info *arg_info)
   char *instruction_value = STRcat("int ", STRitoa(NUM_VALUE(arg_node)));
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-
   node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), I_constant, instruction_value, NULL);
+  
   fprintf(INFO_FILE(arg_info), "\t%s %d\n", "iloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
   CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
@@ -705,6 +705,7 @@ node *GBCfloat(node *arg_node, info *arg_info)
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
   node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), I_constant, instruction_value, NULL);
+  
   fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
   CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
@@ -723,6 +724,7 @@ node *GBCbool(node *arg_node, info *arg_info)
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
   node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_CONSTS_COUNTER(arg_info), I_constant, instruction_value, NULL);
+  
   fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
   CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToCGTableEntries(cgtable_constants, cgtable_entry);
