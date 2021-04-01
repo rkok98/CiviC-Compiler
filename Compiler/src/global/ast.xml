@@ -11,6 +11,7 @@
         <type name="Type" ctype="type" init="T_unknown" copy="literal"/>
         <type name="Link" ctype="node*" init="NULL" copy="lookup"/>
         <type name="CompilerPhase" ctype="compiler_phase_t" init="PH_initial" copy="literal"/>
+        <type name="PseudoInstruct" ctype="pseudo_instruct" init="I_unknown" copy="literal"/>
     </attributetypes>
     <phases>
         <!-- id is the short id of the traversal
@@ -1236,6 +1237,7 @@
             </attributes>
             <flags/>
         </node>
+        
         <!-- Symbol Table-->
         <node name="SymbolTable">
             <sons>
@@ -1267,17 +1269,6 @@
                     <type name="Link">
                         <targets>
                             <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
-                <attribute name="ReturnType">
-                    <type name="Type">
-                        <targets>
-                            <target mandatory="no">
                                 <phases>
                                     <all />
                                 </phases>
@@ -1405,6 +1396,142 @@
                 </attribute>
                 <attribute name="Definition">
                     <type name="Link">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+            </attributes>
+        </node>
+
+        <!-- Code gen -->
+        <node name="CodeGenTable">
+            <sons>
+                <son name="Constants">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="CodeGenTableEntry" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Exports">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="CodeGenTableEntry" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Globals">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="CodeGenTableEntry" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Imports">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="CodeGenTableEntry" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+        </node>
+
+        <node name="CodeGenTableEntry">
+            <sons>
+                <son name="Next">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="CodeGenTableEntry" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+            <attributes>
+                <attribute name="Index">
+                    <type name="Int">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Instruction">
+                    <type name="PseudoInstruct">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Value">
+                    <type name="String">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+            </attributes>
+        </node>
+
+        <!-- Linked List -->
+        <node name="LinkedValue">
+            <sons>
+                <son name="Next">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="LinkedValue" />
+                            <phases>
+                                <all />
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+            </sons>
+            <attributes>
+                <attribute name="Key">
+                    <type name="String">
+                        <targets>
+                            <target mandatory="yes">
+                                <phases>
+                                    <all />
+                                </phases>
+                            </target>
+                        </targets>
+                    </type>
+                </attribute>
+                <attribute name="Value">
+                    <type name="String">
                         <targets>
                             <target mandatory="yes">
                                 <phases>
