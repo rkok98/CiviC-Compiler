@@ -11,6 +11,7 @@
         <type name="Type" ctype="type" init="T_unknown" copy="literal"/>
         <type name="Link" ctype="node*" init="NULL" copy="lookup"/>
         <type name="CompilerPhase" ctype="compiler_phase_t" init="PH_initial" copy="literal"/>
+        <type name="PseudoInstruct" ctype="pseudo_instruct" init="I_unknown" copy="literal"/>
     </attributetypes>
     <phases>
         <!-- id is the short id of the traversal

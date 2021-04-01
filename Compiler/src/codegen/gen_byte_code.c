@@ -830,6 +830,22 @@ node *GBCcodegentableentry(node *arg_node, info *arg_info)
 
   FILE *fileptr = INFO_FILE(arg_info);
 
+  const char *pseudo_instruction;
+
+  switch (CODEGENTABLEENTRY_INSTRUCTION(arg_node))
+  {
+  case I_constant:
+    break;
+  case I_export:
+    break;
+  case I_global:
+    break;
+  case I_import:
+    break;
+  default:
+    DBUG_RETURN(arg_node);
+  }
+
   fprintf(fileptr, "%s%s\n", CODEGENTABLEENTRY_INSTRUCTION(arg_node), CODEGENTABLEENTRY_VALUE(arg_node));
 
   CODEGENTABLEENTRY_NEXT(arg_node) = TRAVopt(CODEGENTABLEENTRY_NEXT(arg_node), arg_info);
@@ -857,12 +873,12 @@ node *GBCdoGenByteCode(node *syntaxtree)
   {
     INFO_FILE(arg_info) = stdout;
   }
-  
+
   TRAVpush(TR_gbc);
 
   syntaxtree = TRAVdo(syntaxtree, arg_info);
   INFO_CODE_GEN_TABLE(arg_info) = TRAVopt(INFO_CODE_GEN_TABLE(arg_info), arg_info);
-  
+
   TRAVpop();
 
   FreeInfo(arg_info);

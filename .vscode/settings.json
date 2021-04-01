@@ -23,7 +23,10 @@
         "vector": "c",
         "induction_var_list.h": "c",
         "__locale": "c",
-        "sstream": "c"
+        "sstream": "c",
+        "unistd.h": "c",
+        "globals.h": "c",
+        "gen_byte_code.h": "c"
     },
     "cSpell.language": "nl,en,en-GB,en-US"
 }
