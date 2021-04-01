@@ -1337,39 +1337,6 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="IsFunction">
-                    <type name="Bool">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
-                <attribute name="IsExport">
-                    <type name="Bool">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
-                <attribute name="IsParameter">
-                    <type name="Bool">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
                 <attribute name="Offset">
                     <type name="Int">
                         <targets>
@@ -1406,6 +1373,11 @@
                     </type>
                 </attribute>
             </attributes>
+            <flags>
+                <flag name="IsFunction" />
+                <flag name="IsExport" />
+                <flag name="IsParameter" />
+            </flags>
         </node>
 
         <!-- Code gen -->
