@@ -340,12 +340,8 @@ node *STdeepSearchByNode(node *table, node *link)
 
         DBUG_PRINT("GBC", ("SEARCH 1.1"));
 
-        printf("AAASDA");
-
         if (NODE_TYPE(link) != NODE_TYPE(n))
             continue;
-
-        printf("BB");
 
         if (NODE_TYPE(n) == N_globdef && STReq(GLOBDEF_NAME(n), GLOBDEF_NAME(link)))
             return entry;
