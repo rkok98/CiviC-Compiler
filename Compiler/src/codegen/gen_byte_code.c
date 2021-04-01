@@ -733,32 +733,26 @@ node *GBCnum(node *arg_node, info *arg_info)
 node *GBCfloat(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCfloat");
-  DBUG_PRINT("GBC", ("GBCfloat"));
 
-  int length = snprintf(NULL, 0, "float %f", FLOAT_VALUE(arg_node));
-  char *str = malloc(length + 1);
-  snprintf(str, length + 1, "float %f", FLOAT_VALUE(arg_node));
+  char *instruction_value = STRcat("float ", STRitoa(FLOAT_VALUE(arg_node)));
 
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *const_pool = SearchPool(cgtable_constants, str);
+  node *const_entry = SearchPool(cgtable_constants, instruction_value);
 
-  // Add to const pool if it doesn't exist yet.
-  // Else extract values from linked list and print to file.
-  if (const_pool == NULL)
+  if (const_entry)
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "floadc", CODEGENTABLEENTRY_INDEX(const_entry));
+    free(instruction_value);
+  }
+  else
+  {
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "floadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
     INFO_LOAD_COUNTER(arg_info) += 1;
   }
-  else
-  {
-    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "floadc", CODEGENTABLEENTRY_INDEX(const_pool));
-    free(str);
-  }
 
-  // Set current type to float
   INFO_CURRENT_TYPE(arg_info) = T_float;
 
   DBUG_RETURN(arg_node);
@@ -767,32 +761,26 @@ node *GBCfloat(node *arg_node, info *arg_info)
 node *GBCbool(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCbool");
-  DBUG_PRINT("GBC", ("GBCbool"));
 
-  // Create const pool byte code string
-  char *str = STRcat("bool ", BOOL_VALUE(arg_node) ? "true" : "false");
+  char *instruction_value = STRcat("bool ", BOOL_VALUE(arg_node) ? "true" : "false");
 
-  // Search linked list for const value
   node *cgtable_constants = CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info));
-  node *const_pool = SearchPool(cgtable_constants, str);
+  node *const_pool = SearchPool(cgtable_constants, instruction_value);
 
-  // Add to const pool if it doesn't exist yet.
-  // Else extract values from linked list and print to file.
-  if (const_pool == NULL)
+  if (const_pool)
   {
-    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", str, NULL);
+    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "bloadc", CODEGENTABLEENTRY_INDEX(const_pool));
+    free(instruction_value);
+  }
+  else
+  {
+    node *cgtable_entry = TBmakeCodegentableentry(INFO_LOAD_COUNTER(arg_info), ".const ", instruction_value, NULL);
     fprintf(INFO_FILE(arg_info), "\t%s %d\n", "bloadc", CODEGENTABLEENTRY_INDEX(cgtable_entry));
 
     CODEGENTABLE_CONSTANTS(INFO_CODE_GEN_TABLE(arg_info)) = addToPool(cgtable_constants, cgtable_entry);
     INFO_LOAD_COUNTER(arg_info) += 1;
   }
-  else
-  {
-    fprintf(INFO_FILE(arg_info), "\t%s %u\n", "bloadc", CODEGENTABLEENTRY_INDEX(const_pool));
-    free(str);
-  }
 
-  // Set current type to bool
   INFO_CURRENT_TYPE(arg_info) = T_bool;
 
   DBUG_RETURN(arg_node);
@@ -801,9 +789,8 @@ node *GBCbool(node *arg_node, info *arg_info)
 node *GBCerror(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCerror");
-  DBUG_PRINT("GBC", ("GBCerror"));
 
-  TRAVopt(ERROR_NEXT(arg_node), arg_info);
+  ERROR_NEXT(arg_node) = TRAVopt(ERROR_NEXT(arg_node), arg_info);
 
   DBUG_RETURN(arg_node);
 }
@@ -811,75 +798,26 @@ node *GBCerror(node *arg_node, info *arg_info)
 node *GBCternary(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCternary");
-  DBUG_PRINT("GBC", ("GBCternary"));
 
-  // creat the branch name
-  char *branch = createBranch("false_expr", arg_info);
+  char *false_branch = createBranch("false_expr", arg_info);
 
-  // traverse over the expresion
-  TRAVopt(TERNARY_COND(arg_node), arg_info);
+  TERNARY_COND(arg_node) = TRAVopt(TERNARY_COND(arg_node), arg_info);
 
-  // creat the end branch
-  fprintf(INFO_FILE(arg_info), "\tbranch_f %s\n", branch);
+  fprintf(INFO_FILE(arg_info), "\tbranch_f %s\n", false_branch);
 
-  // traverse over true branch
-  TRAVopt(TERNARY_THEN(arg_node), arg_info);
+  TERNARY_THEN(arg_node) = TRAVopt(TERNARY_THEN(arg_node), arg_info);
+  char *end_branch = createBranch("end", arg_info);
 
-  // creat the branch name
-  char *end = createBranch("end", arg_info);
+  fprintf(INFO_FILE(arg_info), "\tjump %s\n", end_branch);
+  fprintf(INFO_FILE(arg_info), "%s:\n", false_branch);
 
-  // write the jump
-  fprintf(INFO_FILE(arg_info), "\tjump %s\n", end);
+  TERNARY_ELSE(arg_node) = TRAVopt(TERNARY_ELSE(arg_node), arg_info);
 
-  // write the end false branch
-  fprintf(INFO_FILE(arg_info), "%s:\n", branch);
+  fprintf(INFO_FILE(arg_info), "%s:\n", end_branch);
 
-  // traverse over false branch
-  TRAVopt(TERNARY_ELSE(arg_node), arg_info);
-
-  // write the end branch
-  fprintf(INFO_FILE(arg_info), "%s:\n", end);
-
-  // done
   DBUG_RETURN(arg_node);
 }
 
-/*
- * Traversal start function
- */
-
-node *GBCdoGenByteCode(node *syntaxtree)
-{
-  DBUG_ENTER("GBCdoGenByteCode");
-  DBUG_PRINT("GBC", ("GBCdoGenByteCode"));
-
-  // the output file
-  global.outfile = global.outfile ? global.outfile : STRcpy("a.out");
-
-  info *info = MakeInfo();
-
-  INFO_FILE(info) = fopen(global.outfile, "w");
-
-  if (INFO_FILE(info) == NULL)
-    CTIabort("Could not open file: %s", global.outfile);
-
-  TRAVpush(TR_gbc);
-  syntaxtree = TRAVdo(syntaxtree, info);
-  INFO_CODE_GEN_TABLE(info) = TRAVopt(INFO_CODE_GEN_TABLE(info), info);
-  TRAVpop();
-
-  // close the file
-  fclose(INFO_FILE(info));
-
-  // free the pointer
-  FreeInfo(info);
-
-  DBUG_RETURN(syntaxtree);
-}
-
-/**
- * TODO: Print to out file
- */
 node *GBCcodegentable(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCcodegentable");
@@ -892,6 +830,9 @@ node *GBCcodegentable(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
+/**
+ * Prints the imports, constants, globals and exports from the codegen table.
+ */
 node *GBCcodegentableentry(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBCcodegentableentry");
@@ -905,9 +846,33 @@ node *GBCcodegentableentry(node *arg_node, info *arg_info)
   DBUG_RETURN(arg_node);
 }
 
-/**
- * TODO: Remove the functions below
- */
+node *GBCdoGenByteCode(node *syntaxtree)
+{
+  DBUG_ENTER("GBCdoGenByteCode");
+
+  info *arg_info = MakeInfo();
+
+  if (global.outfile)
+  {
+    INFO_FILE(arg_info) = fopen(global.outfile, "w");
+  }
+  else
+  {
+    INFO_FILE(arg_info) = stdout;
+  }
+  
+  TRAVpush(TR_gbc);
+
+  syntaxtree = TRAVdo(syntaxtree, arg_info);
+  INFO_CODE_GEN_TABLE(arg_info) = TRAVopt(INFO_CODE_GEN_TABLE(arg_info), arg_info);
+  
+  TRAVpop();
+
+  FreeInfo(arg_info);
+
+  DBUG_RETURN(syntaxtree);
+}
+
 node *GBClinkedvalue(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("GBClinkedvalue");
