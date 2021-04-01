@@ -1480,7 +1480,7 @@
                     </type>
                 </attribute>
                 <attribute name="Instruction">
-                    <type name="String">
+                    <type name="PseudoInstruct">
                         <targets>
                             <target mandatory="yes">
                                 <phases>
