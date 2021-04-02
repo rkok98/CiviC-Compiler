@@ -162,7 +162,8 @@ At the end of the civic.y YACC file we added an error function that prints an er
 with CTIabort so the user can see where the error came from (line + col number) and what
 the error message is. 
 
-\section{Semantic Analysis}
+\section{Context Analysis}
+% TODO: René
 Semantic Analysis consists of 2 parts: the context analysis and the type checker. The context
 analyser uses the output from the parser (the AST) and outputs an AST with symbol tables. the
 type checker checks for example if a value can be assigned to a certain type. 
@@ -171,8 +172,8 @@ The context analyser (CA) starts with creating a symbol table for the program. A
 symbol table the CA walks through the AST and calls the corresponding CA node function to create 
 a new SymbolTableEntry for the node.
 
-\section{Optimization}
-% TODO
+\section{Code transformations}
+% TODO: Milestone 6, 9, 10 en for-loop variable initializing (Milestone 5) en for- to while loop
 
 \newpage
 \section{Code Generation}
