@@ -72,7 +72,8 @@ of our compiler and what we did and how we did it. We will do this by following 
 from scanning/parsing to code generation and also use the milestones to further 
 explain the compiler.
 
-% TODO: Schrijf dat we geen extensies hebben toegevoegd en/of optimalizaties buiten de standaard milestones om.
+We didn't implement any of the extensions and optimizations beyond the standard 
+milestones for a functional compiler.
 
 %-------------------------------------------------------------------------------
 %	METHODE
@@ -162,7 +163,13 @@ with CTIabort so the user can see where the error came from (line + col number) 
 the error message is. 
 
 \section{Semantic Analysis}
-% TODO
+Semantic Analysis consists of 2 parts: the context analysis and the type checker. The context
+analyser uses the output from the parser (the AST) and outputs an AST with symbol tables. the
+type checker checks for example if a value can be assigned to a certain type. 
+
+The context analyser (CA) starts with creating a symbol table for the program. After creating the
+symbol table the CA walks through the AST and calls the corresponding CA node function to create 
+a new SymbolTableEntry for the node.
 
 \section{Optimization}
 % TODO
