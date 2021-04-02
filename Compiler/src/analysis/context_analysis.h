@@ -9,9 +9,10 @@ node *CAglobdef(node *arg_node, info *arg_info);
 
 node *CAfundecl(node *arg_node, info *arg_info);
 node *CAfundef(node *arg_node, info *arg_info);
-node *CAparam(node *arg_node, info *arg_info);
 
+node *CAparam(node *arg_node, info *arg_info);
 node *CAvardecl(node *arg_node, info *arg_info);
+
 node *CAvarlet(node *arg_node, info *arg_info);
 node *CAvar(node *arg_node, info *arg_info);
 
