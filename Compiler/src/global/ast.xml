@@ -43,7 +43,7 @@
                 </travuser>
             </traversal>
 
-            <traversal id="FLVI" name="For-loop Induction Variable Initialisation & For- to While-loop conversion" default="sons" include="for_loop_variable_initialisation.h">
+            <traversal id="FLVI" name="For-loop Induction Variable Initialisation &amp; For- to While-loop conversion" default="sons" include="for_loop_variable_initialisation.h">
                 <travuser>
                     <node name="FunBody" />
                     <node name="Stmts" />
