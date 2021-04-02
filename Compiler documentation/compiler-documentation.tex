@@ -138,9 +138,13 @@ use it to create and output an abstract syntax tree (AST). The parser uses the s
 of tokens to do pattern matching with the pre defined casus in the compiler. 
 
 The parser does all the pattern matching for us. For each node in the AST we created 
-a new node with its pattern in civic.y so the parser can match them. 
-Listing 2 is an example of pattern matching of a simple piece of code. In this
-example we added the node with its pattern so the pattern matching visible. 
+a new node with its pattern in civic.y so the parser can match them. The civic.y is a
+YACC file which stands for "Yet Another Compiler Compiler” and auto-generates parsers
+from context-free grammars. The YACC file contains all patterns with their corresponding
+actions to perform.
+
+Listing 2 shows a simple example of pattern matching. In this example we added the
+node with its pattern so the pattern matching visible. 
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Pattern matching Example, captionpos=b]
 
@@ -153,15 +157,34 @@ void foo() {    // fundef: type ID PARENTHESIS_L PARENTHESIS_R  CURLY_L
 }               // CURLY_R 
 \end{lstlisting}
 
+At the end of the civic.y YACC file we added an error function that prints an error message
+with CTIabort so the user can see where the error came from (line + col number) and what
+the error message is. 
 
 \section{Semantic Analysis}
-%\lipsum[7]
+% TODO
 
 \section{Optimization}
-%\lipsum[7]
+% TODO
 
+\newpage
 \section{Code Generation}
-%\lipsum[7]
+\par The last stage of the compiler, the bytecode generation, is converting the abstract syntax tree into assembly code. 
+With this assembly code, the virtual machine specially designed for Civic can execute the given Civic code.
+
+\par The whole code generation is done in a single traversal named "Generate byte code".
+The default traversal mode of the code generation is set to "user", because almost all nodes are traversed.
+There are a few code generation methods that do nothing, and immediately return the node. 
+These methods were necessary because without these methods the compiler would not compile because the user specified traversal expects one method for each AST node.
+
+\par A special code generation table and code generation table entry has been designed for saving and printing the global variables, constants, imports and exports. 
+The code generation table consists of 4 child nodes in which these instructions are stored.
+
+\par Generating the bytecode is done in a fairly simple way.
+The abstract syntax tree is traversed and based on certain flags and attributes and of the different 
+nodes instructions are printed and/or added to the correct code generation table.
+After the AST has been traversed and the main instructions have been printed, the global variables, constants, 
+imports and exports instructions (which are stored in the code generation table) are printed.
 
 \section{Conclusion/Discussion/Reflection}
 \par The last section of your report should be reflective and could be called
