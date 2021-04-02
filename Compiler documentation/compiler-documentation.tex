@@ -172,6 +172,16 @@ The context analyser (CA) starts with creating a symbol table for the program. A
 symbol table the CA walks through the AST and calls the corresponding CA node function to create 
 a new SymbolTableEntry for the node.
 
+\section{Type Checking}
+The type checker uses the output from the context analyser (the AST with symbol tables) and
+walks though the tree and symbol tables to check all the types and their values. The output
+of the type checker is the AST with the symbol tables with possibly refined type annotations.
+
+The type checker checks if the type and the value correspond to each other. For example its 
+not possible to store a boolean into an integer variable or vice versa. For binary operators the
+type checker checks if the left and right node are same type, if its not the case it will 
+print an error for the user.
+
 \section{Code transformations}
 % TODO: Milestone 6, 9, 10 en for-loop variable initializing (Milestone 5) en for- to while loop
 
