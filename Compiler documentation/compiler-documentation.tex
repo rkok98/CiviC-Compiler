@@ -64,7 +64,7 @@
 %-------------------------------------------------------------------------------
 
 \section{Introduction}
-\par This report provides information regarding the CiviC compiler we build in 
+\par This report documents the CiviC compiler we build in 
 the course Compiler Construction by dr. C.U. Grelck. The goal of the CiviC compiler 
 is to create a CiviC compiler that transforms CiviC code into CiviC assembly code 
 that a computer can understand. In this report we will focus on different aspects 
@@ -72,7 +72,7 @@ of our compiler and what we did and how we did it. We will do this by following 
 from scanning/parsing to code generation and also use the milestones to further 
 explain the compiler.
 
-We didn't implement any of the extensions and optimizations beyond the standard 
+Unfortunaly, we did not implement any of the extensions and optimizations beyond the standard 
 milestones for a functional compiler.
 
 %-------------------------------------------------------------------------------
@@ -94,29 +94,24 @@ floats and booleans so there is no need to define other types in the compiler.
 % ^Done, maar niet zeker of t goed is hieronder
 In our scanner we added a validator that validates if an integer is too large or too small by 
 comparing it to the max int and min int. We included the "limits.h" file in our civic.l
-to get the values of min and max. If the integer is too high or too low the compiler
+to get the values of the min and max range of an integer. If the integer is too high or too low the compiler
 returns an CTIerror telling the integer is out of range.
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Integer range check, captionpos=b]
-    [0-9]+      { long integer = strtol(yytext, NULL, 10);
-                    if (integer > INT_MAX || integer < INT_MIN) {
-                        CTIerror("Integer %s out of range", yytext);
-                    }
-                    else
-                    {
-                        yylval.cint=atoi(yytext);
-                        FILTER( INTVAL);
-                    }
-                }
+[0-9]+  { 
+            long integer = strtol(yytext, NULL, 10);
+            if (integer < INT_MIN || integer > INT_MAX) {
+                CTIerrorLine(yylineno, "Integer %s out of range", yytext);
+            }
+            yylval.cint=atoi(yytext);
+            FILTER( INTVAL);
+        }
 \end{lstlisting}
-
-% TODO: Extra check max float value.
-
 
 % TODO: Check Milestone 2
 After completing the scanner we needed to refine our intermediate representation (abstract
-syntax tree) for our compiler. We used the AST that was provided by school and added some 
-elements of our own. To make the SymbolTable work properly we added the SymbolTable to the
+syntax tree) for our compiler. We used the AST that was provided by the course and added some 
+elements of our own. To make the SymbolTable work properly we added the SymbolTable node to the
 AST along with the SymbolTableEntry. A SymbolTableEntry contains all the information about 
 an entry such as in which SymbolTable its stored in, name, type, if its a function/parameter/export,
 its offset, depth and its definition. We did the same for the CodeGenTable and the CodeGenTableEntry.
@@ -165,12 +160,23 @@ the error message is.
 \section{Context Analysis}
 % TODO: René
 Semantic Analysis consists of 2 parts: the context analysis and the type checker. The context
-analyser uses the output from the parser (the AST) and outputs an AST with symbol tables. the
-type checker checks for example if a value can be assigned to a certain type. 
+analyser uses the output from the parser (the AST) and adds an initial symbol table to the AST.
+The type checker validates the given code. For example, he validates whether the correct 
+types are used in assign statements or whether methods return the correct type.
 
-The context analyser (CA) starts with creating a symbol table for the program. After creating the
-symbol table the CA walks through the AST and calls the corresponding CA node function to create 
-a new SymbolTableEntry for the node.
+The context analyser stores an pointer to the current symbol table in a custom info struct created for the context analyser.
+This pointer is necessary so that we want to know to which symbol table we want to add a new entry while performing the context analysis.
+A global symbol table is added to the program node.
+In this global table, global declarations and definitions and function declarations and definitions are stored.
+A new symbol table is created for each function declaration and definition. 
+This table is attached to the relevant symbol table entry by means of a child node.
+A new info struct is created in which the symbol table pointer points to this new table. 
+With this info struct, the statements of the function are traversed. 
+Because the info struct now refers to the function's symbol table, the new symbol table entries are added to this table.
+
+After creating the symbol table the context analysis (AC) traversal, traverses through the AST and calls 
+the corresponding CA node function to create a new SymbolTableEntry for the node.
+After the entry is created it is added to the corresponding symbol table. 
 
 \section{Type Checking}
 The type checker uses the output from the context analyser (the AST with symbol tables) and
