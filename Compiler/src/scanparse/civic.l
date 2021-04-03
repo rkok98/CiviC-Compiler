@@ -115,7 +115,7 @@
                             global.col += yyleng;
                           } 
 
-[ \t\n]+                                  // White space
-"//".*                                    // Comments
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */ }
+[ \t\n]+                                  
+"//".*                                    
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       {}
 [/][*]                                    { yy_fatal_error("Unterminated comment"); } 
