@@ -13,7 +13,7 @@
 struct INFO
 {
   bool firsterror;
-  size_t indentation_level;
+  unsigned int indentation_level;
 };
 
 #define INFO_FIRSTERROR(n) ((n)->firsterror)
