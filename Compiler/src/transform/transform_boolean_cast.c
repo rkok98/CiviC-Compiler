@@ -1,17 +1,15 @@
 #include "transform_boolean_cast.h"
 
+#include "copy.h"
+#include "ctinfo.h"
+#include "dbug.h"
+#include "helpers.h"
+#include "free.h"
+#include "memory.h"
+#include "symbol_table.h"
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
-#include "copy.h"
-#include "dbug.h"
-
-#include "free.h"
-#include "memory.h"
-#include "ctinfo.h"
-
-#include "symbol_table.h"
-#include "helpers.h"
 
 struct INFO
 {

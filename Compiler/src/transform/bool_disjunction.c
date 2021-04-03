@@ -1,12 +1,11 @@
 #include "bool_disjunction.h"
 
-#include "types.h"
-#include "tree_basic.h"
-#include "traverse.h"
-#include "dbug.h"
-
-#include "free.h"
 #include "copy.h"
+#include "dbug.h"
+#include "free.h"
+#include "traverse.h"
+#include "tree_basic.h"
+#include "types.h"
 
 extern node *BDCbinop(node *arg_node, info *arg_info)
 {

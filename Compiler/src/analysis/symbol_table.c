@@ -1,13 +1,12 @@
-#include "string.h"
 #include "symbol_table.h"
+
+#include "ctinfo.h"
+#include "dbug.h"
+#include "memory.h"
+#include "str.h"
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
-#include "dbug.h"
-
-#include "memory.h"
-#include "ctinfo.h"
-#include "str.h"
 
 unsigned int STcountByType(node *entry, nodetype node_type)
 {

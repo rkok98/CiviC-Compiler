@@ -1,17 +1,15 @@
 #include "local_variable_initialisation.h"
 
+#include "copy.h"
+#include "ctinfo.h"
+#include "dbug.h"
+#include "free.h"
+#include "memory.h"
+#include "str.h"
 #include "symbol_table.h"
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
-#include "dbug.h"
-
-#include "memory.h"
-#include "free.h"
-#include "str.h"
-#include "ctinfo.h"
-#include "copy.h"
-#include "types.h"
 
 struct INFO
 {
