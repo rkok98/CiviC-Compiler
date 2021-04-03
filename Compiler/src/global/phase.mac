@@ -32,7 +32,7 @@ PHASE( ac,
        ALWAYS)
 
 SUBPHASE( FLVI,
-          "For-loop Induction Variable Initialisation",
+          "For-loop Induction Variable Initialisation & For- to While-loop conversion",
           FLVIinitializeForLoopsVariables,
           ALWAYS,
           ac)
@@ -82,8 +82,8 @@ PHASE( cg,
        "Generating Code",
        ALWAYS)
 
-SUBPHASE( prt, "Generating byte code", GBCdoGenByteCode, ALWAYS, cg)      
 SUBPHASE( prt_ast, "Print ast", PRTdoPrint, ALWAYS, cg)      
+SUBPHASE( prt, "Generating byte code", GBCdoGenByteCode, ALWAYS, cg)  
 
 SUBPHASE( frtr, 
           "De-allocating syntax tree representation",

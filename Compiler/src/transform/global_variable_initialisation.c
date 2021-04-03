@@ -1,16 +1,14 @@
 #include "global_variable_initialisation.h"
 
-#include "symbol_table.h"
-#include "types.h"
-#include "tree_basic.h"
-#include "traverse.h"
-#include "dbug.h"
-
-#include "memory.h"
-#include "free.h"
-#include "str.h"
 #include "ctinfo.h"
 #include "copy.h"
+#include "dbug.h"
+#include "free.h"
+#include "memory.h"
+#include "str.h"
+#include "symbol_table.h"
+#include "traverse.h"
+#include "tree_basic.h"
 #include "types.h"
 
 struct INFO
@@ -54,7 +52,11 @@ node *GVIprogram(node *arg_node, info *arg_info)
     node *init_symbol_table = TBmakeSymboltable(1, PROGRAM_SYMBOLTABLE(arg_node), NULL);
     
     INFO_INIT_FUNCTION(arg_info) = init_function;
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(init_function)), FUNDEF_TYPE(init_function), 1, FUNDEF_ISEXPORT(init_function), 0, 0, 0, arg_node, NULL, NULL, init_symbol_table);
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(init_function)), FUNDEF_TYPE(init_function), arg_node, init_symbol_table, NULL);
+
+    SYMBOLTABLEENTRY_ISFUNCTION(entry) = TRUE;
+    SYMBOLTABLEENTRY_ISEXPORT(entry) = FUNDEF_ISEXPORT(init_function);
+    SYMBOLTABLEENTRY_ISPARAMETER(entry) = FALSE;
 
     FUNDEF_SYMBOLTABLE(init_function) = init_symbol_table;
     FUNDEF_ISEXPORT(init_function) = TRUE;

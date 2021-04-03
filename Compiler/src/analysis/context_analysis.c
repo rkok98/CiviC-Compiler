@@ -1,23 +1,21 @@
 #include "context_analysis.h"
 
-#include "string.h"
-#include "tree_basic.h"
-#include "traverse.h"
-#include "dbug.h"
-
-#include "memory.h"
-#include "free.h"
-#include "str.h"
-#include "ctinfo.h"
-
 #include "symbol_table.h"
+
+#include "ctinfo.h"
+#include "dbug.h"
+#include "free.h"
+#include "memory.h"
+#include "str.h"
+#include "traverse.h"
+#include "tree_basic.h"
 
 struct INFO
 {
-    node *table;
+    node *symbol_table;
 };
 
-#define INFO_SYMBOL_TABLE(n) ((n)->table)
+#define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 
 static info *MakeInfo(void)
 {
@@ -43,10 +41,10 @@ extern node *CAprogram(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAprogram");
 
-    node *table = TBmakeSymboltable(0, NULL, NULL);
+    node *symbol_table = TBmakeSymboltable(0, NULL, NULL);
 
-    INFO_SYMBOL_TABLE(arg_info) = table;
-    PROGRAM_SYMBOLTABLE(arg_node) = table;
+    INFO_SYMBOL_TABLE(arg_info) = symbol_table;
+    PROGRAM_SYMBOLTABLE(arg_node) = symbol_table;
 
     PROGRAM_DECLS(arg_node) = TRAVopt(PROGRAM_DECLS(arg_node), arg_info);
 
@@ -57,10 +55,14 @@ node *CAglobdecl(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAglobdecl");
 
-    node *table = INFO_SYMBOL_TABLE(arg_info);
-    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDECL_NAME(arg_node)), GLOBDECL_TYPE(arg_node), 0, 0, 0, 0, 0, arg_node, NULL, NULL, NULL);
+    node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
+    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDECL_NAME(arg_node)), GLOBDECL_TYPE(arg_node), arg_node, NULL, NULL);
 
-    STinsert(table, entry);
+    SYMBOLTABLEENTRY_ISFUNCTION(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISEXPORT(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISPARAMETER(entry) = FALSE;
+
+    STinsert(symbol_table, entry);
 
     DBUG_RETURN(arg_node);
 }
@@ -69,10 +71,14 @@ node *CAglobdef(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAglobdef");
 
-    node *table = INFO_SYMBOL_TABLE(arg_info);
-    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDEF_NAME(arg_node)), GLOBDEF_TYPE(arg_node), 0, 0, 0, 0, 0, arg_node, NULL, NULL, NULL);
+    node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
+    node *entry = TBmakeSymboltableentry(STRcpy(GLOBDEF_NAME(arg_node)), GLOBDEF_TYPE(arg_node), arg_node, NULL, NULL);
 
-    STinsert(table, entry);
+    SYMBOLTABLEENTRY_ISFUNCTION(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISEXPORT(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISPARAMETER(entry) = FALSE;
+
+    STinsert(symbol_table, entry);
 
     DBUG_RETURN(arg_node);
 }
@@ -81,10 +87,15 @@ node *CAparam(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAparam");
 
-    node *table = INFO_SYMBOL_TABLE(arg_info);
-    node *entry = TBmakeSymboltableentry(STRcpy(PARAM_NAME(arg_node)), PARAM_TYPE(arg_node), 0, 0, 1, 0, 1, arg_node, NULL, NULL, NULL);
+    node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
+    node *entry = TBmakeSymboltableentry(STRcpy(PARAM_NAME(arg_node)), PARAM_TYPE(arg_node), arg_node, NULL, NULL);
 
-    STinsert(table, entry);
+    SYMBOLTABLEENTRY_DEPTH(entry) = 1;
+    SYMBOLTABLEENTRY_ISFUNCTION(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISEXPORT(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISPARAMETER(entry) = TRUE;
+
+    STinsert(symbol_table, entry);
 
     PARAM_NEXT(arg_node) = TRAVopt(PARAM_NEXT(arg_node), arg_info);
 
@@ -103,7 +114,11 @@ node *CAfundecl(node *arg_node, info *arg_info)
     INFO_SYMBOL_TABLE(fundef_info) = fundef_table;
     FUNDECL_SYMBOLTABLE(arg_node) = fundef_table;
 
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDECL_NAME(arg_node)), FUNDECL_TYPE(arg_node), TRUE, 0, 0, 0, 0, arg_node, NULL, NULL, fundef_table);
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDECL_NAME(arg_node)), FUNDECL_TYPE(arg_node), arg_node, fundef_table, NULL);
+
+    SYMBOLTABLEENTRY_ISFUNCTION(entry) = TRUE;
+    SYMBOLTABLEENTRY_ISEXPORT(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISPARAMETER(entry) = FALSE;
 
     STinsert(parent_table, entry);
 
@@ -125,7 +140,11 @@ node *CAfundef(node *arg_node, info *arg_info)
     INFO_SYMBOL_TABLE(fundef_info) = fundef_table;
     FUNDEF_SYMBOLTABLE(arg_node) = fundef_table;
 
-    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), 1, FUNDEF_ISEXPORT(arg_node), 0, 0, 0, arg_node, NULL, NULL, fundef_table);
+    node *entry = TBmakeSymboltableentry(STRcpy(FUNDEF_NAME(arg_node)), FUNDEF_TYPE(arg_node), arg_node, fundef_table, NULL);
+
+    SYMBOLTABLEENTRY_ISFUNCTION(entry) = TRUE;
+    SYMBOLTABLEENTRY_ISEXPORT(entry) = FUNDEF_ISEXPORT(arg_node);
+    SYMBOLTABLEENTRY_ISPARAMETER(entry) = FALSE;
 
     STinsert(parent_table, entry);
 
@@ -141,13 +160,18 @@ node *CAvardecl(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("CAvardecl");
 
-    node *table = INFO_SYMBOL_TABLE(arg_info);
+    node *symbol_table = INFO_SYMBOL_TABLE(arg_info);
 
     VARDECL_INIT(arg_node) = TRAVopt(VARDECL_INIT(arg_node), arg_info);
 
-    node *entry = TBmakeSymboltableentry(STRcpy(VARDECL_NAME(arg_node)), VARDECL_TYPE(arg_node), 0, 0, 0, 0, 1, arg_node, NULL, NULL, NULL);
+    node *entry = TBmakeSymboltableentry(STRcpy(VARDECL_NAME(arg_node)), VARDECL_TYPE(arg_node), arg_node, NULL, NULL);
 
-    STinsert(table, entry);
+    SYMBOLTABLEENTRY_DEPTH(entry) = 1;
+    SYMBOLTABLEENTRY_ISFUNCTION(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISEXPORT(entry) = FALSE;
+    SYMBOLTABLEENTRY_ISPARAMETER(entry) = FALSE;
+
+    STinsert(symbol_table, entry);
 
     VARDECL_NEXT(arg_node) = TRAVopt(VARDECL_NEXT(arg_node), arg_info);
 
@@ -165,7 +189,7 @@ node *CAvarlet(node *arg_node, info *arg_info)
         CTIerrorLine(NODE_LINE(arg_node) + 1, "Undeclared var: %s\n", VAR_NAME(arg_node));
     }
 
-    VARLET_DECL(arg_node) = SYMBOLTABLEENTRY_DEFINITION(varlet_entry);
+    VARLET_DECL(arg_node) = SYMBOLTABLEENTRY_DECLARATION(varlet_entry);
 
     DBUG_RETURN(arg_node);
 }
@@ -181,7 +205,7 @@ node *CAvar(node *arg_node, info *arg_info)
         CTIerrorLine(NODE_LINE(arg_node) + 1, "Undeclared var: %s\n", VAR_NAME(arg_node));
     }
 
-    VAR_DECL(arg_node) = SYMBOLTABLEENTRY_DEFINITION(var_entry);
+    VAR_DECL(arg_node) = SYMBOLTABLEENTRY_DECLARATION(var_entry);
     VAR_SYMBOLTABLE(arg_node) = INFO_SYMBOL_TABLE(arg_info);
 
     DBUG_RETURN(arg_node);

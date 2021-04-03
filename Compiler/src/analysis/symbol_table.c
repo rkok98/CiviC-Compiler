@@ -1,13 +1,12 @@
-#include "string.h"
 #include "symbol_table.h"
+
+#include "ctinfo.h"
+#include "dbug.h"
+#include "memory.h"
+#include "str.h"
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
-#include "dbug.h"
-
-#include "memory.h"
-#include "ctinfo.h"
-#include "str.h"
 
 unsigned int STcountByType(node *entry, nodetype node_type)
 {
@@ -16,7 +15,7 @@ unsigned int STcountByType(node *entry, nodetype node_type)
         return 0;
     }
 
-    if (NODE_TYPE(SYMBOLTABLEENTRY_DEFINITION(entry)) == node_type)
+    if (NODE_TYPE(SYMBOLTABLEENTRY_DECLARATION(entry)) == node_type)
     {
         return 1 + STcountByType(SYMBOLTABLEENTRY_NEXT(entry), node_type);
     }
@@ -64,7 +63,7 @@ node *STinsert(node *symbol_table, node *entry)
         return NULL;
     }
 
-    SYMBOLTABLEENTRY_OFFSET(entry) = STcountByType(SYMBOLTABLE_ENTRIES(symbol_table), NODE_TYPE(SYMBOLTABLEENTRY_DEFINITION(entry)));
+    SYMBOLTABLEENTRY_OFFSET(entry) = STcountByType(SYMBOLTABLE_ENTRIES(symbol_table), NODE_TYPE(SYMBOLTABLEENTRY_DECLARATION(entry)));
 
     node *last = STlast(symbol_table);
 
@@ -161,7 +160,7 @@ node *STfindByDecl(node *symbol_table, node *decl)
 
     while (entry)
     {
-        node *entry_decl = SYMBOLTABLEENTRY_DEFINITION(entry);
+        node *entry_decl = SYMBOLTABLEENTRY_DECLARATION(entry);
 
         if (NODE_TYPE(entry_decl) == NODE_TYPE(decl))
         {

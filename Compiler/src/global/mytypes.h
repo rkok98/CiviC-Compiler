@@ -50,15 +50,4 @@ typedef enum
     I_unknown
 } pseudo_instruct;
 
-typedef enum
-{
-    a_unknown,
-    a_label,
-    a_store,
-    a_storen,
-    a_storeg,
-    a_loadc,
-    a_load
-} T_asm;
-
 #endif /* _CIVCC_MYTYPES_H_ */

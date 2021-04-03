@@ -43,8 +43,7 @@
                 </travuser>
             </traversal>
 
-            <!-- TODO -->
-            <traversal id="FLVI" name="For-loop Induction Variable Initialisation" default="sons" include="for_loop_variable_initialisation.h">
+            <traversal id="FLVI" name="For-loop Induction Variable Initialisation &amp; For- to While-loop conversion" default="sons" include="for_loop_variable_initialisation.h">
                 <travuser>
                     <node name="FunBody" />
                     <node name="Stmts" />
@@ -1237,12 +1236,11 @@
             </attributes>
             <flags/>
         </node>
-        
+
         <!-- Symbol Table-->
         <node name="SymbolTable">
             <sons>
                 <son name="Entries">
-                    <description>ST body</description>
                     <targets>
                         <target mandatory="yes">
                             <node name="SymbolTableEntry" />
@@ -1280,35 +1278,23 @@
         </node>
 
         <node name="SymbolTableEntry">
-            <description>Symbol table entries</description>
             <sons>
-                <son name="Next">
-                    <description>ST body</description>
-                    <targets>
-                        <target mandatory="no">
-                            <node name="SymbolTableEntry" />
-                            <phases>
-                                <all />
-                            </phases>
-                        </target>
-                    </targets>
-                </son>
-                <son name="NextTable">
-                    <targets>
-                        <target mandatory="no">
-                            <node name="SymbolTable"/>
-                            <phases>
-                                <all/>
-                            </phases>
-                        </target>
-                    </targets>
-                </son>
                 <son name="Table">
                     <targets>
                         <target mandatory="no">
                             <node name="SymbolTable"/>
                             <phases>
                                 <all/>
+                            </phases>
+                        </target>
+                    </targets>
+                </son>
+                <son name="Next">
+                    <targets>
+                        <target mandatory="no">
+                            <node name="SymbolTableEntry" />
+                            <phases>
+                                <all />
                             </phases>
                         </target>
                     </targets>
@@ -1337,30 +1323,8 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="IsFunction">
-                    <type name="Bool">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
-                <attribute name="IsExport">
-                    <type name="Bool">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
-                <attribute name="IsParameter">
-                    <type name="Bool">
+                <attribute name="Declaration">
+                    <type name="Link">
                         <targets>
                             <target mandatory="yes">
                                 <phases>
@@ -1373,7 +1337,7 @@
                 <attribute name="Offset">
                     <type name="Int">
                         <targets>
-                            <target mandatory="yes">
+                            <target mandatory="no">
                                 <any/>
                                 <phases>
                                     <all/>
@@ -1385,7 +1349,7 @@
                 <attribute name="Depth">
                     <type name="Int">
                         <targets>
-                            <target mandatory="yes">
+                            <target mandatory="no">
                                 <any/>
                                 <phases>
                                     <all/>
@@ -1394,18 +1358,12 @@
                         </targets>
                     </type>
                 </attribute>
-                <attribute name="Definition">
-                    <type name="Link">
-                        <targets>
-                            <target mandatory="yes">
-                                <phases>
-                                    <all />
-                                </phases>
-                            </target>
-                        </targets>
-                    </type>
-                </attribute>
             </attributes>
+            <flags>
+                <flag name="IsFunction" />
+                <flag name="IsExport" />
+                <flag name="IsParameter" />
+            </flags>
         </node>
 
         <!-- Code gen -->
