@@ -45,7 +45,7 @@ void printIndentations(info *info)
     return;
   }
 
-  for (size_t i = 0; i < INFO_INDENTATION_LEVEL(info); i++)
+  for (unsigned int i = 0; i < INFO_INDENTATION_LEVEL(info); i++)
   {
     printf("\t");
   }
