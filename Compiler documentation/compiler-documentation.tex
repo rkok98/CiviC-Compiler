@@ -11,6 +11,22 @@
 \setlength{\parindent}{0em}
 \setlength{\parskip}{1em}
 
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta}
+\usetikzlibrary{positioning}
+\tikzset{%
+  >={Latex[width=2mm,length=2mm]},
+  % Specifications for style of nodes:
+            base/.style = {rectangle, rounded corners, draw=black,
+                           minimum width=4cm, minimum height=1cm,
+                           text centered, font=\sffamily},
+  start_stop/.style = {base, fill=black, text=white},
+    loading/.style = {base, fill=orange!15},
+    analyse/.style = {base, fill=red!15},
+    optimize/.style = {base, fill=blue!15},
+    generate/.style = {base, fill=green!15}
+}
+
 %-------------------------------------------------------------------------------
 %	GEGEVENS VOOR IN DE TITEL
 %-------------------------------------------------------------------------------
@@ -72,7 +88,44 @@ milestones for a functional compiler.
 %	METHODE
 %-------------------------------------------------------------------------------
 \newpage
-\section{Lexicographic Analysis}
+\section{The compiler}
+\begin{tikzpicture}[node distance=1cm and 3cm, every node/.style={fill=white, font=\sffamily}, align=center]
+    \node (start)             [start_stop]              {Compiler starts};
+
+    \node (c_preprocessor)     [loading, below=of start]          {C-preprocessor};    
+    \node (read_input_file)     [loading, below=of c_preprocessor]          {Read \& Parse input file};    
+    
+    \node (for_loop)     [analyse, below=of read_input_file]          {Initialise For-loop \\ Induction Variables \& \\ For- to While-loop conversion};  
+    \node (context_analyse)     [analyse, below=of for_loop]          {Context Analysis};  
+    \node (init_globals)     [analyse, below=of context_analyse]          {Initialize Global Variables};  
+    \node (init_locals)     [analyse, below=of init_globals]          {Initialize Local Variables};  
+    \node (type_checking)     [analyse, right=of init_locals]          {Type checking}; 
+    
+    \node (bool_dis_con)     [optimize, above=of type_checking]          {Boolean Disjunction and Conjunction}; 
+    \node (bool_cast)     [optimize, above=of bool_dis_con]          {Transform Boolean Cast Expressions}; 
+
+    \node (print_ast)     [generate, above=of bool_cast]          {Boolean Disjunction and Conjunction}; 
+    \node (gen_bytec)     [generate, above=of print_ast]          {Generate byte code}; 
+    \node (frtr)     [generate, above=of gen_bytec]          {De-allocating syntax tree representation}; 
+
+    \node (ActivityEnds)      [start_stop, above=of frtr] {Compiler ends};
+
+    \draw[->]             (start) -- (c_preprocessor);
+    \draw[->]             (c_preprocessor) -- (read_input_file);
+    \draw[->]             (read_input_file) -- (for_loop);
+    \draw[->]             (for_loop) -- (context_analyse);
+    \draw[->]             (context_analyse) -- (init_globals);
+    \draw[->]             (init_globals) -- (init_locals);
+    \draw[->]             (init_locals) -- (type_checking);
+    \draw[->]             (type_checking) -- (bool_dis_con);
+    \draw[->]             (bool_dis_con) -- (bool_cast);
+    \draw[->]             (bool_cast) -- (print_ast);
+    \draw[->]             (print_ast) -- (gen_bytec);
+    \draw[->]             (gen_bytec) -- (frtr);
+    \draw[->]             (frtr) -- (ActivityEnds);
+\end{tikzpicture}
+
+\subsection{Lexicographic Analysis}
 The first step for building a CiviC compiler is to create (or extend in this case) 
 the scanner that reads the CiviC code (stream of characters) that recognizes the 
 symbols and words and outputs a (finite) stream of tokens.
@@ -114,7 +167,7 @@ to cover the full syntactic range of the CiviC language. Each node in the AST ha
 print traversal which prints the information of the specific node in the Print AST phase.
 
 \newpage
-\section{Syntatic Analysis}
+\subsection{Syntatic Analysis}
 After the scanner is done and creates a (finite) stream of tokens, the parser comes
 into play and will start its job. The parser will use the output from the scanner and
 use it to create and output an abstract syntax tree (AST). The parser uses the stream 
@@ -143,7 +196,7 @@ At the end of the civic.y YACC file we added an error function that prints an er
 with CTIabort so the user can see where the error came from (line + col number) and what
 the error message is. 
 
-\section{Context Analysis}
+\subsection{Context Analysis}
 Semantic Analysis consists of 2 parts: the context analysis and the type checker. The context
 analyser uses the output from the parser (the AST) and adds an initial symbol table to the AST.
 The type checker validates the given code. For example, he validates whether the correct 
@@ -160,12 +213,12 @@ With this info struct, the statements of the function are traversed.
 Because the info struct now refers to the function's symbol table, the new symbol table entries are added to this table.
 
 \newpage
-\section{Turning Variable Initialisations into Regular Assignments}
+\subsection{Turning Variable Initialisations into Regular Assignments}
 Milestone 6: Turning Variable Initialisations into Regular Assignments, is done in two different traversals.
 global- and local\_variable\_initialisation.c. 
 In both files, the declaration and initialization are separated for the respective variables types.
 
-\subsection{Global variable initialisation}
+\subsubsection{Global variable initialisation}
 Global variable initialization works by creating an "\_\_init" function. 
 This function is the first function definition added to the program node, after which the rest of the programs' function definition and function declarations follows.
 A pointer to this init function is included in the info struct so that it is possible to request the init function in other methods.
@@ -186,7 +239,7 @@ export float b;
 export bool c;
 \end{lstlisting}
 
-\subsection{Local variable initialisation}
+\subsubsection{Local variable initialisation}
 The declaration and initialization of local variables is done in the function definition.
 For every function in a program, the body function is traversed. 
 When the traversal encounters a variable definition, it disconnects the initialization and a new initialization statement is created for that variable.
@@ -204,14 +257,14 @@ export int foo()
 \end{lstlisting}
 
 \newpage
-\section{Type Checking}
+\subsection{Type Checking}
 The type checker traverse through the output of the context analyser (the AST with symbol tables) 
 to check all the types and their values. The output of the type checker is the AST with the symbol table.
 Our type checker validates if a function's return statement returns the right type, 
 if a called function is declared in the code, if a binary operator is used with two compatible types, 
 if a value can be casted to the given type and if an variable declaration is initialized with the corresponding type.
 
-\section{Optimiser}
+\subsection{Optimiser}
 % Milestone 9, 10 
 The next step in the compiler is the optimiser. The optimiser replaces code with "better" code
 than the original. By doing this it will improve the execution speed, code size end energy
@@ -219,7 +272,7 @@ consumption. The new code that replaced the old code is always semantically equi
 original code.
 
 % Milestone 9
-\subsection{Compiling Boolean Disjunction and Conjunction}
+\subsubsection{Compiling Boolean Disjunction and Conjunction}
 Short circuit boolean evaluation cannot be mimicked by special VM instructions alone. The standard 
 compiler approach is to systematically replace disjunction and conjunction operators by semantically 
 equivalent if-then-else constructs. But because this is very challenging we got recommended to use the
@@ -232,7 +285,7 @@ round because both left- and right operators need to be checked. The left operat
 the right operator will be used as the "then" and the "else" will be a FALSE.
 
 % TODO: Milestone 10
-\subsection{Compiling Boolean Cast Expressions}
+\subsubsection{Compiling Boolean Cast Expressions}
 The CiviC language features cast expressions to convert values between all three basic types, possibly 
 with loss of precision. The CiviC-VM, however, only has conversion instructions between integer numbers 
 and floating point numbers and vice versa. We needed to implement a compiler pass for the systematic 
@@ -246,7 +299,7 @@ either an Int or a Float. By checking the cast type of the node we can assign th
 to the arg\_node the same way like the short circuit boolean evaluation explained in the previous paragraph.
 
 \newpage
-\section{Code Generation}
+\subsection{Code Generation}
 \par The last stage of the compiler, the bytecode generation, is converting the abstract syntax tree into assembly code. 
 With this assembly code, the virtual machine specially designed for Civic can execute the given Civic code.
 
