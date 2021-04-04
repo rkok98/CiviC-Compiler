@@ -98,7 +98,7 @@ to get the values of the min and max range of an integer. If the integer is too 
 returns an CTIerror telling the integer is out of range.
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Integer range check, captionpos=b]
-[0-9]+  { 
+[0-9]+ { 
             long integer = strtol(yytext, NULL, 10);
             if (integer < INT_MIN || integer > INT_MAX) {
                 CTIerrorLine(yylineno, "Integer %s out of range", yytext);
@@ -173,21 +173,91 @@ A new info struct is created in which the symbol table pointer points to this ne
 With this info struct, the statements of the function are traversed. 
 Because the info struct now refers to the function's symbol table, the new symbol table entries are added to this table.
 
+\newpage
+\section{Turning Variable Initialisations into Regular Assignments}
+Milestone 6: Turning Variable Initialisations into Regular Assignments, is done in two different traversals.
+global- and local\_variable\_initialisation.c. 
+In both files, the declaration and initialization are separated for the respective variables types.
+
+\subsection{Global variable initialisation}
+Global variable initialization works by creating an "\_\_init" function. 
+This function is the first function definition added to the program node, after which the rest of the programs' function definition and function declarations follows.
+A pointer to this init function is included in the info struct so that it is possible to request the init function in other methods.
+After the initialization function has been created, the other declarations of the program are traversed.
+If a declaration node is a global definition, the initialization statement is disconnected and moved to the init function.
+This init function will later also be used by the CiviC-VM.
+
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Output of global variable initialisation, captionpos=b]
+export void __init (  ) 
+{
+        a = 321;
+        b = 1.000000;
+        c = false;
+}
+
+export int a;
+export float b;
+export bool c;
+\end{lstlisting}
+
+\subsection{Local variable initialisation}
+The declaration and initialization of local variables is done in the function definition.
+For every function in a program, the body function is traversed. 
+When the traversal encounters a variable definition, it disconnects the initialization and a new initialization statement is created for that variable.
+This initialization statement is added after all variables are declared but before the rest of the function's expressions are executed.
+
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Output of local variable initialisation, captionpos=b]    
+export int foo() 
+{
+    int a;
+    int b;
+
+    a = 128;
+    b = 64;
+
+    return a + b;
+}
+\end{lstlisting}
+
+\newpage
 \section{Type Checking}
-The type checker traverse through the output from the context analyser (the AST with symbol tables) 
+The type checker traverse through the output of the context analyser (the AST with symbol tables) 
 to check all the types and their values. The output of the type checker is the AST with the symbol table.
+Our type checker validates if a function's return statement returns the right type, 
+if a called function is declared in the code, if a binary operator is used with two compatible types, 
+if a value can be casted to the given type and if an variable declaration is initialized with the corresponding type.
 
-%TODO
-The type checker validates if a function's return statement returns the right type, 
-if a called function is declared in the source code, if a %TODO: René Continue 
+\section{Optimiser}
+% Milestone 9, 10 
+The next step in the compiler is the optimiser. The optimiser replaces code with "better" code
+than the original. By doing this it will improve the execution speed, code size end energy
+consumption. The new code that replaced the old code is always semantically equivalent to the 
+original code.
 
-The type checker checks if the type and the value correspond to each other. For example it is
-not possible to store a boolean into an integer variable or vice versa. For binary operators the
-type checker checks if the left and right node are same type, if its not the case it will 
-print an error for the user.
+% Milestone 9
+Short circuit boolean evaluation cannot be mimicked by special VM instructions alone. The standard 
+compiler approach is to systematically replace disjunction and conjunction operators by semantically 
+equivalent if-then-else constructs. But because this is very challenging we got recommended to use the
+C ternary operator pred?then:else. We created a file called bool\_disjunction.c that handles these 
+code transformations. The file checks if the binary operator is an "\textbar \textbar" (or) or is if its an "\& \&" (and).
+Because each of these operators has a different effect on the outcome of the ternary operator. For 
+the "\textbar \textbar" operator it will use the left operator (BINOP\_LEFT(...)) as the "pred" in the ternary operator,
+use TRUE as the "then" and right operator as the "else". For the "\&\&" operator it will be the other way 
+round because both left- and right operators need to be checked. The left operator will be the "pred",
+the right operator will be used as the "then" and the "else" will be a FALSE.
 
-\section{Code transformations}
-% TODO: Milestone 6, 9, 10 en for-loop variable initializing (Milestone 5) en for- to while loop
+% TODO: Milestone 10
+The CiviC language features cast expressions to convert values between all three basic types, possibly 
+with loss of precision. The CiviC-VM, however, only has conversion instructions between integer numbers 
+and floating point numbers and vice versa. We needed to implement a compiler pass for the systematic 
+transformation of cast expressions with Boolean argument or result value into semantically equivalent 
+non-cast expressions. We added a new sub phase "Transform Boolean Cast Expressions" which calls the 
+TBCtransformBooleanCast in the transform\_boolean\_cast.c file which traverses through the syntaxtree.
+If it comes across a cast it wil first check what cast type it is, if its a bool it will then check if the
+variable is an Int of Float and then replace the arg\_node with a new binary operator. If the cast type
+is not a bool it will check if the info type is a bool, if this is true we need to cast the boolean to 
+either an Int or a Float. By checking the cast type of the node we can assign the corresponding ternary
+to the arg\_node the same way like the short circuit boolean evaluation explained in the previous paragraph.
 
 \newpage
 \section{Code Generation}
