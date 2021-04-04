@@ -40,7 +40,7 @@ static info *FreeInfo(info *info)
 
 void printIndentations(info *info)
 {
-  if (info == NULL)
+  if (!info)
   {
     return;
   }
