@@ -209,6 +209,40 @@ At the end of the civic.y YACC file we added an error function that prints an er
 with CTIabort so the user can see where the error came from (line + col number) and what
 the error message is. 
 
+\subsection{Initialise For-loop Induction Variables \& For- to While-loop conversion}
+Transforming for- into while-loops will be done after the analyzing phase. The compiler checks
+for for-loops in the syntax tree and will replace them with semantically equivalent while-loops.
+The first step is to declare the for-loop variables (start, stop, step) and then use these 
+variables to create the new while loop. If we use a simple for-loop like:
+
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=For-loop example, captionpos=b]
+m=5;
+for(int i=10,m,-1)
+{
+        printInt(i);
+}
+\end{lstlisting}
+
+\newpage
+As input in the compiler we would get the following while-loop:
+
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=While-loop example, captionpos=b]
+_for_1_i = 10;
+_for_1_i_stop = m;
+_for_1_i_step = -1;
+while ((( _for_1_i_step > 0 ) ? ( _for_1_i < _for_1_i_stop ) 
+        : ( _for_1_i > _for_1_i_stop )))
+{
+    printInt(_for_1_i);
+    _for_1_i = ( _for_1_i + _for_1_i_step );
+}
+\end{lstlisting}
+
+In the example above we can see the while-loop the compiler created. It first checks if the step is greater
+than zero. If this is true checks if the counter is less then de stop, if so -> execute body while-loop. If
+the step is not greater than zero, it will check of the counter is greater than the stop. If this is true it 
+will execute the body of the while loop.
+
 \subsection{Context Analysis}
 Semantic Analysis consists of 2 parts: the context analysis and the type checker. The context
 analyser uses the output from the parser (the AST) and adds an initial symbol table to the AST.
