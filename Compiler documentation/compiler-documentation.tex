@@ -11,16 +11,19 @@
 \setlength{\parindent}{0em}
 \setlength{\parskip}{1em}
 
+\usepackage{float}
+
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{positioning}
 \tikzset{%
-  >={Latex[width=2mm,length=2mm]},
-  % Specifications for style of nodes:
-            base/.style = {rectangle, rounded corners, draw=black,
-                           minimum width=4cm, minimum height=1cm,
-                           text centered, font=\sffamily},
-  start_stop/.style = {base, fill=black, text=white},
+    >={Latex[width=2mm,length=2mm]},
+    base/.style =   {
+                        rectangle, rounded corners, draw=black,
+                        minimum width=4cm, minimum height=1cm,
+                        text centered, font=\sffamily
+                    },
+    start_stop/.style = {base, fill=black, text=white},
     loading/.style = {base, fill=orange!15},
     analyse/.style = {base, fill=red!15},
     optimize/.style = {base, fill=blue!15},
@@ -89,6 +92,7 @@ milestones for a functional compiler.
 %-------------------------------------------------------------------------------
 \newpage
 \section{The compiler}
+\begin{figure}[H]
 \begin{tikzpicture}[node distance=1cm and 3cm, every node/.style={fill=white, font=\sffamily}, align=center]
     \node (start)             [start_stop]              {Compiler starts};
 
@@ -124,7 +128,16 @@ milestones for a functional compiler.
     \draw[->]             (gen_bytec) -- (frtr);
     \draw[->]             (frtr) -- (ActivityEnds);
 \end{tikzpicture}
+\caption{A schematic overview of our compiler}
+\label{fig:ThCoStep1}
+\end{figure}
 
+\par See Figure 1 for a schematic overview of our compiler. The steps we have implemented are respective explained in the next chapters. 
+Steps that are not covered are: c-preprocessor reading input file and de-allocating syntax tree representation, 
+these were already provided by the framework. 
+The reason why we, unfortunately, convert a for- to while-loop so early on is discussed in our reflection.
+
+\newpage
 \subsection{Lexicographic Analysis}
 The first step for building a CiviC compiler is to create (or extend in this case) 
 the scanner that reads the CiviC code (stream of characters) that recognizes the 
