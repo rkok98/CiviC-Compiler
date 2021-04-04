@@ -29,6 +29,16 @@
             <traversal id="FREE" name="Free Syntax Tree" default="user" include="free_node.h" />
             <traversal id="CHK" name="Check Syntax Tree" default="user" include="check.h" />
 
+            <traversal id="FLVI" name="For-loop Induction Variable Initialisation &amp; For- to While-loop conversion" default="sons" include="for_loop_variable_initialisation.h">
+                <travuser>
+                    <node name="FunBody" />
+                    <node name="Stmts" />
+                    <node name="For" />
+                    <node name="VarLet" />
+                    <node name="Var" />
+                </travuser>
+            </traversal>
+
             <traversal id="CA" name="Context Analysis" default="sons" include="context_analysis.h">
                 <travuser>
                     <node name="Program" />
@@ -43,13 +53,17 @@
                 </travuser>
             </traversal>
 
-            <traversal id="FLVI" name="For-loop Induction Variable Initialisation &amp; For- to While-loop conversion" default="sons" include="for_loop_variable_initialisation.h">
+            <traversal id="GVI" name="Global Variable Initialisation" default="sons" include="global_variable_initialisation.h">
+                <travuser>
+                    <node name="Program" />
+                    <node name="GlobDef" />
+                </travuser>
+            </traversal>
+
+            <traversal id="LVI" name="Local Variable Initialisation" default="sons" include="local_variable_initialisation.h">
                 <travuser>
                     <node name="FunBody" />
-                    <node name="Stmts" />
-                    <node name="For" />
-                    <node name="VarLet" />
-                    <node name="Var" />
+                    <node name="VarDecl" />
                 </travuser>
             </traversal>
 
@@ -67,20 +81,6 @@
                     <node name="Return" />
                     <node name="Cast" />
                     <node name="BinOp" />
-                </travuser>
-            </traversal>
-
-            <traversal id="GVI" name="Global Variable Initialisation" default="sons" include="global_variable_initialisation.h">
-                <travuser>
-                    <node name="Program" />
-                    <node name="GlobDef" />
-                </travuser>
-            </traversal>
-
-            <traversal id="LVI" name="Local Variable Initialisation" default="sons" include="local_variable_initialisation.h">
-                <travuser>
-                    <node name="FunBody" />
-                    <node name="VarDecl" />
                 </travuser>
             </traversal>
 
