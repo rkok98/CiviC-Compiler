@@ -235,6 +235,7 @@ consumption. The new code that replaced the old code is always semantically equi
 original code.
 
 % Milestone 9
+\subsection{Compiling Boolean Disjunction and Conjunction}
 Short circuit boolean evaluation cannot be mimicked by special VM instructions alone. The standard 
 compiler approach is to systematically replace disjunction and conjunction operators by semantically 
 equivalent if-then-else constructs. But because this is very challenging we got recommended to use the
@@ -247,6 +248,7 @@ round because both left- and right operators need to be checked. The left operat
 the right operator will be used as the "then" and the "else" will be a FALSE.
 
 % TODO: Milestone 10
+\subsection{Compiling Boolean Cast Expressions}
 The CiviC language features cast expressions to convert values between all three basic types, possibly 
 with loss of precision. The CiviC-VM, however, only has conversion instructions between integer numbers 
 and floating point numbers and vice versa. We needed to implement a compiler pass for the systematic 
