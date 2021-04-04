@@ -1,16 +1,8 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% LATEX-TEMPLATE TECHNISCH RAPPORT
-%-------------------------------------------------------------------------------
-% This template is derived from the AVI PT report template.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 %-------------------------------------------------------------------------------
 %	PACKAGES EN DOCUMENT CONFIGURATIE
 %-------------------------------------------------------------------------------
 
 \documentclass{uva-inf-article}
-%\usepackage[dutch]{babel}
-%\usepackage{csquotes}
 
 \usepackage[style=numeric-comp]{biblatex}
 \addbibresource{PT-essay.bib}
@@ -48,16 +40,16 @@
 
 \begin{document}
 \maketitle
+\newpage
 
 %-------------------------------------------------------------------------------
 %	INHOUDSOPGAVE EN ABSTRACT
 %-------------------------------------------------------------------------------
 
-% Niet doen bij korte verslagen en rapporten
-%\tableofcontents
-%\begin{abstract}
-%\lipsum[13]
-%\end{abstract}
+\tableofcontents
+\begin{abstract}
+\end{abstract}
+\newpage
 
 %-------------------------------------------------------------------------------
 %	INTRODUCTIE
@@ -70,9 +62,7 @@ is to create a CiviC compiler that transforms CiviC code into CiviC assembly cod
 that a computer can understand. In this report we will focus on different aspects 
 of our compiler and what we did and how we did it. We will do this by following the order of the milestones,
 from scanning/parsing to code generation and also use the milestones to further 
-explain the compiler.
-
-Unfortunaly, we did not implement any of the extensions and optimizations beyond the standard 
+explain the compiler. Unfortunately, we did not implement any of the extensions and optimizations beyond the standard 
 milestones for a functional compiler.
 
 %-------------------------------------------------------------------------------
@@ -97,7 +87,7 @@ comparing it to the max int and min int. We included the "limits.h" file in our 
 to get the values of the min and max range of an integer. If the integer is too high or too low the compiler
 returns an CTIerror telling the integer is out of range.
 
-\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Integer range check, captionpos=b]
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-1, caption=Integer range check, captionpos=b]
 [0-9]+ { 
             long integer = strtol(yytext, NULL, 10);
             if (integer < INT_MIN || integer > INT_MAX) {
@@ -142,7 +132,7 @@ actions to perform.
 Listing 2 shows a simple example of pattern matching. In this example we added the
 node with its pattern so the pattern matching visible. 
 
-\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Pattern matching Example, captionpos=b]
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-2, caption=Pattern matching Example, captionpos=b]
 
 int b;          // globdef: type ID SEMICOLON
 
@@ -187,7 +177,7 @@ After the initialization function has been created, the other declarations of th
 If a declaration node is a global definition, the initialization statement is disconnected and moved to the init function.
 This init function will later also be used by the CiviC-VM.
 
-\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Output of global variable initialisation, captionpos=b]
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-3, caption=Output of global variable initialisation, captionpos=b]
 export void __init (  ) 
 {
         a = 321;
@@ -206,7 +196,7 @@ For every function in a program, the body function is traversed.
 When the traversal encounters a variable definition, it disconnects the initialization and a new initialization statement is created for that variable.
 This initialization statement is added after all variables are declared but before the rest of the function's expressions are executed.
 
-\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code, caption=Output of local variable initialisation, captionpos=b]    
+\begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-4, caption=Output of local variable initialisation, captionpos=b]    
 export int foo() 
 {
     int a;
@@ -279,6 +269,8 @@ The abstract syntax tree is traversed and based on certain flags and attributes 
 nodes instructions are printed and/or added to the correct code generation table.
 After the AST has been traversed and the main instructions have been printed, the global variables, constants, 
 imports and exports instructions (which are stored in the code generation table) are printed.
+The byte code is exported to stdout by default, but it is also possible to export the output of the compiler to any given file.
+We made the choice for printing to stdout so debugging would be easier. 
 
 \section{Reflection}
 \par Besides the fact that we had little prior knowledge of how a compiler worked, the entire language c was also new to us.
@@ -292,6 +284,9 @@ Another problem that took us too much time to solve was the '.importfun' instruc
 We got the following error after running the test files: "error: Unable to find 'printInt' in any of the modules". 
 This was due to the fact that we did not include the parameters in the functionSignature of the pseudo instruction '.importfun'. 
 It took us a whole day to finally find this 'simple' bug, and was then resolved within 5 minutes.
+We expected that generating byte code would be a lot harder than it ended up being. 
+We had this assumption mainly because the scope of this traversal encompasses the entire Civic program/source code supplied and because bytecode was initially 
+incomprehensible to us. This turned out not to be the case afterwards, partly due to the clearly supplied CiviC-VM specification.
 
 Something we are not too happy about in our compiler is that the last week before creating the compiler, we found out that there was no for-loop instruction in the Civic VM. 
 Unfortunately, this resulted in a quick and dirty method of converting a for-loop to while-loop in the traversal that was meant to declare the induction variables of the for-loops 
@@ -312,18 +307,4 @@ From what we can remember from the first lesson about publishing and sharing our
 we regret that this is not allowed. We think that making this compiler is one of the prestigious projects we have made so far. 
 Writing a compiler has been compared to fighting a dragon for a reason.
 
-
-%-------------------------------------------------------------------------------
-%	REFERENTIES
-%-------------------------------------------------------------------------------
-
-%\printbibliography
-
-%-------------------------------------------------------------------------------
-%	BIJLAGEN EN EINDE
-%-------------------------------------------------------------------------------
-
-%\section{Bijlage A}
-%\section{Bijlage B}
-%\section{Bijlage C}
 \end{document}
