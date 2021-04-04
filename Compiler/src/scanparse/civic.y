@@ -404,9 +404,9 @@ binop:
 
 type: 
        INT        { $$ = T_int;   }
-     | FLOAT     { $$ = T_float; }
-     | BOOL      { $$ = T_bool;  }
-     | VOID      { $$ = T_void;  }
+     | FLOAT      { $$ = T_float; }
+     | BOOL       { $$ = T_bool;  }
+     | VOID       { $$ = T_void;  }
      ;
 
 %%
