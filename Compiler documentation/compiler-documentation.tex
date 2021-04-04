@@ -338,7 +338,7 @@ with loss of precision. The CiviC-VM, however, only has conversion instructions 
 and floating point numbers and vice versa. We needed to implement a compiler pass for the systematic 
 transformation of cast expressions with Boolean argument or result value into semantically equivalent 
 non-cast expressions. We added a new sub phase "Transform Boolean Cast Expressions" which calls the 
-TBCtransformBooleanCast in the transform\_boolean\_cast.c file which traverses through the syntaxtree.
+TBCtransformBooleanCast in the transform\_boolean\_cast.c file which traverses through the syntax tree.
 If it comes across a cast it wil first check what cast type it is, if its a bool it will then check if the
 variable is an Int of Float and then replace the arg\_node with a new binary operator. If the cast type
 is not a bool it will check if the info type is a bool, if this is true we need to cast the boolean to 
