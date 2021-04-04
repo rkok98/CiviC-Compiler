@@ -212,7 +212,13 @@ At the end of the civic.y YACC file we added an error function that prints an er
 with CTIabort so the user can see where the error came from (line + col number) and what
 the error message is. 
 
-\subsection{Initialise For-loop Induction Variables \& For- to While-loop conversion}
+\subsection{Semantic Analysis}
+Semantic Analysis consists of 5 parts: initialise for-loop induction variables \& for- to while-loop conversion, context analysis, initializing global \& local variables 
+and type checking. The context analyser uses the output from the parser (the AST) and adds an initial symbol table to the AST.
+The type checker validates the given code. For example, he validates whether the correct 
+types are used in assign statements or whether methods return the correct type.
+
+\subsubsection{Initialise For-loop Induction Variables \& For- to While-loop conversion}
 Transforming for- into while-loops will be done after the analyzing phase. The compiler checks
 for for-loops in the syntax tree and will replace them with semantically equivalent while-loops.
 The first step is to declare the for-loop variables (start, stop, step) and then use these 
@@ -247,11 +253,6 @@ the step is not greater than zero, it will check of the counter is greater than 
 will execute the body of the while loop.
 
 \subsection{Context Analysis}
-Semantic Analysis consists of 2 parts: the context analysis and the type checker. The context
-analyser uses the output from the parser (the AST) and adds an initial symbol table to the AST.
-The type checker validates the given code. For example, he validates whether the correct 
-types are used in assign statements or whether methods return the correct type.
-
 The context analyser stores an pointer to the current symbol table in a custom info struct created for the context analyser.
 This pointer is necessary because we need to know to which symbol table we want to add a new entry while performing the context analysis.
 A global symbol table is added to the program node.
