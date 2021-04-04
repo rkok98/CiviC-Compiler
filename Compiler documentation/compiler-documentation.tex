@@ -2,11 +2,15 @@
 %	PACKAGES EN DOCUMENT CONFIGURATIE
 %-------------------------------------------------------------------------------
 
-\documentclass{uva-inf-article}
+\documentclass[hidelinks]{uva-inf-article}
 
 \usepackage[style=numeric-comp]{biblatex}
 \addbibresource{PT-essay.bib}
 \usepackage{listings}
+
+\setlength{\parindent}{0em}
+\setlength{\parskip}{1em}
+
 %-------------------------------------------------------------------------------
 %	GEGEVENS VOOR IN DE TITEL
 %-------------------------------------------------------------------------------
@@ -54,7 +58,6 @@
 %-------------------------------------------------------------------------------
 %	INTRODUCTIE
 %-------------------------------------------------------------------------------
-
 \section{Introduction}
 \par This report documents the CiviC compiler we build in 
 the course Compiler Construction by dr. C.U. Grelck. The goal of the CiviC compiler 
@@ -79,13 +82,11 @@ are available in the CiviC language, we need to define these ourselves. We did t
 by defining all the possible symbols (parenthesis, brackets and binary operators etc.)
 which are supported by the CiviC language. The CiviC language only supports integers,
 floats and booleans so there is no need to define other types in the compiler.
-\vspace{5mm}
 
 In our scanner we added a validator that validates if an integer is too large or too small by 
 comparing it to the max int and min int. We included the "limits.h" file in our civic.l
 to get the values of the min and max range of an integer. If the integer is too high or too low the compiler
 returns an CTIerror telling the integer is out of range.
-\vspace{5mm}
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-1, caption=Integer range check, captionpos=b]
 [0-9]+ { 
@@ -107,7 +108,6 @@ its offset, depth and its definition. We did the same for the CodeGenTable and t
 The CodeGenTableEntry stores information for a single line of code generation such as the
 index, instruction and the value of the generated code. Code generation will be further 
 explained in section 6 of this report.
-\vspace{5mm}
 
 To properly illustrate the logical structure of the code we had to expand the print traversals
 to cover the full syntactic range of the CiviC language. Each node in the AST has its own
@@ -119,18 +119,15 @@ After the scanner is done and creates a (finite) stream of tokens, the parser co
 into play and will start its job. The parser will use the output from the scanner and
 use it to create and output an abstract syntax tree (AST). The parser uses the stream 
 of tokens to do pattern matching with the pre defined casus in the compiler. 
-\vspace{5mm}
 
 The parser does all the pattern matching for us. For each node in the AST we created 
 a new node with its pattern in civic.y so the parser can match them. The civic.y is a
 YACC file which stands for "Yet Another Compiler Compiler” and auto-generates parsers
 from context-free grammars. The YACC file contains all patterns with their corresponding
 actions to perform.
-\vspace{5mm}
 
 Listing 2 shows a simple example of pattern matching. In this example we added the
 node with its pattern so the pattern matching visible. 
-\vspace{5mm}
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-2, caption=Pattern matching Example, captionpos=b]
 int b;          // globdef: type ID SEMICOLON
@@ -151,7 +148,6 @@ Semantic Analysis consists of 2 parts: the context analysis and the type checker
 analyser uses the output from the parser (the AST) and adds an initial symbol table to the AST.
 The type checker validates the given code. For example, he validates whether the correct 
 types are used in assign statements or whether methods return the correct type.
-\vspace{5mm}
 
 The context analyser stores an pointer to the current symbol table in a custom info struct created for the context analyser.
 This pointer is necessary because we need to know to which symbol table we want to add a new entry while performing the context analysis.
@@ -176,7 +172,6 @@ A pointer to this init function is included in the info struct so that it is pos
 After the initialization function has been created, the other declarations of the program are traversed.
 If a declaration node is a global definition, the initialization statement is disconnected and moved to the init function.
 This init function will later also be used by the CiviC-VM.
-\vspace{5mm}
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-3, caption=Output of global variable initialisation, captionpos=b]
 export void __init (  ) 
@@ -196,7 +191,6 @@ The declaration and initialization of local variables is done in the function de
 For every function in a program, the body function is traversed. 
 When the traversal encounters a variable definition, it disconnects the initialization and a new initialization statement is created for that variable.
 This initialization statement is added after all variables are declared but before the rest of the function's expressions are executed.
-\vspace{5mm}
 
 \begin{lstlisting}[basicstyle=\small, language=C, label=lst:code-4, caption=Output of local variable initialisation, captionpos=b]    
 export int foo() 
@@ -257,17 +251,14 @@ to the arg\_node the same way like the short circuit boolean evaluation explaine
 \section{Code Generation}
 \par The last stage of the compiler, the bytecode generation, is converting the abstract syntax tree into assembly code. 
 With this assembly code, the virtual machine specially designed for Civic can execute the given Civic code.
-\vspace{5mm}
 
 \par The whole code generation is done in a single traversal named "Generate byte code".
 The default traversal mode of the code generation is set to "user", because almost all nodes are traversed.
 There are a few code generation methods that do nothing, and immediately return the node. 
 These methods were necessary because without these methods the compiler would not compile because the user specified traversal expects one method for each AST node.
-\vspace{5mm}
 
 \par A special code generation table and code generation table entry has been designed for saving and printing the global variables, constants, imports and exports. 
 The code generation table consists of 4 child nodes in which these instructions are stored.
-\vspace{5mm}
 
 \par Generating the bytecode is done in a fairly simple way.
 The abstract syntax tree is traversed and based on certain flags and attributes and of the different 
@@ -281,7 +272,6 @@ We made the choice for printing to stdout so debugging would be easier.
 \section{Reflection}
 \par Besides the fact that we had little prior knowledge of how a compiler worked, the entire language c was also new to us.
 We programmed with Java and Python before, but c was completely new. This made building a compiler a bit more difficult.
-\vspace{5mm}
 
 The milestone we have been working on the longest was getting our parser in order.
 The civic.y at one point gave around 200 shift/reduce conflicts. Eventually, after 2,5 weeks and about 3 TA-sessions we were able to resolve our problems with the parser.
@@ -294,20 +284,17 @@ It took us a whole day to finally find this 'simple' bug, and was then resolved 
 We expected that generating byte code would be a lot harder than it ended up being. 
 We had this assumption mainly because the scope of this traversal encompasses the entire Civic program/source code supplied and because bytecode was initially 
 incomprehensible to us. This turned out not to be the case afterwards, partly due to the clearly supplied CiviC-VM specification.
-\vspace{5mm}
 
 Something we are not too happy about in our compiler is that the last week before creating the compiler, we found out that there was no for-loop instruction in the Civic VM. 
 Unfortunately, this resulted in a quick and dirty method of converting a for-loop to while-loop in the traversal that was meant to declare the induction variables of the for-loops 
 (for\_loop\_variable\_initialisation.c). 
 We had chosen for this solution with the idea of eventually doing this in a separate specific traversal, 
 but due to time constraints, this never happened.
-\vspace{5mm}
 
 All in all, we are very satisfied with our end result. 
 We have managed to write a working compiler that at least passes all the basic checks provided. 
 We are very proud that we have accomplished this in a period of about 8 to 10 weeks. 
 We had learned during the open day that this course was one of the toughest of the program.
-\vspace{5mm}
 
 What we regret is that we did not have enough time to work on the extensions. 
 We started the course with the idea to also work on the extensions, but due to a lack of time,
