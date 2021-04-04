@@ -28,7 +28,7 @@ ENDPHASE( ld)
 /******************************************************************************/
 
 PHASE( ac,
-       "Analyzing Code",
+       "Semantic Analysis",
        ALWAYS)
 
 SUBPHASE( FLVI,

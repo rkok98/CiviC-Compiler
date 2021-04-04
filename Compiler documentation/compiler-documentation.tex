@@ -16,7 +16,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 \usetikzlibrary{positioning}
-\tikzset{%
+\tikzset{
     >={Latex[width=2mm,length=2mm]},
     base/.style =   {
                         rectangle, rounded corners, draw=black,
@@ -136,6 +136,9 @@ milestones for a functional compiler.
 Steps that are not covered are: c-preprocessor reading input file and de-allocating syntax tree representation, 
 these were already provided by the framework. 
 The reason why we, unfortunately, convert a for- to while-loop so early on is discussed in our reflection.
+Each color in the diagram represents a different phase as described in the compiler (phase.mac file). 
+Orange is the Loading CiviC program phase, red is the semantic analysis phase, 
+purple is the code optimizer phase and green is the final code generating phase.
 
 \newpage
 \subsection{Lexicographic Analysis}
