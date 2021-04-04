@@ -13,7 +13,7 @@
 struct INFO
 {
   bool firsterror;
-  size_t indentation_level;
+  unsigned int indentation_level;
 };
 
 #define INFO_FIRSTERROR(n) ((n)->firsterror)
@@ -40,12 +40,12 @@ static info *FreeInfo(info *info)
 
 void printIndentations(info *info)
 {
-  if (info == NULL)
+  if (!info)
   {
     return;
   }
 
-  for (size_t i = 0; i < INFO_INDENTATION_LEVEL(info); i++)
+  for (unsigned int i = 0; i < INFO_INDENTATION_LEVEL(info); i++)
   {
     printf("\t");
   }
