@@ -53,7 +53,7 @@
 #
 
 
-src = global scanparse print codegen framework analysis transform
+src = global scanparse print codegen framework analysis optimize
              
 
 
@@ -79,9 +79,10 @@ print       = print.o
 
 codegen     = gen_byte_code.o
 
-analysis    = symbol_table.o context_analysis.o type_checking.o for_loop_variable_initialisation.o
+analysis    = symbol_table.o context_analysis.o type_checking.o for_loop_variable_initialisation.o \
+              global_variable_initialisation.o local_variable_initialisation.o 
 
-transform   = global_variable_initialisation.o local_variable_initialisation.o bool_disjunction.o transform_boolean_cast.o \
+optimize    = bool_disjunction.o transform_boolean_cast.o
 
 
 ###############################################################################

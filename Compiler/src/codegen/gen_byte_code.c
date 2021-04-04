@@ -118,7 +118,7 @@ const char *typePrefix(type t)
   case T_void:
     return NULL;
   case T_unknown:
-    CTIabort("Unknown type found in file: %s, line: %s", __FILE__, __LINE__);
+    CTIabort("Unknown type found at line: %s", __LINE__);
   }
 
   return NULL;
@@ -132,18 +132,6 @@ node *GBCprogram(node *arg_node, info *arg_info)
 
   TRAVdo(PROGRAM_DECLS(arg_node), arg_info);
 
-  DBUG_RETURN(arg_node);
-}
-
-node *GBCsymboltable(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("GBCsymboltable");
-  DBUG_RETURN(arg_node);
-}
-
-node *GBCsymboltableentry(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("GBCsymboltableentry");
   DBUG_RETURN(arg_node);
 }
 
@@ -206,17 +194,6 @@ node *GBCexprstmt(node *arg_node, info *arg_info)
   {
     fprintf(INFO_FILE(arg_info), "\t%spop\n", typePrefix(SYMBOLTABLEENTRY_TYPE(entry)));
   }
-
-  DBUG_RETURN(arg_node);
-}
-
-node *GBCreturn(node *arg_node, info *arg_info)
-{
-  DBUG_ENTER("GBCreturn");
-
-  TRAVopt(RETURN_EXPR(arg_node), arg_info);
-
-  fprintf(INFO_FILE(arg_info), "\t%sreturn\n", typePrefix(INFO_CURRENT_TYPE(arg_info)));
 
   DBUG_RETURN(arg_node);
 }
@@ -352,6 +329,17 @@ node *GBCfunbody(node *arg_node, info *arg_info)
 
   TRAVopt(FUNBODY_VARDECLS(arg_node), arg_info);
   TRAVopt(FUNBODY_STMTS(arg_node), arg_info);
+
+  DBUG_RETURN(arg_node);
+}
+
+node *GBCreturn(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("GBCreturn");
+
+  TRAVopt(RETURN_EXPR(arg_node), arg_info);
+
+  fprintf(INFO_FILE(arg_info), "\t%sreturn\n", typePrefix(INFO_CURRENT_TYPE(arg_info)));
 
   DBUG_RETURN(arg_node);
 }
@@ -623,7 +611,7 @@ node *GBCmonop(node *arg_node, info *arg_info)
     operation = "not";
     break;
   case MO_unknown:
-    CTIabort("Unknown operator type found in file: %s, line: %s", __FILE__, __LINE__);
+    CTIabort("Unknown operator type found at line: %s", __LINE__);
     break;
   }
 
@@ -852,6 +840,18 @@ node *GBCcodegentableentry(node *arg_node, info *arg_info)
 
   CODEGENTABLEENTRY_NEXT(arg_node) = TRAVopt(CODEGENTABLEENTRY_NEXT(arg_node), arg_info);
 
+  DBUG_RETURN(arg_node);
+}
+
+node *GBCsymboltable(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("GBCsymboltable");
+  DBUG_RETURN(arg_node);
+}
+
+node *GBCsymboltableentry(node *arg_node, info *arg_info)
+{
+  DBUG_ENTER("GBCsymboltableentry");
   DBUG_RETURN(arg_node);
 }
 
