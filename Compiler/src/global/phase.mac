@@ -32,7 +32,7 @@ PHASE( ac,
        ALWAYS)
 
 SUBPHASE( FLVI,
-          "For-loop Induction Variable Initialisation",
+          "For-loop Induction Variable Initialisation & For- to While-loop conversion",
           FLVIinitializeForLoopsVariables,
           ALWAYS,
           ac)
@@ -55,22 +55,9 @@ SUBPHASE(  lvi,
            ALWAYS,
            ac)
 
-
 SUBPHASE(  tc,
           "Type checking",
            TCdoTypeChecking, 
-           ALWAYS,
-           ac)
-
-SUBPHASE(  bdc,
-          "Boolean Disjunction and Conjunction",
-           BDCdoBoolDisjunction, 
-           ALWAYS,
-           ac)
-
-SUBPHASE(  tbc,
-          "Transform Boolean Cast Expressions",
-           TBCtransformBooleanCast, 
            ALWAYS,
            ac)
 
@@ -78,12 +65,32 @@ ENDPHASE(ac)
 
 /******************************************************************************/
 
+PHASE( oc,
+       "Optimizing Code",
+       ALWAYS)
+
+SUBPHASE(  bdc,
+          "Boolean Disjunction and Conjunction",
+           BDCdoBoolDisjunction, 
+           ALWAYS,
+           oc)
+
+SUBPHASE(  tbc,
+          "Transform Boolean Cast Expressions",
+           TBCtransformBooleanCast, 
+           ALWAYS,
+           oc)
+
+ENDPHASE(oc)
+
+/******************************************************************************/
+
 PHASE( cg,
        "Generating Code",
        ALWAYS)
 
-SUBPHASE( prt, "Generating byte code", GBCdoGenByteCode, ALWAYS, cg)      
 SUBPHASE( prt_ast, "Print ast", PRTdoPrint, ALWAYS, cg)      
+SUBPHASE( prt, "Generating byte code", GBCdoGenByteCode, ALWAYS, cg)  
 
 SUBPHASE( frtr, 
           "De-allocating syntax tree representation",

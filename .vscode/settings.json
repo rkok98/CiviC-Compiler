@@ -28,7 +28,14 @@
         "globals.h": "c",
         "gen_byte_code.h": "c",
         "string.h": "c",
-        "tree_basic.h": "c"
+        "tree_basic.h": "c",
+        "dbug.h": "c",
+        "traverse.h": "c",
+        "for_loop_variable_initialisation.h": "c",
+        "free.h": "c",
+        "cstring": "c",
+        "symbol_table.h": "c",
+        "str.h": "c"
     },
     "cSpell.language": "nl,en,en-GB,en-US"
 }

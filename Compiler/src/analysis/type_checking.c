@@ -1,9 +1,10 @@
 #include "type_checking.h"
-#include "symbol_table.h"
-#include "helpers.h"
 
-#include "dbug.h"
+#include "helpers.h"
+#include "symbol_table.h"
+
 #include "ctinfo.h"
+#include "dbug.h"
 #include "free.h"
 #include "memory.h"
 #include "str.h"

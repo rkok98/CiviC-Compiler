@@ -1,16 +1,19 @@
-#include <stdarg.h>
 #include "print.h"
+
+#include "helpers.h"
+
+#include <stdarg.h>
+
+#include "dbug.h"
+#include "globals.h"
+#include "memory.h"
 #include "traverse.h"
 #include "tree_basic.h"
-#include "dbug.h"
-#include "memory.h"
-#include "globals.h"
-#include "helpers.h"
 
 struct INFO
 {
   bool firsterror;
-  size_t indentation_level;
+  unsigned int indentation_level;
 };
 
 #define INFO_FIRSTERROR(n) ((n)->firsterror)
@@ -37,12 +40,12 @@ static info *FreeInfo(info *info)
 
 void printIndentations(info *info)
 {
-  if (info == NULL)
+  if (!info)
   {
     return;
   }
 
-  for (size_t i = 0; i < INFO_INDENTATION_LEVEL(info); i++)
+  for (unsigned int i = 0; i < INFO_INDENTATION_LEVEL(info); i++)
   {
     printf("\t");
   }
@@ -358,7 +361,6 @@ node *PRTglobdecl(node *arg_node, info *arg_info)
 node *PRTglobdef(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTglobdef");
-  DBUG_PRINT("PRT", ("PRTglobdef"));
 
   if (GLOBDEF_ISEXPORT(arg_node))
   {
@@ -383,7 +385,6 @@ node *PRTglobdef(node *arg_node, info *arg_info)
 node *PRTfor(node *arg_node, info *arg_info)
 {
   DBUG_ENTER("PRTfor");
-  DBUG_PRINT("PRT", ("PRTfor"));
 
   print(arg_info, "for ( int %s = ", FOR_LOOPVAR(arg_node));
 

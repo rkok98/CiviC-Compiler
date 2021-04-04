@@ -1,17 +1,14 @@
 #include "for_loop_variable_initialisation.h"
 
+#include "copy.h"
+#include "ctinfo.h"
+#include "dbug.h"
+#include "free.h"
+#include "memory.h"
+#include "str.h"
 #include "types.h"
 #include "tree_basic.h"
 #include "traverse.h"
-#include "dbug.h"
-
-#include "memory.h"
-#include "free.h"
-#include "str.h"
-#include "copy.h"
-#include "ctinfo.h"
-
-#include <string.h>
 
 struct INFO
 {
@@ -53,7 +50,7 @@ node *IVLfind(node *list, const char *old_name)
     node *cursor = list;
     while (cursor)
     {
-        if (strcmp(LINKEDVALUE_KEY(cursor), old_name) == 0)
+        if (STReq(LINKEDVALUE_KEY(cursor), old_name))
         {
             return cursor;
         }

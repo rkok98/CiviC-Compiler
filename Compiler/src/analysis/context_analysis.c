@@ -2,15 +2,13 @@
 
 #include "symbol_table.h"
 
+#include "ctinfo.h"
 #include "dbug.h"
-#include "string.h"
+#include "free.h"
+#include "memory.h"
+#include "str.h"
 #include "traverse.h"
 #include "tree_basic.h"
-
-#include "ctinfo.h"
-#include "memory.h"
-#include "free.h"
-#include "str.h"
 
 struct INFO
 {

@@ -13,7 +13,6 @@
 #include "ctinfo.h"
 #include "limits.h"
 
-
 #define FILTER(token) \
   global.col += yyleng;  \
   return( token);
@@ -22,50 +21,49 @@
 #define YY_NO_UNPUT
 #define YY_NO_INPUT
 
-
 %}
 
 %p 6000
 %e 2000
 %option noyywrap
 %option nounput
-
+%option yylineno
 
 %%
 
-"("                       { FILTER( PARENTHESIS_L); }
-")"                       { FILTER( PARENTHESIS_R); }
-"{"                       { FILTER( CURLY_L); }
-"}"                       { FILTER( CURLY_R); }
-"["                       { FILTER( BRACKET_L); }
-"]"                       { FILTER( BRACKET_R); }
-","                       { FILTER( COMMA); }
-";"                       { FILTER( SEMICOLON); }
+"("                       { FILTER(PARENTHESIS_L); }
+")"                       { FILTER(PARENTHESIS_R); }
+"{"                       { FILTER(CURLY_L); }
+"}"                       { FILTER(CURLY_R); }
+"["                       { FILTER(BRACKET_L); }
+"]"                       { FILTER(BRACKET_R); }
+","                       { FILTER(COMMA); }
+";"                       { FILTER(SEMICOLON); }
 
-"-"                       { FILTER( MINUS); }
-"+"                       { FILTER( PLUS);  }
-"*"                       { FILTER( STAR);  } 
-"/"                       { FILTER( SLASH);  } 
-"%"                       { FILTER( PERCENT);  } 
+"-"                       { FILTER(MINUS); }
+"+"                       { FILTER(PLUS);  }
+"*"                       { FILTER(STAR);  } 
+"/"                       { FILTER(SLASH);  } 
+"%"                       { FILTER(PERCENT);  } 
 
-"<="                      { FILTER( LE);    }
-"<"                       { FILTER( LT);    } 
-">="                      { FILTER( GE);    }
-">"                       { FILTER( GT);    }
-"=="                      { FILTER( EQ);    }
-"!="                      { FILTER( NE);    }
-"&&"                      { FILTER( AND);   }
-"||"                      { FILTER( OR);    }
+"<="                      { FILTER(LE);    }
+"<"                       { FILTER(LT);    } 
+">="                      { FILTER(GE);    }
+">"                       { FILTER(GT);    }
+"=="                      { FILTER(EQ);    }
+"!="                      { FILTER(NE);    }
+"&&"                      { FILTER(AND);   }
+"||"                      { FILTER(OR);    }
 
-"="                       { FILTER( LET);   }
+"="                       { FILTER(LET);   }
 
-"!"                       { FILTER( NOT);   }
+"!"                       { FILTER(NOT);   }
 
-"void"                    { FILTER( VOID); }
+"void"                    { FILTER(VOID); }
 
-"int"                     { FILTER( INT); }
-"float"                   { FILTER( FLOAT); }
-"bool"                    { FILTER( BOOL); }
+"int"                     { FILTER(INT); }
+"float"                   { FILTER(FLOAT); }
+"bool"                    { FILTER(BOOL); }
 
 "true"                    { 
                             yylval.cbool = TRUE;
@@ -77,15 +75,15 @@
                             FILTER(BOOLVAL);
                           }
 
-"extern"                  { FILTER( EXTERN); }
-"export"                  { FILTER( EXPORT); }
-"return"                  { FILTER( RETURN); }
+"extern"                  { FILTER(EXTERN); }
+"export"                  { FILTER(EXPORT); }
+"return"                  { FILTER(RETURN); }
 
-"if"                      { FILTER( IF); }
-"else"                    { FILTER( ELSE); }
-"do"                      { FILTER( DO);}
-"while"                   { FILTER( WHILE); }
-"for"                     { FILTER( FOR); }
+"if"                      { FILTER(IF); }
+"else"                    { FILTER(ELSE); }
+"do"                      { FILTER(DO);}
+"while"                   { FILTER(WHILE); }
+"for"                     { FILTER(FOR); }
 
 
 [A-Za-z][A-Za-z0-9_]*     { 
@@ -96,7 +94,7 @@
 [0-9]+                    { 
                             long integer = strtol(yytext, NULL, 10);
                             if (integer < INT_MIN || integer > INT_MAX) {
-                              CTIerror("Integer %s out of range", yytext);
+                              CTIerrorLine(yylineno, "Integer %s out of range", yytext);
                             }
                             yylval.cint=atoi(yytext);
                             FILTER( INTVAL);
@@ -117,7 +115,7 @@
                             global.col += yyleng;
                           } 
 
-[ \t\n]+                                  // White space
-"//".*                                    // Comments
-[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       { /* DO NOTHING */ }
+[ \t\n]+                                  
+"//".*                                    
+[/][*][^*]*[*]+([^*/][^*]*[*]+)*[/]       {}
 [/][*]                                    { yy_fatal_error("Unterminated comment"); } 
