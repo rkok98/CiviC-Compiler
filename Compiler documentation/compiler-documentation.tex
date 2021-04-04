@@ -281,8 +281,23 @@ After the AST has been traversed and the main instructions have been printed, th
 imports and exports instructions (which are stored in the code generation table) are printed.
 
 \section{Conclusion/Discussion/Reflection}
-\par The last section of your report should be reflective and could be called
-anything along the lines of Conclusions, Discussion or Reflection. 
+\par Besides the fact that we had little prior knowledge of how a compiler worked, the entire language c was also new to us.
+We programmed with Java and Python before, but c was completely new. This made building a compiler a bit more difficult.
+
+The milestone we have been working on the longest was getting our parser in order.
+The civic.y at one point gave around 200 shift/reduce conflicts. Eventually, after 2,5 weeks and about 3 TA-sessions we were able to resolve our problems with the parser.
+In addition, the end results of milestones (such as milestone 6) were sometimes very unclear. Fortunately, the TAs were always very enthusiastic and helpful when you came up with questions. 
+After a TA session we often thought: "Oh was that it?" Milestones often sounded more difficult than they actually were.
+Another problem that took us too much time to solve was the '.importfun' instruction while generating the byte code. 
+We got the following error after running the test files: "error: Unable to find 'printInt' in any of the modules". 
+This was due to the fact that we did not include the parameters in the functionSignature of the pseudo instruction '.importfun'. 
+It took us a whole day to finally find this 'simple' bug, and was then resolved within 5 minutes.
+
+Something we are not too happy about in our compiler is that the last week before creating the compiler, we found out that there was no for-loop instruction in the Civic VM. 
+Unfortunately, this resulted in a quick and dirty method of converting a for-loop to while-loop in the traversal that was meant to declare the induction variables of the for-loops 
+(for\_loop\_variable\_initialisation.c). 
+We had chosen for this solution with the idea of eventually doing this in a separate specific traversal, 
+but due to time constraints, this never happened.
 
 %-------------------------------------------------------------------------------
 %	REFERENTIES
