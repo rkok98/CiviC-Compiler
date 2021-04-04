@@ -45,7 +45,7 @@ static info *FreeInfo(info *info)
 
 node *GVIprogram(node *arg_node, info *arg_info)
 {
-    DBUG_ENTER("VIprogram");
+    DBUG_ENTER("GVIprogram");
 
     node *init_body = TBmakeFunbody(NULL, NULL, NULL);
     node *init_function = TBmakeFundef(T_void, STRcpy("__init"), init_body, NULL);
@@ -79,7 +79,7 @@ node *GVIprogram(node *arg_node, info *arg_info)
 
 node *GVIglobdef(node *arg_node, info *arg_info)
 {
-    DBUG_ENTER("VIglobdef");
+    DBUG_ENTER("GVIglobdef");
 
     node *globdef_init = GLOBDEF_INIT(arg_node);
     globdef_init = TRAVopt(globdef_init, arg_info);
