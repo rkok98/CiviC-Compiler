@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="definition">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="attributetypes"/>
+        <xs:element ref="phases"/>
+        <xs:element ref="nodesets"/>
+        <xs:element ref="syntaxtree"/>
+      </xs:sequence>
+      <xs:attribute name="version" use="required" type="xs:decimal"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="attributetypes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="type"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nodesets">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="nodeset"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="nodeset">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="target">
+          <xs:attribute name="name" use="required" type="xs:NCName"/>
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="syntaxtree">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="node"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="type">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="targets"/>
+      </xs:sequence>
+      <xs:attribute name="copy" type="xs:NCName"/>
+      <xs:attribute name="ctype"/>
+      <xs:attribute name="init" type="xs:NMTOKEN"/>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="phases">
+    <xs:complexType>
+      <xs:choice>
+        <xs:element ref="all"/>
+        <xs:element ref="general"/>
+        <xs:element ref="range"/>
+      </xs:choice>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="all">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="general">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="traversal"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="traversal">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="travuser"/>
+        <xs:element minOccurs="0" ref="travnone"/>
+        <xs:element minOccurs="0" ref="travsons"/>
+      </xs:sequence>
+      <xs:attribute name="default" use="required" type="xs:NCName"/>
+      <xs:attribute name="id" use="required" type="xs:NCName"/>
+      <xs:attribute name="include" use="required" type="xs:NCName"/>
+      <xs:attribute name="name" use="required"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="travuser">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="node"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="travnone">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="node"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="travsons">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="node"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+  <xs:element name="range">
+    <xs:complexType>
+      <xs:attribute name="from" use="required" type="xs:NCName"/>
+      <xs:attribute name="to" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:complexType name="target">
+    <xs:sequence>
+      <xs:element ref="target"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="target">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element ref="any"/>
+          <xs:element ref="set"/>
+          <xs:element minOccurs="0" maxOccurs="unbounded" ref="node"/>
+        </xs:choice>
+        <xs:element minOccurs="0" ref="phases"/>
+      </xs:sequence>
+      <xs:attribute name="mandatory" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="any">
+    <xs:complexType/>
+  </xs:element>
+  <xs:element name="set">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="node">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="description"/>
+        <xs:element minOccurs="0" ref="sons"/>
+        <xs:element minOccurs="0" ref="attributes"/>
+        <xs:element minOccurs="0" ref="flags"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="sons">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="son"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="son">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="description"/>
+        <xs:element ref="targets"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="attributes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="description"/>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="attribute"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="attribute">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" ref="description"/>
+        <xs:element ref="type"/>
+      </xs:sequence>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="flags">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="flag"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="flag">
+    <xs:complexType>
+      <xs:attribute name="name" use="required" type="xs:NCName"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="targets">
+    <xs:complexType>
+      <xs:complexContent>
+        <xs:extension base="target">
+        </xs:extension>
+      </xs:complexContent>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="description" type="xs:string"/>
+</xs:schema>
