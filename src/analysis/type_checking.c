@@ -12,17 +12,23 @@
 #include "tree_basic.h"
 #include "traverse.h"
 
+// Structure to store type checking information.
 struct INFO
 {
-    node *symbol_table;
-    type type;
-    type return_type;
+    node *symbol_table;   // Current symbol table being processed.
+    type type;            // Current node type.
+    type return_type;     // Function return type.
 };
 
 #define INFO_SYMBOL_TABLE(n) ((n)->symbol_table)
 #define INFO_TYPE(n) ((n)->type)
 #define INFO_RETURN_TYPE(n) ((n)->return_type)
 
+/**
+ * Create and initialize a new type checking info structure.
+ *
+ * @return A pointer to the newly created info structure.
+ */
 static info *MakeInfo(void)
 {
     info *result;
@@ -37,6 +43,12 @@ static info *MakeInfo(void)
     DBUG_RETURN(result);
 }
 
+/**
+ * Free the memory occupied by the given type checking info structure.
+ *
+ * @param info The info structure to free.
+ * @return NULL, as a convention to indicate the structure was freed.
+ */
 static info *FreeInfo(info *info)
 {
     DBUG_ENTER("FreeInfo");
@@ -44,6 +56,12 @@ static info *FreeInfo(info *info)
     DBUG_RETURN(info);
 }
 
+/**
+ * Count the number of arguments in a given expression node.
+ *
+ * @param arg_node The argument node to start counting from.
+ * @return The number of arguments.
+ */
 unsigned int TCcountArguments(node *arg_node)
 {
     if (!arg_node)
@@ -54,6 +72,9 @@ unsigned int TCcountArguments(node *arg_node)
     return 1 + TCcountArguments(EXPRS_NEXT(arg_node));
 }
 
+/**
+ * Handle type checking for integer numbers.
+ */
 node *TCnum(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCnum");
@@ -61,6 +82,9 @@ node *TCnum(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
+/**
+ * Handle type checking for floating point numbers.
+ */
 node *TCfloat(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCfloat");
@@ -68,6 +92,9 @@ node *TCfloat(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
+/**
+ * Type check for booleans.
+ */
 node *TCbool(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCbool");
@@ -209,6 +236,9 @@ node *TCcast(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
+/**
+ * Type check a binary operation.
+ */
 node *TCbinop(node *arg_node, info *arg_info)
 {
     DBUG_ENTER("TCbinop");
@@ -245,6 +275,13 @@ node *TCbinop(node *arg_node, info *arg_info)
     DBUG_RETURN(arg_node);
 }
 
+/**
+ * Entry point for type checking.
+ * Traverse the syntax tree to check types for each node.
+ *
+ * @param syntaxtree The root of the syntax tree to be type checked.
+ * @return The traversed syntax tree.
+ */
 node *TCdoTypeChecking(node *syntaxtree)
 {
     DBUG_ENTER("TCdoTypecheck");
