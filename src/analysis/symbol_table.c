@@ -8,6 +8,13 @@
 #include "tree_basic.h"
 #include "traverse.h"
 
+/**
+ * Counts the number of symbol table entries that match the given node type.
+ *
+ * @param entry Start of the symbol table entry list.
+ * @param node_type The node type to be matched against.
+ * @return The count of symbol table entries of the specified type.
+ */
 unsigned int STcountByType(node *entry, nodetype node_type)
 {
     if (entry == NULL)
@@ -20,9 +27,15 @@ unsigned int STcountByType(node *entry, nodetype node_type)
         return 1 + STcountByType(SYMBOLTABLEENTRY_NEXT(entry), node_type);
     }
 
-    return 0 + STcountByType(SYMBOLTABLEENTRY_NEXT(entry), node_type);
+    return STcountByType(SYMBOLTABLEENTRY_NEXT(entry), node_type);
 }
 
+/**
+ * Counts the number of parameters in the symbol table entries.
+ *
+ * @param entry Start of the symbol table entry list.
+ * @return The count of parameters in the symbol table.
+ */
 unsigned int STcountParams(node *entry)
 {
     if (!entry)
@@ -35,9 +48,15 @@ unsigned int STcountParams(node *entry)
         return 1 + STcountParams(SYMBOLTABLEENTRY_NEXT(entry));
     }
 
-    return 0 + STcountParams(SYMBOLTABLEENTRY_NEXT(entry));
+    return STcountParams(SYMBOLTABLEENTRY_NEXT(entry));
 }
 
+/**
+ * Counts the number of variable declarations in the symbol table entries.
+ *
+ * @param entry Start of the symbol table entry list.
+ * @return The count of variable declarations in the symbol table.
+ */
 unsigned int STcountVarDecls(node *entry)
 {
     if (!entry)
@@ -50,9 +69,17 @@ unsigned int STcountVarDecls(node *entry)
         return 1 + STcountVarDecls(SYMBOLTABLEENTRY_NEXT(entry));
     }
 
-    return 0 + STcountVarDecls(SYMBOLTABLEENTRY_NEXT(entry));
+    return STcountVarDecls(SYMBOLTABLEENTRY_NEXT(entry));
 }
 
+/**
+ * Inserts a new symbol table entry into the given symbol table.
+ * If the entry name already exists in the table, it prints an error.
+ *
+ * @param symbol_table The symbol table to which the entry should be added.
+ * @param entry The symbol table entry to be inserted.
+ * @return The inserted entry if successful, otherwise NULL.
+ */
 node *STinsert(node *symbol_table, node *entry)
 {
     DBUG_ENTER("STinsert");
@@ -79,6 +106,13 @@ node *STinsert(node *symbol_table, node *entry)
     DBUG_RETURN(entry);
 }
 
+/**
+ * Searches for a symbol table entry with the given name.
+ *
+ * @param symbol_table The symbol table to search within.
+ * @param name The name of the entry to search for.
+ * @return The found entry if exists, otherwise NULL.
+ */
 node *STfind(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfind");
@@ -97,6 +131,13 @@ node *STfind(node *symbol_table, char *name)
     DBUG_RETURN(NULL);
 }
 
+/**
+ * Searches for a symbol table entry with the given name, including parent tables.
+ *
+ * @param symbol_table The symbol table to start the search from.
+ * @param name The name of the entry to search for.
+ * @return The found entry if exists, otherwise NULL.
+ */
 node *STfindInParents(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfindInParents");
@@ -116,6 +157,13 @@ node *STfindInParents(node *symbol_table, char *name)
     DBUG_RETURN(NULL);
 }
 
+/**
+ * Searches for a function entry with the given name in the symbol table.
+ *
+ * @param symbol_table The symbol table to search within.
+ * @param name The name of the function entry to search for.
+ * @return The found function entry if exists, otherwise NULL.
+ */
 node *STfindFunc(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfindFunc");
@@ -134,6 +182,13 @@ node *STfindFunc(node *symbol_table, char *name)
     DBUG_RETURN(NULL);
 }
 
+/**
+ * Searches for a function entry with the given name in the symbol table, including parent tables.
+ *
+ * @param symbol_table The symbol table to start the search from.
+ * @param name The name of the function entry to search for.
+ * @return The found function entry if exists, otherwise NULL.
+ */
 node *STfindFuncInParents(node *symbol_table, char *name)
 {
     DBUG_ENTER("STfindFuncInParents");
@@ -153,6 +208,13 @@ node *STfindFuncInParents(node *symbol_table, char *name)
     DBUG_RETURN(NULL);
 }
 
+/**
+ * Searches for a symbol table entry with the given declaration in the symbol table.
+ *
+ * @param symbol_table The symbol table to search within.
+ * @param decl The declaration of the entry to search for.
+ * @return The found entry if exists, otherwise NULL.
+ */
 node *STfindByDecl(node *symbol_table, node *decl)
 {
     DBUG_ENTER("STfindByDecl");
@@ -196,6 +258,13 @@ node *STfindByDecl(node *symbol_table, node *decl)
     DBUG_RETURN(NULL);
 }
 
+/**
+ * Searches for a symbol table entry with the given declaration in the symbol table, including parent tables.
+ *
+ * @param symbol_table The symbol table to start the search from.
+ * @param decl The declaration of the entry to search for.
+ * @return The found entry if exists, otherwise NULL.
+ */
 node *STfindByDeclInParents(node *symbol_table, node *decl)
 {
     DBUG_ENTER("STfindByDeclInParents");
@@ -215,6 +284,12 @@ node *STfindByDeclInParents(node *symbol_table, node *decl)
     DBUG_RETURN(NULL);
 }
 
+/**
+ * Retrieves the last entry in the given symbol table.
+ *
+ * @param symbol_table The symbol table to retrieve the last entry from.
+ * @return The last entry in the symbol table or NULL if the table is empty.
+ */
 node *STlast(node *symbol_table)
 {
     DBUG_ENTER("STlast");
